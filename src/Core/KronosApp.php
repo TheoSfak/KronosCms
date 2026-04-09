@@ -53,13 +53,21 @@ class KronosApp
         $this->checkInstalled($rootDir);
 
         // 3. Initialise database
-        $this->db = KronosDB::init(
-            host:   $this->env('DB_HOST', '127.0.0.1'),
-            port:   (int) $this->env('DB_PORT', '3306'),
-            dbName: $this->env('DB_NAME', ''),
-            user:   $this->env('DB_USER', ''),
-            pass:   $this->env('DB_PASS', '')
-        );
+        try {
+            $this->db = KronosDB::init(
+                host:   $this->env('DB_HOST', '127.0.0.1'),
+                port:   (int) $this->env('DB_PORT', '3306'),
+                dbName: $this->env('DB_NAME', ''),
+                user:   $this->env('DB_USER', ''),
+                pass:   $this->env('DB_PASS', '')
+            );
+        } catch (\Throwable $e) {
+            // DB unreachable — send user back to installer
+            $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+            $base = rtrim(dirname(dirname($scriptName)), '/');
+            header('Location: ' . $base . '/install/');
+            exit;
+        }
 
         // 4. Core services
         $this->hooks        = new KronosHooks();
@@ -146,13 +154,16 @@ class KronosApp
     private function checkInstalled(string $rootDir): void
     {
         $configFile = $rootDir . '/config/app.php';
+        $envFile    = $rootDir . '/.env';
         $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 
-        // Allow the install wizard to run without a config file
-        if (!file_exists($configFile) && !str_contains($requestUri, '/install')) {
+        // Consider installed only when BOTH config/app.php AND .env are present
+        $isInstalled = file_exists($configFile) && file_exists($envFile);
+
+        if (!$isInstalled && !str_contains($requestUri, '/install')) {
             // Detect subdirectory prefix (e.g. /KronosCMS when running under XAMPP)
-            $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';           // /KronosCMS/public/index.php
-            $base = rtrim(dirname(dirname($scriptName)), '/');     // /KronosCMS
+            $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';       // /KronosCMS/public/index.php
+            $base = rtrim(dirname(dirname($scriptName)), '/');
             header('Location: ' . $base . '/install/');
             exit;
         }
