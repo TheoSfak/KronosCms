@@ -1,0 +1,135 @@
+{
+  "meta": {
+    "title": "Shop Homepage",
+    "description": "E-commerce homepage with hero banner, featured products, and category grid.",
+    "mode": "ecommerce",
+    "emoji": "🛒"
+  },
+  "version": 1,
+  "slug": "ecom-homepage",
+  "title": "Shop Homepage",
+  "blocks": [
+    {
+      "id": "nav",
+      "type": "container",
+      "props": { "style": "background:#fff;border-bottom:1px solid #e5e7eb;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100" },
+      "children": [
+        { "id": "nav-logo", "type": "heading", "props": { "level": 2, "text": "KRONOS SHOP", "style": "font-size:1.2rem;font-weight:800;letter-spacing:.05em;color:#0f172a;margin:0" } },
+        { "id": "nav-links", "type": "container", "props": { "style": "display:flex;gap:2rem;font-size:.9rem;color:#475569" }, "children": [
+          { "id": "nl-1", "type": "text", "props": { "text": "New Arrivals", "style": "" } },
+          { "id": "nl-2", "type": "text", "props": { "text": "Women", "style": "" } },
+          { "id": "nl-3", "type": "text", "props": { "text": "Men", "style": "" } },
+          { "id": "nl-4", "type": "text", "props": { "text": "Sale", "style": "color:#ef4444;font-weight:600" } }
+        ]},
+        { "id": "nav-cart", "type": "button", "props": { "text": "🛒 Cart (0)", "style": "background:#0f172a;color:#fff;padding:.5rem 1.25rem;border-radius:.5rem;font-size:.85rem;border:none;cursor:pointer" } }
+      ]
+    },
+    {
+      "id": "hero",
+      "type": "container",
+      "props": { "style": "background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 50%,#0f172a 100%);color:#fff;padding:6rem 2rem;text-align:center;position:relative;overflow:hidden" },
+      "children": [
+        { "id": "hero-badge", "type": "text", "props": { "text": "NEW COLLECTION — SPRING/SUMMER 2025", "style": "font-size:.7rem;font-weight:700;letter-spacing:.15em;color:#f59e0b;margin-bottom:1.5rem" } },
+        { "id": "hero-h1", "type": "heading", "props": { "level": 1, "text": "Style that speaks for itself", "style": "font-size:3.5rem;font-weight:800;max-width:700px;margin:0 auto 1.5rem;line-height:1.1" } },
+        { "id": "hero-sub", "type": "text", "props": { "text": "Premium quality pieces crafted for the modern wardrobe. Free shipping on orders over £50.", "style": "font-size:1.1rem;opacity:.85;max-width:520px;margin:0 auto 2.5rem;line-height:1.7" } },
+        { "id": "hero-btns", "type": "container", "props": { "style": "display:flex;gap:1rem;justify-content:center;flex-wrap:wrap" }, "children": [
+          { "id": "hero-cta", "type": "button", "props": { "text": "Shop New Arrivals →", "style": "background:#f59e0b;color:#000;padding:.9rem 2rem;border-radius:.5rem;font-weight:700;font-size:1rem;border:none;cursor:pointer" } },
+          { "id": "hero-sale", "type": "button", "props": { "text": "View Sale", "style": "background:transparent;color:#fff;border:2px solid rgba(255,255,255,.4);padding:.9rem 2rem;border-radius:.5rem;font-weight:600;font-size:1rem;cursor:pointer" } }
+        ]}
+      ]
+    },
+    {
+      "id": "categories",
+      "type": "container",
+      "props": { "style": "padding:3rem 2rem;max-width:1100px;margin:0 auto" },
+      "children": [
+        { "id": "cat-title", "type": "heading", "props": { "level": 2, "text": "Shop by Category", "style": "font-size:1.5rem;font-weight:700;margin-bottom:1.5rem;color:#0f172a" } },
+        { "id": "cat-grid", "type": "container", "props": { "style": "display:grid;grid-template-columns:repeat(4,1fr);gap:1rem" }, "children": [
+          { "id": "c1", "type": "container", "props": { "style": "border-radius:.75rem;overflow:hidden;position:relative;cursor:pointer;background:#e0e7ff" }, "children": [
+            { "id": "c1-img", "type": "image", "props": { "src": "https://placehold.co/280x200/4f46e5/fff?text=Women", "alt": "Women", "style": "width:100%;display:block" } },
+            { "id": "c1-label", "type": "text", "props": { "text": "Women", "style": "padding:.75rem 1rem;font-weight:700;font-size:.9rem;color:#0f172a" } }
+          ]},
+          { "id": "c2", "type": "container", "props": { "style": "border-radius:.75rem;overflow:hidden;cursor:pointer;background:#ecfdf5" }, "children": [
+            { "id": "c2-img", "type": "image", "props": { "src": "https://placehold.co/280x200/10b981/fff?text=Men", "alt": "Men", "style": "width:100%;display:block" } },
+            { "id": "c2-label", "type": "text", "props": { "text": "Men", "style": "padding:.75rem 1rem;font-weight:700;font-size:.9rem;color:#0f172a" } }
+          ]},
+          { "id": "c3", "type": "container", "props": { "style": "border-radius:.75rem;overflow:hidden;cursor:pointer;background:#fff7ed" }, "children": [
+            { "id": "c3-img", "type": "image", "props": { "src": "https://placehold.co/280x200/f59e0b/fff?text=Accessories", "alt": "Accessories", "style": "width:100%;display:block" } },
+            { "id": "c3-label", "type": "text", "props": { "text": "Accessories", "style": "padding:.75rem 1rem;font-weight:700;font-size:.9rem;color:#0f172a" } }
+          ]},
+          { "id": "c4", "type": "container", "props": { "style": "border-radius:.75rem;overflow:hidden;cursor:pointer;background:#fef2f2" }, "children": [
+            { "id": "c4-img", "type": "image", "props": { "src": "https://placehold.co/280x200/ef4444/fff?text=Sale", "alt": "Sale", "style": "width:100%;display:block" } },
+            { "id": "c4-label", "type": "text", "props": { "text": "Sale", "style": "padding:.75rem 1rem;font-weight:700;font-size:.9rem;color:#ef4444" } }
+          ]}
+        ]}
+      ]
+    },
+    {
+      "id": "featured",
+      "type": "container",
+      "props": { "style": "padding:3rem 2rem;max-width:1100px;margin:0 auto" },
+      "children": [
+        { "id": "feat-hdr", "type": "container", "props": { "style": "display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem" }, "children": [
+          { "id": "feat-title", "type": "heading", "props": { "level": 2, "text": "Featured Products", "style": "font-size:1.5rem;font-weight:700;color:#0f172a" } },
+          { "id": "feat-all", "type": "button", "props": { "text": "View All →", "style": "background:transparent;color:#4f46e5;border:none;font-weight:600;cursor:pointer;font-size:.9rem" } }
+        ]},
+        { "id": "prod-grid", "type": "container", "props": { "style": "display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem" }, "children": [
+          { "id": "p1", "type": "container", "props": { "style": "border-radius:.75rem;overflow:hidden;background:#fff;border:1px solid #e5e7eb" }, "children": [
+            { "id": "p1-img", "type": "image", "props": { "src": "https://placehold.co/300x350/f1f5f9/334155?text=Product+1", "alt": "Product 1", "style": "width:100%;display:block" } },
+            { "id": "p1-body", "type": "container", "props": { "style": "padding:1rem" }, "children": [
+              { "id": "p1-cat", "type": "text", "props": { "text": "WOMEN · TOPS", "style": "font-size:.65rem;font-weight:700;letter-spacing:.08em;color:#64748b;margin-bottom:.25rem" } },
+              { "id": "p1-name", "type": "heading", "props": { "level": 3, "text": "Classic Linen Blouse", "style": "font-size:.95rem;font-weight:600;margin-bottom:.5rem;color:#0f172a" } },
+              { "id": "p1-price", "type": "text", "props": { "text": "£49.00", "style": "font-weight:700;color:#4f46e5" } }
+            ]}
+          ]},
+          { "id": "p2", "type": "container", "props": { "style": "border-radius:.75rem;overflow:hidden;background:#fff;border:1px solid #e5e7eb" }, "children": [
+            { "id": "p2-img", "type": "image", "props": { "src": "https://placehold.co/300x350/f1f5f9/334155?text=Product+2", "alt": "Product 2", "style": "width:100%;display:block" } },
+            { "id": "p2-body", "type": "container", "props": { "style": "padding:1rem" }, "children": [
+              { "id": "p2-cat", "type": "text", "props": { "text": "MEN · OUTERWEAR", "style": "font-size:.65rem;font-weight:700;letter-spacing:.08em;color:#64748b;margin-bottom:.25rem" } },
+              { "id": "p2-name", "type": "heading", "props": { "level": 3, "text": "Merino Wool Coat", "style": "font-size:.95rem;font-weight:600;margin-bottom:.5rem;color:#0f172a" } },
+              { "id": "p2-price", "type": "text", "props": { "text": "£149.00", "style": "font-weight:700;color:#4f46e5" } }
+            ]}
+          ]},
+          { "id": "p3", "type": "container", "props": { "style": "border-radius:.75rem;overflow:hidden;background:#fff;border:1px solid #e5e7eb" }, "children": [
+            { "id": "p3-img", "type": "image", "props": { "src": "https://placehold.co/300x350/f1f5f9/334155?text=Product+3", "alt": "Product 3", "style": "width:100%;display:block" } },
+            { "id": "p3-body", "type": "container", "props": { "style": "padding:1rem" }, "children": [
+              { "id": "p3-cat", "type": "text", "props": { "text": "ACCESSORIES", "style": "font-size:.65rem;font-weight:700;letter-spacing:.08em;color:#64748b;margin-bottom:.25rem" } },
+              { "id": "p3-name", "type": "heading", "props": { "level": 3, "text": "Leather Crossbody Bag", "style": "font-size:.95rem;font-weight:600;margin-bottom:.5rem;color:#0f172a" } },
+              { "id": "p3-price", "type": "text", "props": { "text": "£89.00", "style": "font-weight:700;color:#4f46e5" } }
+            ]}
+          ]},
+          { "id": "p4", "type": "container", "props": { "style": "border-radius:.75rem;overflow:hidden;background:#fff;border:1px solid #e5e7eb" }, "children": [
+            { "id": "p4-img", "type": "image", "props": { "src": "https://placehold.co/300x350/f1f5f9/334155?text=Product+4", "alt": "Product 4", "style": "width:100%;display:block" } },
+            { "id": "p4-body", "type": "container", "props": { "style": "padding:1rem" }, "children": [
+              { "id": "p4-cat", "type": "text", "props": { "text": "WOMEN · FOOTWEAR", "style": "font-size:.65rem;font-weight:700;letter-spacing:.08em;color:#64748b;margin-bottom:.25rem" } },
+              { "id": "p4-name", "type": "heading", "props": { "level": 3, "text": "Suede Chelsea Boots", "style": "font-size:.95rem;font-weight:600;margin-bottom:.5rem;color:#0f172a" } },
+              { "id": "p4-price", "type": "text", "props": { "text": "£115.00", "style": "font-weight:700;color:#4f46e5" } }
+            ]}
+          ]}
+        ]}
+      ]
+    },
+    {
+      "id": "promo",
+      "type": "container",
+      "props": { "style": "background:#f59e0b;padding:3rem 2rem;text-align:center" },
+      "children": [
+        { "id": "promo-text", "type": "heading", "props": { "level": 2, "text": "Up to 40% off selected styles — Sale ends Sunday.", "style": "font-size:1.6rem;font-weight:800;color:#000;margin-bottom:1.25rem" } },
+        { "id": "promo-cta", "type": "button", "props": { "text": "Shop the Sale →", "style": "background:#000;color:#fff;padding:.85rem 2rem;border-radius:.5rem;font-weight:700;border:none;cursor:pointer" } }
+      ]
+    },
+    {
+      "id": "newsletter",
+      "type": "container",
+      "props": { "style": "padding:4rem 2rem;background:#f8fafc;text-align:center" },
+      "children": [
+        { "id": "nl-title", "type": "heading", "props": { "level": 2, "text": "Get early access to new drops", "style": "font-size:1.5rem;font-weight:700;margin-bottom:.5rem;color:#0f172a" } },
+        { "id": "nl-sub", "type": "text", "props": { "text": "Join 25,000+ subscribers and be first to know about new arrivals, exclusive discounts, and style guides.", "style": "color:#64748b;margin-bottom:2rem" } },
+        { "id": "nl-form", "type": "container", "props": { "style": "display:flex;gap:.75rem;max-width:480px;margin:0 auto" }, "children": [
+          { "id": "nl-input", "type": "text", "props": { "text": "[Email input field]", "style": "flex:1;padding:.75rem 1rem;border:1px solid #d1d5db;border-radius:.5rem;font-size:.9rem;background:#fff" } },
+          { "id": "nl-btn", "type": "button", "props": { "text": "Subscribe", "style": "background:#0f172a;color:#fff;padding:.75rem 1.5rem;border-radius:.5rem;font-weight:600;border:none;cursor:pointer;white-space:nowrap" } }
+        ]}
+      ]
+    }
+  ]
+}

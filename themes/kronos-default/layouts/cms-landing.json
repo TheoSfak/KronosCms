@@ -1,0 +1,104 @@
+{
+  "meta": {
+    "title": "Business Landing Page",
+    "description": "Professional business landing page with hero, feature highlights, social proof, and CTA.",
+    "mode": "cms",
+    "emoji": "🏢"
+  },
+  "version": 1,
+  "slug": "cms-landing",
+  "title": "Business Landing Page",
+  "blocks": [
+    {
+      "id": "nav",
+      "type": "container",
+      "props": { "style": "background:#fff;border-bottom:1px solid #e5e7eb;padding:.875rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100" },
+      "children": [
+        { "id": "nav-logo", "type": "heading", "props": { "level": 3, "text": "Acme Co.", "style": "margin:0;font-size:1.25rem;font-weight:800;color:#111" } },
+        { "id": "nav-cta", "type": "button", "props": { "text": "Get Started Free", "url": "#cta", "style": "background:#4f46e5;color:#fff;padding:.5rem 1.25rem;border-radius:8px;font-size:.875rem;font-weight:600;text-decoration:none" } }
+      ]
+    },
+    {
+      "id": "hero",
+      "type": "container",
+      "props": { "style": "padding:6rem 2rem 5rem;text-align:center;background:#fafafa" },
+      "children": [
+        { "id": "hero-badge", "type": "text", "props": { "text": "✨ Now in public beta", "style": "display:inline-block;background:#ede9fe;color:#4f46e5;font-size:.8rem;font-weight:700;padding:.3rem .9rem;border-radius:9999px;margin-bottom:1.25rem" } },
+        { "id": "hero-h1", "type": "heading", "props": { "level": 1, "text": "The Smarter Way to Grow Your Business Online", "style": "font-size:3rem;font-weight:800;max-width:700px;margin:0 auto 1.25rem;line-height:1.15;color:#0f172a" } },
+        { "id": "hero-sub", "type": "text", "props": { "text": "Acme helps ambitious businesses build beautiful websites, attract more customers, and scale with confidence.", "style": "font-size:1.2rem;color:#64748b;max-width:560px;margin:0 auto 2.5rem;line-height:1.7" } },
+        { "id": "hero-btns", "type": "container", "props": { "style": "display:flex;gap:12px;justify-content:center;flex-wrap:wrap" }, "children": [
+          { "id": "btn-primary", "type": "button", "props": { "text": "Start for free →", "url": "#", "style": "background:#4f46e5;color:#fff;padding:.875rem 2rem;border-radius:10px;font-weight:700;font-size:1rem;text-decoration:none;display:inline-block" } },
+          { "id": "btn-demo", "type": "button", "props": { "text": "Watch demo", "url": "#", "style": "background:#fff;color:#4f46e5;border:1.5px solid #c7d2fe;padding:.875rem 2rem;border-radius:10px;font-weight:700;font-size:1rem;text-decoration:none;display:inline-block" } }
+        ]}
+      ]
+    },
+    {
+      "id": "features",
+      "type": "container",
+      "props": { "style": "padding:5rem 2rem;max-width:1100px;margin:0 auto" },
+      "children": [
+        { "id": "feat-title", "type": "heading", "props": { "level": 2, "text": "Everything you need to succeed", "style": "text-align:center;font-size:2rem;font-weight:700;margin-bottom:.75rem" } },
+        { "id": "feat-sub", "type": "text", "props": { "text": "Powerful features designed to help any business grow faster.", "style": "text-align:center;color:#64748b;margin-bottom:3rem" } },
+        {
+          "id": "features-grid",
+          "type": "container",
+          "props": { "style": "display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2rem" },
+          "children": [
+            { "id": "f1", "type": "container", "props": { "style": "background:#f8fafc;border-radius:12px;padding:1.75rem" }, "children": [
+              { "id": "f1-icon", "type": "text", "props": { "text": "⚡", "style": "font-size:2rem;margin-bottom:.75rem" } },
+              { "id": "f1-title", "type": "heading", "props": { "level": 3, "text": "Blazing Fast", "style": "font-size:1.05rem;font-weight:700;margin-bottom:.5rem" } },
+              { "id": "f1-desc", "type": "text", "props": { "text": "Optimised from the ground up for sub-second load times and a perfect Lighthouse score.", "style": "color:#64748b;font-size:.875rem;line-height:1.6" } }
+            ]},
+            { "id": "f2", "type": "container", "props": { "style": "background:#f8fafc;border-radius:12px;padding:1.75rem" }, "children": [
+              { "id": "f2-icon", "type": "text", "props": { "text": "🎨", "style": "font-size:2rem;margin-bottom:.75rem" } },
+              { "id": "f2-title", "type": "heading", "props": { "level": 3, "text": "Visual Builder", "style": "font-size:1.05rem;font-weight:700;margin-bottom:.5rem" } },
+              { "id": "f2-desc", "type": "text", "props": { "text": "Drag, drop, and customise every element of your pages — no code required.", "style": "color:#64748b;font-size:.875rem;line-height:1.6" } }
+            ]},
+            { "id": "f3", "type": "container", "props": { "style": "background:#f8fafc;border-radius:12px;padding:1.75rem" }, "children": [
+              { "id": "f3-icon", "type": "text", "props": { "text": "🔒", "style": "font-size:2rem;margin-bottom:.75rem" } },
+              { "id": "f3-title", "type": "heading", "props": { "level": 3, "text": "Secure by Default", "style": "font-size:1.05rem;font-weight:700;margin-bottom:.5rem" } },
+              { "id": "f3-desc", "type": "text", "props": { "text": "JWT auth, CSRF protection, and password hashing — built in from day one.", "style": "color:#64748b;font-size:.875rem;line-height:1.6" } }
+            ]},
+            { "id": "f4", "type": "container", "props": { "style": "background:#f8fafc;border-radius:12px;padding:1.75rem" }, "children": [
+              { "id": "f4-icon", "type": "text", "props": { "text": "📊", "style": "font-size:2rem;margin-bottom:.75rem" } },
+              { "id": "f4-title", "type": "heading", "props": { "level": 3, "text": "Built-in Analytics", "style": "font-size:1.05rem;font-weight:700;margin-bottom:.5rem" } },
+              { "id": "f4-desc", "type": "text", "props": { "text": "Track page views, events, and conversions right from your dashboard.", "style": "color:#64748b;font-size:.875rem;line-height:1.6" } }
+            ]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "social-proof",
+      "type": "container",
+      "props": { "style": "background:#0f172a;color:#fff;padding:5rem 2rem;text-align:center" },
+      "children": [
+        { "id": "sp-title", "type": "heading", "props": { "level": 2, "text": "Trusted by 10,000+ businesses worldwide", "style": "font-size:1.75rem;font-weight:700;margin-bottom:3rem" } },
+        { "id": "sp-stats", "type": "container", "props": { "style": "display:flex;gap:3rem;justify-content:center;flex-wrap:wrap" }, "children": [
+          { "id": "s1", "type": "container", "props": {}, "children": [
+            { "id": "s1-v", "type": "heading", "props": { "level": 3, "text": "10,000+", "style": "font-size:2.5rem;font-weight:800;color:#818cf8;margin-bottom:.25rem" } },
+            { "id": "s1-l", "type": "text", "props": { "text": "Happy customers", "style": "opacity:.7;font-size:.9rem" } }
+          ]},
+          { "id": "s2", "type": "container", "props": {}, "children": [
+            { "id": "s2-v", "type": "heading", "props": { "level": 3, "text": "99.9%", "style": "font-size:2.5rem;font-weight:800;color:#34d399;margin-bottom:.25rem" } },
+            { "id": "s2-l", "type": "text", "props": { "text": "Uptime SLA", "style": "opacity:.7;font-size:.9rem" } }
+          ]},
+          { "id": "s3", "type": "container", "props": {}, "children": [
+            { "id": "s3-v", "type": "heading", "props": { "level": 3, "text": "< 0.8s", "style": "font-size:2.5rem;font-weight:800;color:#f9a8d4;margin-bottom:.25rem" } },
+            { "id": "s3-l", "type": "text", "props": { "text": "Average load time", "style": "opacity:.7;font-size:.9rem" } }
+          ]}
+        ]}
+      ]
+    },
+    {
+      "id": "cta",
+      "type": "container",
+      "props": { "style": "background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;padding:5rem 2rem;text-align:center" },
+      "children": [
+        { "id": "cta-title", "type": "heading", "props": { "level": 2, "text": "Ready to get started?", "style": "font-size:2.25rem;font-weight:800;margin-bottom:.75rem" } },
+        { "id": "cta-sub", "type": "text", "props": { "text": "Join thousands of businesses already growing with Acme. No credit card required.", "style": "opacity:.85;font-size:1.1rem;margin-bottom:2rem" } },
+        { "id": "cta-btn", "type": "button", "props": { "text": "Create your free account →", "url": "#", "style": "background:#fff;color:#4f46e5;padding:.9rem 2.5rem;border-radius:9999px;font-weight:700;font-size:1.05rem;text-decoration:none;display:inline-block" } }
+      ]
+    }
+  ]
+}

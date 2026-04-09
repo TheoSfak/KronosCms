@@ -31,6 +31,8 @@ class KronosDashboardModule extends KronosModule
         $router->get('/dashboard/orders',           fn($p) => $this->page('orders', $p),     [$auth]);
         $router->get('/dashboard/analytics',        fn($p) => $this->page('analytics', $p),  [$auth]);
         $router->get('/dashboard/users',            fn($p) => $this->page('users', $p),      [$auth]);
+        $router->get('/dashboard/templates',        fn($p) => $this->page('templates', $p),  [$auth]);
+        $router->post('/dashboard/templates',       fn($p) => $this->page('templates', $p),  [$auth]);
         $router->get('/dashboard/marketplace',      fn($p) => $this->page('marketplace', $p),[$auth]);
         $router->get('/dashboard/ai',               fn($p) => $this->page('ai', $p),         [$auth]);
         $router->get('/dashboard/settings',         fn($p) => $this->page('settings', $p),   [$auth]);

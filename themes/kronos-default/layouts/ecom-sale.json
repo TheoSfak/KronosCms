@@ -1,0 +1,138 @@
+{
+  "meta": {
+    "title": "Sale & Promotions",
+    "description": "High-urgency sale landing page with countdown, product grid, and email capture.",
+    "mode": "ecommerce",
+    "emoji": "🔥"
+  },
+  "version": 1,
+  "slug": "ecom-sale",
+  "title": "Sale & Promotions",
+  "blocks": [
+    {
+      "id": "hero",
+      "type": "container",
+      "props": { "style": "background:linear-gradient(135deg,#b91c1c,#ef4444);color:#fff;padding:5rem 2rem;text-align:center;position:relative;overflow:hidden" },
+      "children": [
+        { "id": "hero-badge", "type": "text", "props": { "text": "⚡ FLASH SALE — LIMITED TIME ONLY", "style": "font-size:.75rem;font-weight:700;letter-spacing:.12em;background:rgba(255,255,255,.15);padding:.35rem 1rem;border-radius:2rem;display:inline-block;margin-bottom:1.75rem" } },
+        { "id": "hero-h1", "type": "heading", "props": { "level": 1, "text": "Up to 50% Off", "style": "font-size:4.5rem;font-weight:900;line-height:1;margin-bottom:.75rem;letter-spacing:-.02em" } },
+        { "id": "hero-sub", "type": "heading", "props": { "level": 2, "text": "Selected styles. This weekend only.", "style": "font-size:1.3rem;font-weight:400;opacity:.92;margin-bottom:2.5rem" } },
+        { "id": "countdown", "type": "container", "props": { "style": "display:inline-flex;gap:1rem;background:rgba(0,0,0,.25);border-radius:1rem;padding:1.25rem 2rem;margin-bottom:2.5rem" }, "children": [
+          { "id": "cd-hr", "type": "container", "props": { "style": "text-align:center" }, "children": [
+            { "id": "cd-hr-n", "type": "text", "props": { "text": "08", "style": "font-size:2.5rem;font-weight:800;line-height:1;display:block" } },
+            { "id": "cd-hr-l", "type": "text", "props": { "text": "HRS", "style": "font-size:.6rem;letter-spacing:.1em;opacity:.7" } }
+          ]},
+          { "id": "cd-sep1", "type": "text", "props": { "text": ":", "style": "font-size:2.5rem;font-weight:800;opacity:.5;line-height:1" } },
+          { "id": "cd-min", "type": "container", "props": { "style": "text-align:center" }, "children": [
+            { "id": "cd-min-n", "type": "text", "props": { "text": "34", "style": "font-size:2.5rem;font-weight:800;line-height:1;display:block" } },
+            { "id": "cd-min-l", "type": "text", "props": { "text": "MIN", "style": "font-size:.6rem;letter-spacing:.1em;opacity:.7" } }
+          ]},
+          { "id": "cd-sep2", "type": "text", "props": { "text": ":", "style": "font-size:2.5rem;font-weight:800;opacity:.5;line-height:1" } },
+          { "id": "cd-sec", "type": "container", "props": { "style": "text-align:center" }, "children": [
+            { "id": "cd-sec-n", "type": "text", "props": { "text": "52", "style": "font-size:2.5rem;font-weight:800;line-height:1;display:block" } },
+            { "id": "cd-sec-l", "type": "text", "props": { "text": "SEC", "style": "font-size:.6rem;letter-spacing:.1em;opacity:.7" } }
+          ]}
+        ]},
+        { "id": "hero-cta", "type": "button", "props": { "text": "Shop the Sale Now →", "style": "background:#fff;color:#b91c1c;padding:1rem 2.5rem;border-radius:.5rem;font-weight:800;font-size:1.1rem;border:none;cursor:pointer" } }
+      ]
+    },
+    {
+      "id": "sale-products",
+      "type": "container",
+      "props": { "style": "padding:3.5rem 2rem;max-width:1100px;margin:0 auto" },
+      "children": [
+        { "id": "sale-title", "type": "heading", "props": { "level": 2, "text": "Sale Items", "style": "font-size:1.6rem;font-weight:700;margin-bottom:1.5rem;color:#0f172a" } },
+        { "id": "sale-grid", "type": "container", "props": { "style": "display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem" }, "children": [
+          { "id": "sp1", "type": "container", "props": { "style": "border-radius:.75rem;overflow:hidden;background:#fff;border:1px solid #fef2f2;position:relative" }, "children": [
+            { "id": "sp1-sale-tag", "type": "text", "props": { "text": "-40%", "style": "position:absolute;top:.75rem;left:.75rem;background:#ef4444;color:#fff;font-size:.7rem;font-weight:800;padding:.2rem .5rem;border-radius:.25rem;z-index:1" } },
+            { "id": "sp1-img", "type": "image", "props": { "src": "https://placehold.co/380x300/fef2f2/b91c1c?text=Sale+Item+1", "alt": "Sale item 1", "style": "width:100%;display:block" } },
+            { "id": "sp1-body", "type": "container", "props": { "style": "padding:1rem" }, "children": [
+              { "id": "sp1-name", "type": "heading", "props": { "level": 3, "text": "Tailored Blazer", "style": "font-size:.95rem;font-weight:600;margin-bottom:.5rem;color:#0f172a" } },
+              { "id": "sp1-prices", "type": "container", "props": { "style": "display:flex;align-items:center;gap:.75rem" }, "children": [
+                { "id": "sp1-new", "type": "text", "props": { "text": "£89.00", "style": "font-weight:800;color:#ef4444;font-size:1rem" } },
+                { "id": "sp1-old", "type": "text", "props": { "text": "£149.00", "style": "color:#9ca3af;text-decoration:line-through;font-size:.85rem" } }
+              ]}
+            ]}
+          ]},
+          { "id": "sp2", "type": "container", "props": { "style": "border-radius:.75rem;overflow:hidden;background:#fff;border:1px solid #fef2f2;position:relative" }, "children": [
+            { "id": "sp2-sale-tag", "type": "text", "props": { "text": "-50%", "style": "position:absolute;top:.75rem;left:.75rem;background:#ef4444;color:#fff;font-size:.7rem;font-weight:800;padding:.2rem .5rem;border-radius:.25rem;z-index:1" } },
+            { "id": "sp2-img", "type": "image", "props": { "src": "https://placehold.co/380x300/fef2f2/b91c1c?text=Sale+Item+2", "alt": "Sale item 2", "style": "width:100%;display:block" } },
+            { "id": "sp2-body", "type": "container", "props": { "style": "padding:1rem" }, "children": [
+              { "id": "sp2-name", "type": "heading", "props": { "level": 3, "text": "Leather Belt Bag", "style": "font-size:.95rem;font-weight:600;margin-bottom:.5rem;color:#0f172a" } },
+              { "id": "sp2-prices", "type": "container", "props": { "style": "display:flex;align-items:center;gap:.75rem" }, "children": [
+                { "id": "sp2-new", "type": "text", "props": { "text": "£45.00", "style": "font-weight:800;color:#ef4444;font-size:1rem" } },
+                { "id": "sp2-old", "type": "text", "props": { "text": "£90.00", "style": "color:#9ca3af;text-decoration:line-through;font-size:.85rem" } }
+              ]}
+            ]}
+          ]},
+          { "id": "sp3", "type": "container", "props": { "style": "border-radius:.75rem;overflow:hidden;background:#fff;border:1px solid #fef2f2;position:relative" }, "children": [
+            { "id": "sp3-sale-tag", "type": "text", "props": { "text": "-35%", "style": "position:absolute;top:.75rem;left:.75rem;background:#ef4444;color:#fff;font-size:.7rem;font-weight:800;padding:.2rem .5rem;border-radius:.25rem;z-index:1" } },
+            { "id": "sp3-img", "type": "image", "props": { "src": "https://placehold.co/380x300/fef2f2/b91c1c?text=Sale+Item+3", "alt": "Sale item 3", "style": "width:100%;display:block" } },
+            { "id": "sp3-body", "type": "container", "props": { "style": "padding:1rem" }, "children": [
+              { "id": "sp3-name", "type": "heading", "props": { "level": 3, "text": "Silk Camisole", "style": "font-size:.95rem;font-weight:600;margin-bottom:.5rem;color:#0f172a" } },
+              { "id": "sp3-prices", "type": "container", "props": { "style": "display:flex;align-items:center;gap:.75rem" }, "children": [
+                { "id": "sp3-new", "type": "text", "props": { "text": "£32.00", "style": "font-weight:800;color:#ef4444;font-size:1rem" } },
+                { "id": "sp3-old", "type": "text", "props": { "text": "£49.00", "style": "color:#9ca3af;text-decoration:line-through;font-size:.85rem" } }
+              ]}
+            ]}
+          ]},
+          { "id": "sp4", "type": "container", "props": { "style": "border-radius:.75rem;overflow:hidden;background:#fff;border:1px solid #fef2f2;position:relative" }, "children": [
+            { "id": "sp4-sale-tag", "type": "text", "props": { "text": "-45%", "style": "position:absolute;top:.75rem;left:.75rem;background:#ef4444;color:#fff;font-size:.7rem;font-weight:800;padding:.2rem .5rem;border-radius:.25rem;z-index:1" } },
+            { "id": "sp4-img", "type": "image", "props": { "src": "https://placehold.co/380x300/fef2f2/b91c1c?text=Sale+Item+4", "alt": "Sale item 4", "style": "width:100%;display:block" } },
+            { "id": "sp4-body", "type": "container", "props": { "style": "padding:1rem" }, "children": [
+              { "id": "sp4-name", "type": "heading", "props": { "level": 3, "text": "Knit Midi Dress", "style": "font-size:.95rem;font-weight:600;margin-bottom:.5rem;color:#0f172a" } },
+              { "id": "sp4-prices", "type": "container", "props": { "style": "display:flex;align-items:center;gap:.75rem" }, "children": [
+                { "id": "sp4-new", "type": "text", "props": { "text": "£55.00", "style": "font-weight:800;color:#ef4444;font-size:1rem" } },
+                { "id": "sp4-old", "type": "text", "props": { "text": "£100.00", "style": "color:#9ca3af;text-decoration:line-through;font-size:.85rem" } }
+              ]}
+            ]}
+          ]},
+          { "id": "sp5", "type": "container", "props": { "style": "border-radius:.75rem;overflow:hidden;background:#fff;border:1px solid #fef2f2;position:relative" }, "children": [
+            { "id": "sp5-sale-tag", "type": "text", "props": { "text": "-30%", "style": "position:absolute;top:.75rem;left:.75rem;background:#ef4444;color:#fff;font-size:.7rem;font-weight:800;padding:.2rem .5rem;border-radius:.25rem;z-index:1" } },
+            { "id": "sp5-img", "type": "image", "props": { "src": "https://placehold.co/380x300/fef2f2/b91c1c?text=Sale+Item+5", "alt": "Sale item 5", "style": "width:100%;display:block" } },
+            { "id": "sp5-body", "type": "container", "props": { "style": "padding:1rem" }, "children": [
+              { "id": "sp5-name", "type": "heading", "props": { "level": 3, "text": "Cashmere Cardigan", "style": "font-size:.95rem;font-weight:600;margin-bottom:.5rem;color:#0f172a" } },
+              { "id": "sp5-prices", "type": "container", "props": { "style": "display:flex;align-items:center;gap:.75rem" }, "children": [
+                { "id": "sp5-new", "type": "text", "props": { "text": "£84.00", "style": "font-weight:800;color:#ef4444;font-size:1rem" } },
+                { "id": "sp5-old", "type": "text", "props": { "text": "£120.00", "style": "color:#9ca3af;text-decoration:line-through;font-size:.85rem" } }
+              ]}
+            ]}
+          ]},
+          { "id": "sp6", "type": "container", "props": { "style": "border-radius:.75rem;overflow:hidden;background:#fff;border:1px solid #fef2f2;position:relative" }, "children": [
+            { "id": "sp6-sale-tag", "type": "text", "props": { "text": "-25%", "style": "position:absolute;top:.75rem;left:.75rem;background:#ef4444;color:#fff;font-size:.7rem;font-weight:800;padding:.2rem .5rem;border-radius:.25rem;z-index:1" } },
+            { "id": "sp6-img", "type": "image", "props": { "src": "https://placehold.co/380x300/fef2f2/b91c1c?text=Sale+Item+6", "alt": "Sale item 6", "style": "width:100%;display:block" } },
+            { "id": "sp6-body", "type": "container", "props": { "style": "padding:1rem" }, "children": [
+              { "id": "sp6-name", "type": "heading", "props": { "level": 3, "text": "Chelsea Ankle Boots", "style": "font-size:.95rem;font-weight:600;margin-bottom:.5rem;color:#0f172a" } },
+              { "id": "sp6-prices", "type": "container", "props": { "style": "display:flex;align-items:center;gap:.75rem" }, "children": [
+                { "id": "sp6-new", "type": "text", "props": { "text": "£86.00", "style": "font-weight:800;color:#ef4444;font-size:1rem" } },
+                { "id": "sp6-old", "type": "text", "props": { "text": "£115.00", "style": "color:#9ca3af;text-decoration:line-through;font-size:.85rem" } }
+              ]}
+            ]}
+          ]}
+        ]}
+      ]
+    },
+    {
+      "id": "urgency",
+      "type": "container",
+      "props": { "style": "background:#fef2f2;border:1px solid #fecaca;border-radius:.75rem;padding:2rem;max-width:700px;margin:0 auto 3rem;text-align:center" },
+      "children": [
+        { "id": "urg-text", "type": "heading", "props": { "level": 3, "text": "🔥 Don't miss out — these prices won't last!", "style": "font-size:1.1rem;font-weight:700;color:#b91c1c;margin-bottom:.5rem" } },
+        { "id": "urg-sub", "type": "text", "props": { "text": "All sale items are final sale. No returns or exchanges. Shop now before stock runs out.", "style": "color:#64748b;font-size:.875rem" } }
+      ]
+    },
+    {
+      "id": "email-capture",
+      "type": "container",
+      "props": { "style": "background:#0f172a;color:#fff;padding:3.5rem 2rem;text-align:center" },
+      "children": [
+        { "id": "ec-title", "type": "heading", "props": { "level": 2, "text": "Never miss a sale again", "style": "font-size:1.6rem;font-weight:700;margin-bottom:.5rem" } },
+        { "id": "ec-sub", "type": "text", "props": { "text": "Sign up for early-access alerts before our next flash sale drops.", "style": "opacity:.7;margin-bottom:2rem" } },
+        { "id": "ec-form", "type": "container", "props": { "style": "display:flex;gap:.75rem;max-width:420px;margin:0 auto" }, "children": [
+          { "id": "ec-input", "type": "text", "props": { "text": "[Email input]", "style": "flex:1;padding:.75rem 1rem;border:1px solid rgba(255,255,255,.2);border-radius:.5rem;background:rgba(255,255,255,.1);color:#fff;font-size:.9rem" } },
+          { "id": "ec-btn", "type": "button", "props": { "text": "Notify Me", "style": "background:#ef4444;color:#fff;padding:.75rem 1.25rem;border-radius:.5rem;font-weight:700;border:none;cursor:pointer;white-space:nowrap" } }
+        ]}
+      ]
+    }
+  ]
+}

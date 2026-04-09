@@ -1,0 +1,109 @@
+{
+  "meta": {
+    "title": "Brand Story & Shop",
+    "description": "Luxury brand page combining storytelling, brand values, featured collection, and CTA.",
+    "mode": "ecommerce",
+    "emoji": "✨"
+  },
+  "version": 1,
+  "slug": "ecom-brand",
+  "title": "Brand Story & Shop",
+  "blocks": [
+    {
+      "id": "hero",
+      "type": "container",
+      "props": { "style": "min-height:85vh;background:linear-gradient(to bottom,#1c1917,#292524);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4rem 2rem;position:relative;overflow:hidden" },
+      "children": [
+        { "id": "hero-eyebrow", "type": "text", "props": { "text": "THE KRONOS STUDIO COLLECTION", "style": "font-size:.65rem;font-weight:700;letter-spacing:.2em;color:#d4b896;margin-bottom:2rem" } },
+        { "id": "hero-h1", "type": "heading", "props": { "level": 1, "text": "Crafted with intention. Worn with purpose.", "style": "font-size:3.5rem;font-weight:300;max-width:700px;margin:0 auto 1.5rem;line-height:1.2;font-style:italic" } },
+        { "id": "hero-sub", "type": "text", "props": { "text": "Each piece in our collection tells a story of heritage craftsmanship, sustainable materials, and timeless design — made to be worn for decades, not just seasons.", "style": "font-size:1rem;opacity:.75;max-width:520px;margin:0 auto 3rem;line-height:1.8" } },
+        { "id": "hero-cta", "type": "button", "props": { "text": "Explore the Collection", "style": "background:#d4b896;color:#1c1917;padding:.9rem 2.5rem;border-radius:2rem;font-weight:700;border:none;cursor:pointer;letter-spacing:.03em" } }
+      ]
+    },
+    {
+      "id": "story",
+      "type": "container",
+      "props": { "style": "max-width:1100px;margin:5rem auto;padding:0 2rem;display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center" },
+      "children": [
+        { "id": "story-img", "type": "image", "props": { "src": "https://placehold.co/520x580/1c1917/d4b896?text=Brand+Story", "alt": "Brand story image", "style": "width:100%;border-radius:1rem;display:block" } },
+        { "id": "story-text", "type": "container", "props": {}, "children": [
+          { "id": "st-eyebrow", "type": "text", "props": { "text": "OUR STORY", "style": "font-size:.65rem;font-weight:700;letter-spacing:.15em;color:#d4b896;margin-bottom:1rem" } },
+          { "id": "st-title", "type": "heading", "props": { "level": 2, "text": "Born from a simple question: Why can't fashion be both beautiful and responsible?", "style": "font-size:1.75rem;font-weight:700;color:#0f172a;margin-bottom:1.25rem;line-height:1.35" } },
+          { "id": "st-p1", "type": "text", "props": { "text": "We started Kronos Studio in 2018 with a small atelier in Lisbon, a handful of dedicated craftspeople, and a radical commitment to making fashion differently.", "style": "color:#64748b;line-height:1.8;margin-bottom:1rem;font-size:.95rem" } },
+          { "id": "st-p2", "type": "text", "props": { "text": "Every garment is cut in our studio from deadstock fabrics or certified sustainable materials. Every stitch is done by hand. Every piece carries the name of the person who made it.", "style": "color:#64748b;line-height:1.8;margin-bottom:1.5rem;font-size:.95rem" } },
+          { "id": "st-cta", "type": "button", "props": { "text": "Read the full story →", "style": "background:transparent;color:#1c1917;border:2px solid #1c1917;padding:.7rem 1.75rem;border-radius:2rem;font-weight:600;cursor:pointer;font-size:.9rem" } }
+        ]}
+      ]
+    },
+    {
+      "id": "values",
+      "type": "container",
+      "props": { "style": "background:#f8f5f0;padding:4rem 2rem" },
+      "children": [
+        { "id": "val-grid", "type": "container", "props": { "style": "max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:3rem;text-align:center" }, "children": [
+          { "id": "v1", "type": "container", "props": {}, "children": [
+            { "id": "v1-icon", "type": "text", "props": { "text": "🌱", "style": "font-size:2.5rem;margin-bottom:1rem;display:block" } },
+            { "id": "v1-name", "type": "heading", "props": { "level": 3, "text": "Sustainably Sourced", "style": "font-size:1rem;font-weight:700;margin-bottom:.5rem;color:#1c1917" } },
+            { "id": "v1-desc", "type": "text", "props": { "text": "100% of our fabrics are either deadstock, recycled, or GOTS-certified organic.", "style": "color:#64748b;font-size:.875rem;line-height:1.7" } }
+          ]},
+          { "id": "v2", "type": "container", "props": {}, "children": [
+            { "id": "v2-icon", "type": "text", "props": { "text": "🤲", "style": "font-size:2.5rem;margin-bottom:1rem;display:block" } },
+            { "id": "v2-name", "type": "heading", "props": { "level": 3, "text": "Handcrafted in Lisbon", "style": "font-size:1rem;font-weight:700;margin-bottom:.5rem;color:#1c1917" } },
+            { "id": "v2-desc", "type": "text", "props": { "text": "Our atelier employs 34 skilled artisans, all paid above living wage with full benefits.", "style": "color:#64748b;font-size:.875rem;line-height:1.7" } }
+          ]},
+          { "id": "v3", "type": "container", "props": {}, "children": [
+            { "id": "v3-icon", "type": "text", "props": { "text": "🔄", "style": "font-size:2.5rem;margin-bottom:1rem;display:block" } },
+            { "id": "v3-name", "type": "heading", "props": { "level": 3, "text": "Made to Last", "style": "font-size:1rem;font-weight:700;margin-bottom:.5rem;color:#1c1917" } },
+            { "id": "v3-desc", "type": "text", "props": { "text": "Every garment comes with a lifetime repair guarantee. We'll fix it for free, forever.", "style": "color:#64748b;font-size:.875rem;line-height:1.7" } }
+          ]}
+        ]}
+      ]
+    },
+    {
+      "id": "collection",
+      "type": "container",
+      "props": { "style": "padding:4rem 2rem;max-width:1100px;margin:0 auto" },
+      "children": [
+        { "id": "coll-hdr", "type": "container", "props": { "style": "text-align:center;margin-bottom:2.5rem" }, "children": [
+          { "id": "coll-eyebrow", "type": "text", "props": { "text": "FEATURED COLLECTION", "style": "font-size:.65rem;font-weight:700;letter-spacing:.15em;color:#d4b896;margin-bottom:.75rem" } },
+          { "id": "coll-title", "type": "heading", "props": { "level": 2, "text": "Spring / Summer 2025", "style": "font-size:2rem;font-weight:700;color:#1c1917" } }
+        ]},
+        { "id": "coll-grid", "type": "container", "props": { "style": "display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem" }, "children": [
+          { "id": "cp1", "type": "container", "props": { "style": "position:relative;overflow:hidden;border-radius:1rem;cursor:pointer" }, "children": [
+            { "id": "cp1-img", "type": "image", "props": { "src": "https://placehold.co/380x400/292524/d4b896?text=Piece+1", "alt": "Collection piece 1", "style": "width:100%;display:block;transition:transform .3s" } },
+            { "id": "cp1-overlay", "type": "container", "props": { "style": "position:absolute;bottom:0;left:0;right:0;padding:1.5rem;background:linear-gradient(to top,rgba(0,0,0,.7),transparent);color:#fff" }, "children": [
+              { "id": "cp1-name", "type": "heading", "props": { "level": 3, "text": "Organic Poplin Shirt", "style": "font-size:1rem;font-weight:600;margin-bottom:.25rem" } },
+              { "id": "cp1-price", "type": "text", "props": { "text": "£79.00", "style": "color:#d4b896;font-weight:700" } }
+            ]}
+          ]},
+          { "id": "cp2", "type": "container", "props": { "style": "position:relative;overflow:hidden;border-radius:1rem;cursor:pointer" }, "children": [
+            { "id": "cp2-img", "type": "image", "props": { "src": "https://placehold.co/380x400/292524/d4b896?text=Piece+2", "alt": "Collection piece 2", "style": "width:100%;display:block" } },
+            { "id": "cp2-overlay", "type": "container", "props": { "style": "position:absolute;bottom:0;left:0;right:0;padding:1.5rem;background:linear-gradient(to top,rgba(0,0,0,.7),transparent);color:#fff" }, "children": [
+              { "id": "cp2-name", "type": "heading", "props": { "level": 3, "text": "Linen Wide-Leg Trousers", "style": "font-size:1rem;font-weight:600;margin-bottom:.25rem" } },
+              { "id": "cp2-price", "type": "text", "props": { "text": "£95.00", "style": "color:#d4b896;font-weight:700" } }
+            ]}
+          ]},
+          { "id": "cp3", "type": "container", "props": { "style": "position:relative;overflow:hidden;border-radius:1rem;cursor:pointer" }, "children": [
+            { "id": "cp3-img", "type": "image", "props": { "src": "https://placehold.co/380x400/292524/d4b896?text=Piece+3", "alt": "Collection piece 3", "style": "width:100%;display:block" } },
+            { "id": "cp3-overlay", "type": "container", "props": { "style": "position:absolute;bottom:0;left:0;right:0;padding:1.5rem;background:linear-gradient(to top,rgba(0,0,0,.7),transparent);color:#fff" }, "children": [
+              { "id": "cp3-name", "type": "heading", "props": { "level": 3, "text": "Merino Knit Vest", "style": "font-size:1rem;font-weight:600;margin-bottom:.25rem" } },
+              { "id": "cp3-price", "type": "text", "props": { "text": "£69.00", "style": "color:#d4b896;font-weight:700" } }
+            ]}
+          ]}
+        ]},
+        { "id": "coll-cta", "type": "container", "props": { "style": "text-align:center;margin-top:2rem" }, "children": [
+          { "id": "coll-btn", "type": "button", "props": { "text": "Browse All New Arrivals →", "style": "background:#1c1917;color:#fff;padding:.9rem 2.5rem;border-radius:2rem;font-weight:700;border:none;cursor:pointer;font-size:.95rem" } }
+        ]}
+      ]
+    },
+    {
+      "id": "social-proof",
+      "type": "container",
+      "props": { "style": "background:#1c1917;color:#fff;padding:3.5rem 2rem;text-align:center" },
+      "children": [
+        { "id": "sp-quote", "type": "text", "props": { "text": "\"The most thoughtfully made clothing I've worn in years. The quality is extraordinary.\"", "style": "font-size:1.3rem;font-style:italic;max-width:600px;margin:0 auto 1rem;line-height:1.6;opacity:.9" } },
+        { "id": "sp-author", "type": "text", "props": { "text": "— Sophie M., London", "style": "font-size:.85rem;opacity:.5;letter-spacing:.05em" } }
+      ]
+    }
+  ]
+}

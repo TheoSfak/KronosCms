@@ -1,0 +1,103 @@
+{
+  "meta": {
+    "title": "Blog Homepage",
+    "description": "Magazine-style blog homepage with hero, featured post, and 3-column article grid.",
+    "mode": "cms",
+    "emoji": "📰"
+  },
+  "version": 1,
+  "slug": "cms-blog",
+  "title": "Blog Homepage",
+  "blocks": [
+    {
+      "id": "nav",
+      "type": "container",
+      "props": {
+        "style": "background:#fff;border-bottom:1px solid #e5e7eb;padding:.875rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100"
+      },
+      "children": [
+        { "id": "nav-logo", "type": "heading", "props": { "level": 3, "text": "My Blog", "style": "margin:0;font-size:1.3rem;font-weight:800;color:#111" } },
+        { "id": "nav-links", "type": "text", "props": { "text": "Home · About · Archive · Contact", "style": "color:#6b7280;font-size:.9rem" } }
+      ]
+    },
+    {
+      "id": "hero",
+      "type": "container",
+      "props": { "style": "background:linear-gradient(135deg,#0f172a,#1e3a8a);color:#fff;padding:5rem 2rem;text-align:center" },
+      "children": [
+        { "id": "hero-tag", "type": "text", "props": { "text": "✍️ FEATURED", "style": "font-size:.75rem;font-weight:700;letter-spacing:.1em;opacity:.7;margin-bottom:.75rem" } },
+        { "id": "hero-h1", "type": "heading", "props": { "level": 1, "text": "The Ultimate Guide to Modern Web Design", "style": "font-size:2.75rem;font-weight:800;max-width:700px;margin:0 auto .75rem;line-height:1.2" } },
+        { "id": "hero-sub", "type": "text", "props": { "text": "A deep dive into the principles, tools, and workflows that define great design in 2025.", "style": "font-size:1.1rem;opacity:.8;max-width:560px;margin:0 auto 2rem" } },
+        { "id": "hero-btn", "type": "button", "props": { "text": "Read Article →", "url": "#", "style": "background:#3b82f6;color:#fff;padding:.75rem 2rem;border-radius:9999px;font-weight:600;text-decoration:none;display:inline-block" } }
+      ]
+    },
+    {
+      "id": "section-label",
+      "type": "container",
+      "props": { "style": "max-width:1100px;margin:3rem auto 1.5rem;padding:0 2rem;display:flex;align-items:center;gap:1rem" },
+      "children": [
+        { "id": "section-title", "type": "heading", "props": { "level": 2, "text": "Latest Articles", "style": "font-size:1.5rem;font-weight:700;color:#111;margin:0" } },
+        { "id": "section-line", "type": "text", "props": { "text": "", "style": "flex:1;height:1px;background:#e5e7eb" } }
+      ]
+    },
+    {
+      "id": "articles-grid",
+      "type": "container",
+      "props": { "style": "max-width:1100px;margin:0 auto 4rem;padding:0 2rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem" },
+      "children": [
+        {
+          "id": "article-1",
+          "type": "container",
+          "props": { "style": "background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden" },
+          "children": [
+            { "id": "a1-img", "type": "image", "props": { "src": "https://placehold.co/600x300/1e3a8a/fff?text=Article+1", "alt": "Article image", "style": "width:100%;display:block" } },
+            { "id": "a1-body", "type": "container", "props": { "style": "padding:1.25rem" }, "children": [
+              { "id": "a1-cat", "type": "text", "props": { "text": "DESIGN", "style": "font-size:.7rem;font-weight:700;color:#3b82f6;letter-spacing:.08em;margin-bottom:.5rem" } },
+              { "id": "a1-title", "type": "heading", "props": { "level": 3, "text": "10 Design Principles Every Developer Should Know", "style": "font-size:1.1rem;font-weight:700;margin:0 0 .5rem;line-height:1.4" } },
+              { "id": "a1-excerpt", "type": "text", "props": { "text": "Good design isn't magic — it's a set of learnable principles that guide every decision.", "style": "color:#6b7280;font-size:.875rem;line-height:1.6;margin-bottom:1rem" } },
+              { "id": "a1-meta", "type": "text", "props": { "text": "Jan 15 · 5 min read", "style": "font-size:.75rem;color:#9ca3af" } }
+            ]}
+          ]
+        },
+        {
+          "id": "article-2",
+          "type": "container",
+          "props": { "style": "background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden" },
+          "children": [
+            { "id": "a2-img", "type": "image", "props": { "src": "https://placehold.co/600x300/0f172a/fff?text=Article+2", "alt": "Article image", "style": "width:100%;display:block" } },
+            { "id": "a2-body", "type": "container", "props": { "style": "padding:1.25rem" }, "children": [
+              { "id": "a2-cat", "type": "text", "props": { "text": "CODING", "style": "font-size:.7rem;font-weight:700;color:#8b5cf6;letter-spacing:.08em;margin-bottom:.5rem" } },
+              { "id": "a2-title", "type": "heading", "props": { "level": 3, "text": "Building Scalable APIs with PHP 8 and Modern Best Practices", "style": "font-size:1.1rem;font-weight:700;margin:0 0 .5rem;line-height:1.4" } },
+              { "id": "a2-excerpt", "type": "text", "props": { "text": "PHP 8 brings powerful new features that make building robust REST APIs cleaner than ever.", "style": "color:#6b7280;font-size:.875rem;line-height:1.6;margin-bottom:1rem" } },
+              { "id": "a2-meta", "type": "text", "props": { "text": "Jan 10 · 8 min read", "style": "font-size:.75rem;color:#9ca3af" } }
+            ]}
+          ]
+        },
+        {
+          "id": "article-3",
+          "type": "container",
+          "props": { "style": "background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden" },
+          "children": [
+            { "id": "a3-img", "type": "image", "props": { "src": "https://placehold.co/600x300/064e3b/fff?text=Article+3", "alt": "Article image", "style": "width:100%;display:block" } },
+            { "id": "a3-body", "type": "container", "props": { "style": "padding:1.25rem" }, "children": [
+              { "id": "a3-cat", "type": "text", "props": { "text": "PERFORMANCE", "style": "font-size:.7rem;font-weight:700;color:#10b981;letter-spacing:.08em;margin-bottom:.5rem" } },
+              { "id": "a3-title", "type": "heading", "props": { "level": 3, "text": "Website Speed Optimisation: A Practical Checklist for 2025", "style": "font-size:1.1rem;font-weight:700;margin:0 0 .5rem;line-height:1.4" } },
+              { "id": "a3-excerpt", "type": "text", "props": { "text": "From image compression to lazy loading — every technique you need to hit a perfect Lighthouse score.", "style": "color:#6b7280;font-size:.875rem;line-height:1.6;margin-bottom:1rem" } },
+              { "id": "a3-meta", "type": "text", "props": { "text": "Jan 5 · 6 min read", "style": "font-size:.75rem;color:#9ca3af" } }
+            ]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "newsletter",
+      "type": "container",
+      "props": { "style": "background:#f8fafc;border-top:1px solid #e5e7eb;padding:4rem 2rem;text-align:center" },
+      "children": [
+        { "id": "nl-title", "type": "heading", "props": { "level": 2, "text": "Stay in the loop", "style": "font-size:1.75rem;font-weight:700;margin-bottom:.5rem" } },
+        { "id": "nl-sub", "type": "text", "props": { "text": "Get the latest articles delivered straight to your inbox. No spam, unsubscribe any time.", "style": "color:#6b7280;margin-bottom:1.5rem" } },
+        { "id": "nl-btn", "type": "button", "props": { "text": "Subscribe →", "url": "#", "style": "background:#1e3a8a;color:#fff;padding:.75rem 2.5rem;border-radius:9999px;font-weight:600;text-decoration:none;display:inline-block" } }
+      ]
+    }
+  ]
+}

@@ -77,6 +77,9 @@ window.KronosConfig = {
     <a href="<?= kronos_url('/dashboard/ai') ?>" class="nav-item <?= $nav_active('/dashboard/ai') ?>">
       <span class="nav-icon">🤖</span> AI Chat
     </a>
+    <a href="<?= kronos_url('/dashboard/templates') ?>" class="nav-item <?= $nav_active('/dashboard/templates') ?>">
+      <span class="nav-icon">📐</span> Templates
+    </a>
     <a href="<?= kronos_url('/dashboard/marketplace') ?>" class="nav-item <?= $nav_active('/dashboard/marketplace') ?>">
       <span class="nav-icon">🛍️</span> Marketplace
     </a>

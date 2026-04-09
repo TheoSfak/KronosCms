@@ -1,0 +1,122 @@
+{
+  "meta": {
+    "title": "Product Detail Page",
+    "description": "Full product page with image gallery, details, size selector, add to cart, and related products.",
+    "mode": "ecommerce",
+    "emoji": "🛍️"
+  },
+  "version": 1,
+  "slug": "ecom-product",
+  "title": "Product Detail Page",
+  "blocks": [
+    {
+      "id": "nav",
+      "type": "container",
+      "props": { "style": "background:#fff;border-bottom:1px solid #e5e7eb;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100" },
+      "children": [
+        { "id": "nav-logo", "type": "heading", "props": { "level": 2, "text": "KRONOS SHOP", "style": "font-size:1.1rem;font-weight:800;letter-spacing:.05em;color:#0f172a;margin:0" } },
+        { "id": "nav-breadcrumb", "type": "text", "props": { "text": "Home / Women / Tops / Classic Linen Blouse", "style": "font-size:.8rem;color:#94a3b8" } },
+        { "id": "nav-cart", "type": "button", "props": { "text": "🛒 Cart (1)", "style": "background:#0f172a;color:#fff;padding:.45rem 1rem;border-radius:.5rem;font-size:.8rem;border:none;cursor:pointer" } }
+      ]
+    },
+    {
+      "id": "product-main",
+      "type": "container",
+      "props": { "style": "max-width:1100px;margin:2.5rem auto;padding:0 2rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start" },
+      "children": [
+        {
+          "id": "gallery",
+          "type": "container",
+          "props": { "style": "display:flex;flex-direction:column;gap:.75rem" },
+          "children": [
+            { "id": "main-img", "type": "image", "props": { "src": "https://placehold.co/560x640/f1f5f9/334155?text=Product+Image", "alt": "Product main image", "style": "width:100%;border-radius:1rem;display:block" } },
+            { "id": "thumbs", "type": "container", "props": { "style": "display:flex;gap:.75rem" }, "children": [
+              { "id": "th1", "type": "image", "props": { "src": "https://placehold.co/120x140/e0e7ff/4f46e5?text=Alt+1", "alt": "Alternate view 1", "style": "width:80px;border-radius:.5rem;cursor:pointer;border:2px solid #4f46e5" } },
+              { "id": "th2", "type": "image", "props": { "src": "https://placehold.co/120x140/ecfdf5/10b981?text=Alt+2", "alt": "Alternate view 2", "style": "width:80px;border-radius:.5rem;cursor:pointer;border:2px solid #e5e7eb" } },
+              { "id": "th3", "type": "image", "props": { "src": "https://placehold.co/120x140/fff7ed/f59e0b?text=Alt+3", "alt": "Alternate view 3", "style": "width:80px;border-radius:.5rem;cursor:pointer;border:2px solid #e5e7eb" } }
+            ]}
+          ]
+        },
+        {
+          "id": "details",
+          "type": "container",
+          "props": { "style": "display:flex;flex-direction:column;gap:1.25rem" },
+          "children": [
+            { "id": "prod-cat", "type": "text", "props": { "text": "WOMEN · TOPS", "style": "font-size:.7rem;font-weight:700;letter-spacing:.1em;color:#64748b" } },
+            { "id": "prod-title", "type": "heading", "props": { "level": 1, "text": "Classic Linen Blouse", "style": "font-size:2rem;font-weight:800;color:#0f172a;margin:0;line-height:1.2" } },
+            { "id": "prod-rating", "type": "text", "props": { "text": "★★★★☆ · 4.3 (128 reviews)", "style": "color:#f59e0b;font-size:.9rem" } },
+            { "id": "prod-price", "type": "container", "props": { "style": "display:flex;align-items:baseline;gap:.75rem" }, "children": [
+              { "id": "price-now", "type": "text", "props": { "text": "£49.00", "style": "font-size:1.6rem;font-weight:800;color:#0f172a" } },
+              { "id": "price-was", "type": "text", "props": { "text": "£79.00", "style": "font-size:1rem;color:#9ca3af;text-decoration:line-through" } },
+              { "id": "price-badge", "type": "text", "props": { "text": "Save 38%", "style": "background:#dcfce7;color:#166534;font-size:.75rem;font-weight:600;padding:.15rem .5rem;border-radius:.25rem" } }
+            ]},
+            { "id": "prod-desc", "type": "text", "props": { "text": "A timeless linen blouse crafted from premium Belgian linen. Naturally breathable, beautifully textured, and designed to last a lifetime. Perfect for both casual and smart-casual occasions.", "style": "color:#64748b;line-height:1.8;font-size:.95rem" } },
+            { "id": "color-section", "type": "container", "props": {}, "children": [
+              { "id": "color-label", "type": "text", "props": { "text": "Colour: Natural White", "style": "font-size:.85rem;font-weight:600;margin-bottom:.5rem;color:#0f172a" } },
+              { "id": "color-swatches", "type": "container", "props": { "style": "display:flex;gap:.5rem" }, "children": [
+                { "id": "sw1", "type": "text", "props": { "text": " ", "style": "width:32px;height:32px;border-radius:50%;background:#f1f5f9;border:2px solid #4f46e5;cursor:pointer;display:inline-block" } },
+                { "id": "sw2", "type": "text", "props": { "text": " ", "style": "width:32px;height:32px;border-radius:50%;background:#b45309;border:2px solid #e5e7eb;cursor:pointer;display:inline-block" } },
+                { "id": "sw3", "type": "text", "props": { "text": " ", "style": "width:32px;height:32px;border-radius:50%;background:#0f172a;border:2px solid #e5e7eb;cursor:pointer;display:inline-block" } }
+              ]}
+            ]},
+            { "id": "size-section", "type": "container", "props": {}, "children": [
+              { "id": "size-label", "type": "text", "props": { "text": "Size:", "style": "font-size:.85rem;font-weight:600;margin-bottom:.5rem;color:#0f172a" } },
+              { "id": "size-btns", "type": "container", "props": { "style": "display:flex;gap:.5rem;flex-wrap:wrap" }, "children": [
+                { "id": "sz-xs", "type": "button", "props": { "text": "XS", "style": "padding:.4rem .9rem;border:1px solid #e5e7eb;border-radius:.375rem;font-size:.8rem;cursor:pointer;background:#fff" } },
+                { "id": "sz-s",  "type": "button", "props": { "text": "S",  "style": "padding:.4rem .9rem;border:2px solid #4f46e5;border-radius:.375rem;font-size:.8rem;cursor:pointer;background:#ede9fe;font-weight:600" } },
+                { "id": "sz-m",  "type": "button", "props": { "text": "M",  "style": "padding:.4rem .9rem;border:1px solid #e5e7eb;border-radius:.375rem;font-size:.8rem;cursor:pointer;background:#fff" } },
+                { "id": "sz-l",  "type": "button", "props": { "text": "L",  "style": "padding:.4rem .9rem;border:1px solid #e5e7eb;border-radius:.375rem;font-size:.8rem;cursor:pointer;background:#fff" } },
+                { "id": "sz-xl", "type": "button", "props": { "text": "XL", "style": "padding:.4rem .9rem;border:1px solid #d1d5db;border-radius:.375rem;font-size:.8rem;cursor:not-allowed;background:#f9fafb;color:#9ca3af;text-decoration:line-through" } }
+              ]}
+            ]},
+            { "id": "add-to-cart", "type": "button", "props": { "text": "Add to Cart — £49.00", "style": "background:#0f172a;color:#fff;padding:1rem 2rem;border-radius:.5rem;font-weight:700;font-size:1rem;border:none;cursor:pointer;width:100%;text-align:center" } },
+            { "id": "wishlist", "type": "button", "props": { "text": "♡ Save to Wishlist", "style": "background:transparent;color:#64748b;border:1px solid #e5e7eb;padding:.75rem 2rem;border-radius:.5rem;font-size:.9rem;cursor:pointer;width:100%" } },
+            { "id": "shipping-info", "type": "container", "props": { "style": "background:#f8fafc;border-radius:.5rem;padding:1rem;font-size:.8rem;color:#475569;line-height:1.6" }, "children": [
+              { "id": "s1", "type": "text", "props": { "text": "🚚 Free delivery on orders over £50", "style": "margin-bottom:.25rem" } },
+              { "id": "s2", "type": "text", "props": { "text": "↩ Free returns within 30 days", "style": "margin-bottom:.25rem" } },
+              { "id": "s3", "type": "text", "props": { "text": "🌿 Made from sustainable materials", "style": "" } }
+            ]}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "related",
+      "type": "container",
+      "props": { "style": "padding:3rem 2rem;max-width:1100px;margin:0 auto;border-top:1px solid #e5e7eb" },
+      "children": [
+        { "id": "related-title", "type": "heading", "props": { "level": 2, "text": "You might also like", "style": "font-size:1.4rem;font-weight:700;margin-bottom:1.5rem;color:#0f172a" } },
+        { "id": "related-grid", "type": "container", "props": { "style": "display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem" }, "children": [
+          { "id": "r1", "type": "container", "props": { "style": "border-radius:.75rem;overflow:hidden;border:1px solid #e5e7eb;cursor:pointer" }, "children": [
+            { "id": "r1-img", "type": "image", "props": { "src": "https://placehold.co/280x320/f1f5f9/334155?text=Related+1", "alt": "Related product 1", "style": "width:100%;display:block" } },
+            { "id": "r1-info", "type": "container", "props": { "style": "padding:.75rem" }, "children": [
+              { "id": "r1-name", "type": "text", "props": { "text": "Silk Wrap Dress", "style": "font-weight:600;font-size:.9rem;color:#0f172a" } },
+              { "id": "r1-price", "type": "text", "props": { "text": "£79.00", "style": "color:#4f46e5;font-weight:700;font-size:.9rem" } }
+            ]}
+          ]},
+          { "id": "r2", "type": "container", "props": { "style": "border-radius:.75rem;overflow:hidden;border:1px solid #e5e7eb;cursor:pointer" }, "children": [
+            { "id": "r2-img", "type": "image", "props": { "src": "https://placehold.co/280x320/f1f5f9/334155?text=Related+2", "alt": "Related product 2", "style": "width:100%;display:block" } },
+            { "id": "r2-info", "type": "container", "props": { "style": "padding:.75rem" }, "children": [
+              { "id": "r2-name", "type": "text", "props": { "text": "Tailored Wide-Leg Trousers", "style": "font-weight:600;font-size:.9rem;color:#0f172a" } },
+              { "id": "r2-price", "type": "text", "props": { "text": "£65.00", "style": "color:#4f46e5;font-weight:700;font-size:.9rem" } }
+            ]}
+          ]},
+          { "id": "r3", "type": "container", "props": { "style": "border-radius:.75rem;overflow:hidden;border:1px solid #e5e7eb;cursor:pointer" }, "children": [
+            { "id": "r3-img", "type": "image", "props": { "src": "https://placehold.co/280x320/f1f5f9/334155?text=Related+3", "alt": "Related product 3", "style": "width:100%;display:block" } },
+            { "id": "r3-info", "type": "container", "props": { "style": "padding:.75rem" }, "children": [
+              { "id": "r3-name", "type": "text", "props": { "text": "Linen Straight Skirt", "style": "font-weight:600;font-size:.9rem;color:#0f172a" } },
+              { "id": "r3-price", "type": "text", "props": { "text": "£42.00", "style": "color:#4f46e5;font-weight:700;font-size:.9rem" } }
+            ]}
+          ]},
+          { "id": "r4", "type": "container", "props": { "style": "border-radius:.75rem;overflow:hidden;border:1px solid #e5e7eb;cursor:pointer" }, "children": [
+            { "id": "r4-img", "type": "image", "props": { "src": "https://placehold.co/280x320/f1f5f9/334155?text=Related+4", "alt": "Related product 4", "style": "width:100%;display:block" } },
+            { "id": "r4-info", "type": "container", "props": { "style": "padding:.75rem" }, "children": [
+              { "id": "r4-name", "type": "text", "props": { "text": "Cashmere Turtleneck", "style": "font-weight:600;font-size:.9rem;color:#0f172a" } },
+              { "id": "r4-price", "type": "text", "props": { "text": "£98.00", "style": "color:#4f46e5;font-weight:700;font-size:.9rem" } }
+            ]}
+          ]}
+        ]}
+      ]
+    }
+  ]
+}

@@ -24,6 +24,7 @@ const PAGES = [
   { label: 'Builder',      path: '/dashboard/builder/1' },
   { label: 'Analytics',    path: '/dashboard/analytics' },
   { label: 'AI Chat',      path: '/dashboard/ai' },
+  { label: 'Templates',    path: '/dashboard/templates' },
   { label: 'Marketplace',  path: '/dashboard/marketplace' },
   { label: 'Users',        path: '/dashboard/users' },
   { label: 'Settings',     path: '/dashboard/settings' },
