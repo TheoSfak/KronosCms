@@ -1,8 +1,6 @@
 <?php
 declare(strict_types=1);
 
-namespace Kronos;
-
 use Kronos\Core\KronosModule;
 use Kronos\Core\KronosApp;
 

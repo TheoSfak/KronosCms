@@ -1,12 +1,8 @@
 <?php
 declare(strict_types=1);
 
-namespace Kronos;
-
 use Kronos\Core\KronosModule;
 use Kronos\Core\KronosApp;
-use Kronos\Marketplace\HubClient;
-use Kronos\Marketplace\PackageInstaller;
 
 /**
  * KronosMarketplaceModule — integrates the Hub package marketplace.

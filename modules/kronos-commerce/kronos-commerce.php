@@ -1,11 +1,8 @@
 <?php
 declare(strict_types=1);
 
-namespace Kronos;
-
 use Kronos\Core\KronosModule;
 use Kronos\Core\KronosApp;
-use Kronos\Commerce\PaymentManager;
 
 /**
  * KronosCommerceModule — wires the commerce payment layer into KronosCMS.
