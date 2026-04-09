@@ -68,7 +68,7 @@ $appName = kronos_option('app_name', 'KronosCMS');
   <div class="alert alert-error"><?= kronos_e($error) ?></div>
   <?php endif; ?>
 
-  <form method="POST" action="/dashboard/login" class="login-form">
+  <form method="POST" action="<?= kronos_url('/dashboard/login') ?>" class="login-form">
     <div class="form-group">
       <label>Username or Email</label>
       <input type="text" name="username" value="<?= kronos_e($_POST['username'] ?? '') ?>" required autocomplete="username" autofocus>

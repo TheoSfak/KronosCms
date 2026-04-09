@@ -52,6 +52,11 @@ function apply_filters(string $hook, mixed $value, mixed ...$args): mixed
 
 function kronos_redirect(string $url, int $status = 302): void
 {
+    // If a root-relative path is given, prepend the app base URL so it works
+    // correctly in subdirectory installs (e.g. /KronosCMS/public/dashboard/login)
+    if (str_starts_with($url, '/')) {
+        $url = kronos_url($url);
+    }
     http_response_code($status);
     header('Location: ' . $url);
     exit;
