@@ -156,9 +156,15 @@ function kronos_csrf_token(): string
 
 function kronos_verify_csrf(): void
 {
-    $header = $_SERVER['HTTP_X_KRONOS_CSRF'] ?? '';
     $cookie = $_COOKIE['kronos_csrf'] ?? '';
-    if (empty($header) || empty($cookie) || !hash_equals($cookie, $header)) {
+
+    // Accept from either the X-Kronos-CSRF header (AJAX/fetch) or the
+    // _kronos_csrf form field (standard HTML form POST).
+    $token = $_SERVER['HTTP_X_KRONOS_CSRF']
+          ?? $_POST['_kronos_csrf']
+          ?? '';
+
+    if ($token === '' || $cookie === '' || !hash_equals($cookie, $token)) {
         kronos_abort(403, 'Invalid CSRF token');
     }
 }

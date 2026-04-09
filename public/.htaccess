@@ -9,6 +9,9 @@ Options -MultiViews
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # Pass Authorization header through to PHP (Apache strips it by default)
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
     # Serve existing static files directly (css, js, images, fonts, etc.)
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^ - [L]

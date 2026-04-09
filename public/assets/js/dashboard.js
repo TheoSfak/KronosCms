@@ -41,7 +41,7 @@
           // Retry original request
           return fetch(url, init).then(r => r.json());
         } else {
-          window.location.href = '/dashboard/login';
+          window.location.href = (cfg.appUrl || '') + '/dashboard/login';
           return null;
         }
       }

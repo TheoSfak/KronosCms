@@ -27,6 +27,10 @@ class StreamEndpoint
 
     public function handle(array $params): void
     {
+        // Allow the SSE stream to run indefinitely (EventSource reconnects after timeout)
+        set_time_limit(0);
+        ignore_user_abort(true);
+
         // SSE headers — disable all buffering
         header('Content-Type: text/event-stream; charset=utf-8');
         header('Cache-Control: no-cache, no-store, must-revalidate');

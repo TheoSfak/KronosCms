@@ -28,45 +28,43 @@ $errors   = [];
 $success  = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!kronos_verify_csrf($_POST['_kronos_csrf'] ?? '')) {
-        $errors[] = 'Invalid security token. Please refresh and try again.';
-    } else {
-        $title    = trim($_POST['title'] ?? '');
-        $slug     = kronos_sanitize_slug($_POST['slug'] ?? $title);
-        $postType = in_array($_POST['post_type'] ?? '', ['post', 'page'], true) ? $_POST['post_type'] : 'post';
-        $status   = in_array($_POST['status'] ?? '', ['published', 'draft'], true) ? $_POST['status'] : 'draft';
-        $layoutId = !empty($_POST['layout_id']) ? (int) $_POST['layout_id'] : null;
+    kronos_verify_csrf(); // aborts with 403 JSON on CSRF mismatch
 
-        if ($title === '') {
-            $errors[] = 'Title is required.';
-        }
-        if ($slug === '') {
-            $errors[] = 'Slug is required.';
-        }
+    $title    = trim($_POST['title'] ?? '');
+    $slug     = kronos_sanitize_slug($_POST['slug'] ?? $title);
+    $postType = in_array($_POST['post_type'] ?? '', ['post', 'page'], true) ? $_POST['post_type'] : 'post';
+    $status   = in_array($_POST['status'] ?? '', ['published', 'draft'], true) ? $_POST['status'] : 'draft';
+    $layoutId = !empty($_POST['layout_id']) ? (int) $_POST['layout_id'] : null;
 
-        if (empty($errors)) {
-            $data = [
-                'title'      => $title,
-                'slug'       => $slug,
-                'post_type'  => $postType,
-                'status'     => $status,
-                'layout_id'  => $layoutId,
-                'updated_at' => date('Y-m-d H:i:s'),
-            ];
+    if ($title === '') {
+        $errors[] = 'Title is required.';
+    }
+    if ($slug === '') {
+        $errors[] = 'Slug is required.';
+    }
 
-            if ($isEdit) {
-                $db->update('kronos_posts', $data, ['id' => $postId]);
-                $success = true;
-                // Refresh data
-                $post = $db->getRow('SELECT * FROM kronos_posts WHERE id = ?', [$postId]);
+    if (empty($errors)) {
+        $data = [
+            'title'      => $title,
+            'slug'       => $slug,
+            'post_type'  => $postType,
+            'status'     => $status,
+            'layout_id'  => $layoutId,
+            'updated_at' => date('Y-m-d H:i:s'),
+        ];
+
+        if ($isEdit) {
+            $db->update('kronos_posts', $data, ['id' => $postId]);
+            $success = true;
+            // Refresh data
+            $post = $db->getRow('SELECT * FROM kronos_posts WHERE id = ?', [$postId]);
+        } else {
+            $data['created_at'] = date('Y-m-d H:i:s');
+            $newId = $db->insert('kronos_posts', $data);
+            if ($newId) {
+                kronos_redirect('/dashboard/content/' . $newId . '?created=1');
             } else {
-                $data['created_at'] = date('Y-m-d H:i:s');
-                $newId = $db->insert('kronos_posts', $data);
-                if ($newId) {
-                    kronos_redirect('/dashboard/content/' . $newId . '?created=1');
-                } else {
-                    $errors[] = 'Failed to create post. Please try again.';
-                }
+                $errors[] = 'Failed to create post. Please try again.';
             }
         }
     }
