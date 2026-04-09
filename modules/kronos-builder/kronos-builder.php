@@ -25,7 +25,7 @@ class KronosBuilderModule extends KronosModule
         $router = $app->router();
 
         // Rendered page output (public-facing, no auth)
-        $router->add('GET', '/page/{slug}', [$this, 'renderPage']);
+        $router->get('/page/{slug}', [$this, 'renderPage']);
 
         // Register built-in widgets via hook
         do_action('kronos/builder/register_widgets');
