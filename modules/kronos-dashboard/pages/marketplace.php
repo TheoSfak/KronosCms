@@ -21,6 +21,7 @@ require $dashDir . '/partials/layout-header.php';
     grid.innerHTML = '<p class="text-muted">Loading…</p>';
     try {
       const res = await window.KronosDash.api('/marketplace/directory', 'GET');
+      if (!res) throw new Error('No response from server — check PHP error logs.');
       const packages = res.data || [];
       if (!packages.length) {
         grid.innerHTML = '<p class="text-muted">No packages available.</p>';

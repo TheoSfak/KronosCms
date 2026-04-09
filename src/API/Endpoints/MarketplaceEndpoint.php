@@ -39,7 +39,7 @@ class MarketplaceEndpoint
     private function directory(): void
     {
         $app    = KronosApp::getInstance();
-        $client = new HubClient($app);
+        $client = new HubClient($app->config());
         $data   = $client->fetchDirectory();
         kronos_json(['data' => $data]);
     }
