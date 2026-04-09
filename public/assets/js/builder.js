@@ -69,40 +69,38 @@
       const hint = document.createElement('div');
       hint.className = 'canvas-drop-zone';
       hint.id = 'builder-empty-hint';
-      hint.innerHTML = '<span>Drag a widget here to start building</span>';
+      hint.innerHTML = '<span class="drop-icon">✦</span><strong style="color:#374151;font-size:.9rem">Drop a block to start building</strong><span style="font-size:.8rem">Drag anything from the left panel</span>';
       canvas.appendChild(hint);
     }
 
     ast.forEach(block => renderBlock(block, canvas, ast));
   }
 
-  /* ── Block renderer (shared with dashboard.js canvas init) ────── */
+  /* ── Block renderer ──────────────────────────────────────────── */
   function renderBlock(block, canvas, ast) {
     const widget = (window.KronosAPI && window.KronosAPI.Widgets._registry)
       ? window.KronosAPI.Widgets._registry[block.type]
       : null;
 
     const el = document.createElement('div');
-    el.className    = 'canvas-block';
+    el.className       = 'canvas-block';
     el.dataset.blockId = block.id;
-    el.draggable    = true;
-    el.style.position = 'relative';
+    el.draggable       = true;
 
-    // Render content
-    if (widget) {
-      el.innerHTML = widget.render(block.attrs || {});
-    } else {
-      el.innerHTML = `<span class="text-muted text-sm">[${escHtml(block.type)}]</span>`;
-    }
+    // Block type badge
+    const badge = document.createElement('span');
+    badge.className   = 'block-type-badge';
+    badge.textContent = block.type;
+    el.appendChild(badge);
 
     // Block toolbar
     const toolbar = document.createElement('div');
-    toolbar.style.cssText = 'position:absolute;top:6px;right:6px;display:flex;gap:4px;opacity:0;transition:opacity .15s';
-    el.addEventListener('mouseenter', () => { toolbar.style.opacity = '1'; });
-    el.addEventListener('mouseleave', () => { toolbar.style.opacity = '0'; });
+    toolbar.className = 'block-toolbar';
 
-    // Duplicate
-    const dupBtn = makeBtn('⊕', 'Duplicate', () => {
+    const handleBtn = makeBtn('⠿', 'Drag to reorder', () => {});
+    handleBtn.classList.add('btn-handle');
+
+    const dupBtn = makeBtn('⧉', 'Duplicate', () => {
       const idx      = ast.findIndex(b => b.id === block.id);
       const newBlock = { ...block, id: uid(), attrs: { ...block.attrs } };
       ast.splice(idx + 1, 0, newBlock);
@@ -111,7 +109,6 @@
       saveAst(ast);
     });
 
-    // Delete
     const delBtn = makeBtn('✕', 'Delete', () => {
       const idx = ast.findIndex(b => b.id === block.id);
       if (idx > -1) {
@@ -121,39 +118,46 @@
         saveAst(ast);
       }
     });
-    delBtn.style.color = 'var(--danger)';
+    delBtn.classList.add('btn-danger');
 
+    toolbar.appendChild(handleBtn);
     toolbar.appendChild(dupBtn);
     toolbar.appendChild(delBtn);
     el.appendChild(toolbar);
 
-    // ── Block drag-to-reorder ──
+    // Content wrapper
+    const content = document.createElement('div');
+    content.className = 'block-content';
+    if (widget) {
+      content.innerHTML = widget.render(block.attrs || {});
+    } else {
+      content.innerHTML = `<span style="color:#9ca3af;font-size:.8rem">[${escHtml(block.type)}]</span>`;
+    }
+    el.appendChild(content);
+
+    // ── Drag to reorder ──
     el.addEventListener('dragstart', e => {
       e.dataTransfer.setData('block-id', block.id);
       e.dataTransfer.effectAllowed = 'move';
-      el.style.opacity = '0.5';
+      setTimeout(() => { el.style.opacity = '0.4'; }, 0);
     });
-    el.addEventListener('dragend', () => { el.style.opacity = '1'; });
+    el.addEventListener('dragend', () => { el.style.opacity = ''; el.classList.remove('drag-over-block'); });
 
     el.addEventListener('dragover', e => {
       e.preventDefault();
       const src = e.dataTransfer.getData('block-id');
-      if (src && src !== block.id) {
-        el.style.outline = '2px solid var(--primary)';
-      }
+      if (src && src !== block.id) el.classList.add('drag-over-block');
     });
-    el.addEventListener('dragleave', () => { el.style.outline = ''; });
+    el.addEventListener('dragleave', () => el.classList.remove('drag-over-block'));
 
     el.addEventListener('drop', e => {
       e.preventDefault();
-      el.style.outline = '';
+      el.classList.remove('drag-over-block');
       const srcId = e.dataTransfer.getData('block-id');
       if (!srcId || srcId === block.id) return;
-
       const srcIdx  = ast.findIndex(b => b.id === srcId);
       const destIdx = ast.findIndex(b => b.id === block.id);
       if (srcIdx < 0 || destIdx < 0) return;
-
       const [moved] = ast.splice(srcIdx, 1);
       ast.splice(destIdx, 0, moved);
       history.push([...ast]);
@@ -183,15 +187,22 @@
 
     const controls = widget ? widget.getControls() : [];
 
-    inspector.innerHTML = `<div class="builder-panel-header">${escHtml(block.type)} Settings</div>`;
-    const form = document.createElement('div');
-    form.style.padding = '12px';
+    inspector.innerHTML = '';
+
+    // Header with type pill
+    const hdr = document.createElement('div');
+    hdr.className = 'inspector-block-header';
+    hdr.innerHTML = `<span class="inspector-type-pill">${escHtml(block.type)}</span>
+                     <span class="inspector-block-label">Properties</span>`;
+    inspector.appendChild(hdr);
 
     if (controls.length === 0) {
-      const note = document.createElement('p');
-      note.className = 'text-sm text-muted';
-      note.textContent = 'No editable properties.';
-      form.appendChild(note);
+      const empty = document.createElement('div');
+      empty.className = 'inspector-empty';
+      empty.innerHTML = `<div class="inspector-empty-icon">⬡</div>
+                         <div class="inspector-empty-label">This block has no<br>editable properties.</div>`;
+      inspector.appendChild(empty);
+      return;
     }
 
     controls.forEach(ctrl => {
@@ -206,6 +217,7 @@
       if (ctrl.type === 'textarea') {
         input = document.createElement('textarea');
         input.value = block.attrs[ctrl.key] ?? ctrl.default ?? '';
+        input.rows  = 3;
       } else if (ctrl.type === 'select') {
         input = document.createElement('select');
         (ctrl.options || []).forEach(opt => {
@@ -219,27 +231,24 @@
         input = document.createElement('input');
         input.type  = ctrl.type || 'text';
         input.value = block.attrs[ctrl.key] ?? ctrl.default ?? '';
+        input.placeholder = ctrl.default ?? '';
       }
 
       input.addEventListener('input', function () {
         block.attrs[ctrl.key] = this.value;
 
-        // Re-render just the affected block
-        const el = canvas.querySelector(`[data-block-id="${block.id}"]`);
-        if (el && widget) {
-          const tools = el.querySelector(':scope > div[style*="position:absolute"]');
-          el.innerHTML = widget.render(block.attrs);
-          if (tools) el.appendChild(tools);
+        // Re-render content area only (preserve badge + toolbar)
+        const el      = canvas.querySelector(`[data-block-id="${block.id}"]`);
+        const content = el ? el.querySelector('.block-content') : null;
+        if (content && widget) {
+          content.innerHTML = widget.render(block.attrs);
         }
-
         saveAst(ast);
       });
 
       group.appendChild(input);
-      form.appendChild(group);
+      inspector.appendChild(group);
     });
-
-    inspector.appendChild(form);
   }
 
   /* ── Debounced save ───────────────────────────────────────────── */
@@ -271,6 +280,13 @@
       if (e.dataTransfer.types.includes('widget-type')) {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'copy';
+        canvas.parentElement.classList.add('drag-over');
+      }
+    });
+
+    canvas.addEventListener('dragleave', e => {
+      if (!canvas.contains(e.relatedTarget)) {
+        canvas.parentElement.classList.remove('drag-over');
       }
     });
 
@@ -279,6 +295,7 @@
       if (!type) return;
 
       e.preventDefault();
+      canvas.parentElement.classList.remove('drag-over');
       const hint = document.getElementById('builder-empty-hint');
       if (hint) hint.remove();
 
@@ -368,10 +385,9 @@
 
   function makeBtn(icon, title, onClick) {
     const btn = document.createElement('button');
-    btn.className   = 'action-btn';
+    btn.className   = 'block-toolbar-btn';
     btn.textContent = icon;
     btn.title       = title;
-    btn.style.cssText = 'padding:2px 6px;font-size:.75rem;';
     btn.addEventListener('click', e => { e.stopPropagation(); onClick(); });
     return btn;
   }
