@@ -150,7 +150,20 @@ img { max-width: 100%; display: block; }
 
 
 /* ── Main Content ────────────────────────────────────── */
-.main-content { overflow: auto; }
+.main-content {
+  grid-row: 1 / -1;
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.main-content > main.page-content {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+}
 
 .page-content { padding: 24px; max-width: 1280px; }
 
@@ -556,10 +569,19 @@ select { appearance: auto; cursor: pointer; }
 
 
 /* ── Builder ─────────────────────────────────────────── */
+/* Builder page: page-content fills main, no padding, no max-width */
+.builder-page .main-content > main.page-content {
+  padding: 0;
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+}
+
 .builder-layout {
   display: grid;
   grid-template-columns: 220px 1fr 260px;
-  height: calc(100vh - var(--topbar-h));
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 

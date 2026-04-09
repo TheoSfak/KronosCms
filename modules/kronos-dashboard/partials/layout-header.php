@@ -28,7 +28,7 @@ $nav_active = function(string $path) use ($currentUri): string {
 <title><?= kronos_e($pageTitle ?? 'Dashboard') ?> — <?= kronos_e($appName) ?></title>
 <link rel="stylesheet" href="<?= kronos_asset('css/dashboard.css') ?>">
 </head>
-<body class="dashboard-body">
+<body class="dashboard-body<?= !empty($builderPage) ? ' builder-page' : '' ?>">
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
@@ -95,6 +95,7 @@ $nav_active = function(string $path) use ($currentUri): string {
     <button class="sidebar-toggle" onclick="document.getElementById('sidebar').classList.toggle('collapsed')" aria-label="Toggle sidebar">☰</button>
     <h1 class="page-title"><?= kronos_e($pageTitle ?? 'Dashboard') ?></h1>
     <div class="topbar-actions">
+      <?= $topbarExtra ?? '' ?>
       <a href="<?= kronos_url('/') ?>" target="_blank" class="topbar-btn" title="View site">↗ Site</a>
     </div>
   </header>

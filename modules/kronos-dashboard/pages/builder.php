@@ -50,41 +50,18 @@ $widgets = [
 
 do_action('kronos/builder/widgets', $widgets);
 
-?><!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Builder — <?= kronos_e($layout['layout_name']) ?> — <?= kronos_e(kronos_option('app_name', 'KronosCMS')) ?></title>
-<link rel="stylesheet" href="<?= kronos_asset('css/dashboard.css') ?>">
-<style>
-/* Override body layout for full-screen builder */
-body.builder-page .main-content { overflow: hidden; }
-</style>
-</head>
-<body class="dashboard-body builder-page">
-
-<?php
-// Render sidebar via layout-header partial (but we need $app injected already)
-require __DIR__ . '/../partials/layout-header.php';
+$pageTitle   = 'Builder — ' . ($layout['layout_name'] ?? 'Untitled');
+$builderPage = true;
+$topbarExtra = '<input type="text" id="builder-layout-name"
+    value="' . htmlspecialchars($layout['layout_name'] ?? '', ENT_QUOTES) . '"
+    style="border:none;background:transparent;font-weight:600;font-size:.95rem;width:260px;padding:4px 0;outline:none;"
+    placeholder="Layout name…">
+  <span id="builder-save-status" class="text-muted text-sm">Auto-saved</span>
+  <button id="builder-save-btn" class="btn btn-primary btn-sm">Save</button>
+  <a href="' . kronos_url('/dashboard/content') . '" class="btn btn-ghost btn-sm">← Exit</a>';
+$dashDir     = dirname(__DIR__);
+require $dashDir . '/partials/layout-header.php';
 ?>
-
-<!-- ── Builder Topbar (replaces normal topbar) ── -->
-<div class="topbar" style="gap:10px;">
-  <a href="<?= kronos_url('/dashboard/content') ?>" class="btn btn-ghost btn-sm">← Exit Builder</a>
-
-  <div style="flex:1;padding:0 12px;">
-    <input type="text" id="builder-layout-name"
-           value="<?= kronos_e($layout['layout_name']) ?>"
-           style="border:none;background:transparent;font-weight:600;font-size:.95rem;width:300px;padding:4px 0;"
-           placeholder="Layout name…">
-  </div>
-
-  <div class="topbar-actions">
-    <span id="builder-save-status" class="text-muted text-sm">Auto-saved</span>
-    <button id="builder-save-btn" class="btn btn-primary btn-sm">Save</button>
-  </div>
-</div>
 
 <!-- ── Three-panel Builder Layout ── -->
 <div class="builder-layout">
@@ -138,9 +115,11 @@ window.KronosBuilderMeta = {
 </script>
 
 <?php
-// layout-footer injects window.KronosConfig and loads dashboard.js (which includes builder init)
+// layout-footer injects window.KronosConfig and loads dashboard.js
 require __DIR__ . '/../partials/layout-footer.php';
 ?>
+
+<script src="<?= kronos_asset('js/builder.js') ?>"></script>
 
 <script src="<?= kronos_asset('js/builder.js') ?>"></script>
 
@@ -189,5 +168,3 @@ document.addEventListener('drop', function(){
   if (hint) hint.remove();
 }, { once: true, capture: true });
 </script>
-</body>
-</html>
