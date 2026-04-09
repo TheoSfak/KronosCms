@@ -1,6 +1,15 @@
 # Rewrite to public/ — needed when repo root is the XAMPP htdocs subfolder
 <IfModule mod_rewrite.c>
     RewriteEngine On
+
+    # Pass install wizard, hub-mock, and vendor through as-is
+    RewriteRule ^install(/.*)?$ - [L]
+    RewriteRule ^hub-mock(/.*)?$ - [L]
+    RewriteRule ^vendor(/.*)?$ - [L]
+
+    # Root → public/
     RewriteRule ^$ public/ [L]
+
+    # Everything else that isn't already under public/ → public/
     RewriteRule ^((?!public/).*)$ public/$1 [L,QSA]
 </IfModule>
