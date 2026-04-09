@@ -27,15 +27,16 @@ if ($layoutId > 0) {
 if (!$layout) {
     $name     = 'Untitled Layout ' . date('Y-m-d H:i');
     $layoutId = (int) $db->insert('kronos_builder_layouts', [
-        'name'       => $name,
-        'content'    => '[]',
-        'created_at' => date('Y-m-d H:i:s'),
-        'updated_at' => date('Y-m-d H:i:s'),
+        'layout_name' => $name,
+        'layout_type' => 'page',
+        'json_data'   => '[]',
+        'created_at'  => date('Y-m-d H:i:s'),
+        'updated_at'  => date('Y-m-d H:i:s'),
     ]);
-    $layout = ['id' => $layoutId, 'name' => $name, 'content' => '[]'];
+    $layout = ['id' => $layoutId, 'layout_name' => $name, 'json_data' => '[]'];
 }
 
-$ast  = json_decode((string) ($layout['content'] ?? '[]'), true);
+$ast  = json_decode((string) ($layout['json_data'] ?? '[]'), true);
 if (!is_array($ast)) $ast = [];
 
 // Available widgets for the palette
@@ -54,7 +55,7 @@ do_action('kronos/builder/widgets', $widgets);
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Builder — <?= kronos_e($layout['name']) ?> — <?= kronos_e(kronos_option('app_name', 'KronosCMS')) ?></title>
+<title>Builder — <?= kronos_e($layout['layout_name']) ?> — <?= kronos_e(kronos_option('app_name', 'KronosCMS')) ?></title>
 <link rel="stylesheet" href="<?= kronos_asset('css/dashboard.css') ?>">
 <style>
 /* Override body layout for full-screen builder */
@@ -74,7 +75,7 @@ require __DIR__ . '/../partials/layout-header.php';
 
   <div style="flex:1;padding:0 12px;">
     <input type="text" id="builder-layout-name"
-           value="<?= kronos_e($layout['name']) ?>"
+           value="<?= kronos_e($layout['layout_name']) ?>"
            style="border:none;background:transparent;font-weight:600;font-size:.95rem;width:300px;padding:4px 0;"
            placeholder="Layout name…">
   </div>
@@ -132,7 +133,7 @@ require __DIR__ . '/../partials/layout-header.php';
 window.KronosBuilderAST  = <?= json_encode($ast, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
 window.KronosBuilderMeta = {
   id:   <?= (int) $layout['id'] ?>,
-  name: <?= json_encode($layout['name']) ?>
+  name: <?= json_encode($layout['layout_name']) ?>
 };
 </script>
 
