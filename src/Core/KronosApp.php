@@ -18,6 +18,9 @@ class KronosApp
     private KronosHooks $hooks;
     private KronosConfig $config;
     private KronosModuleLoader $moduleLoader;
+    private KronosThemeManager $themeManager;
+
+    private string $rootDir = '';
 
     /** @var array<string, mixed> Loaded .env values */
     private array $env = [];
@@ -41,6 +44,7 @@ class KronosApp
     public function bootstrap(string $rootDir): void
     {
         $rootDir = rtrim($rootDir, '/\\');
+        $this->rootDir = $rootDir;
 
         // 1. Load environment variables
         $this->loadEnv($rootDir);
@@ -67,6 +71,10 @@ class KronosApp
         $this->moduleLoader = new KronosModuleLoader($this);
         $this->moduleLoader->loadAll($rootDir . '/modules');
         $this->moduleLoader->bootAll();
+
+        // 5b. Boot theme manager (after modules so filters are registered)
+        $this->themeManager = new KronosThemeManager($this);
+        $this->themeManager->boot();
 
         // 6. Dispatch request
         $matched = $this->router->dispatch();
@@ -98,6 +106,16 @@ class KronosApp
     public function config(): KronosConfig
     {
         return $this->config;
+    }
+
+    public function themeManager(): KronosThemeManager
+    {
+        return $this->themeManager;
+    }
+
+    public function rootDir(): string
+    {
+        return $this->rootDir;
     }
 
     // ------------------------------------------------------------------

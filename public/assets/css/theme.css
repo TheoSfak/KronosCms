@@ -1,0 +1,148 @@
+/* ==========================================================
+   KronosCMS — theme.css (kronos-default theme)
+   Minimal, readable, light mode
+   ========================================================== */
+
+:root {
+  --accent:        #4f46e5;
+  --accent-h:      #4338ca;
+  --text:          #1a1d2b;
+  --text-muted:    #6b7280;
+  --bg:            #ffffff;
+  --bg-alt:        #f8f9fb;
+  --border:        #e3e7ee;
+  --radius:        8px;
+  --container:     960px;
+  --font:          'Inter', system-ui, -apple-system, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body { font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.65; }
+a    { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+img  { max-width: 100%; display: block; }
+
+/* ── Container ─────────────────────────────────────────── */
+.container { max-width: var(--container); margin: 0 auto; padding: 0 20px; }
+
+/* ── Header ────────────────────────────────────────────── */
+.site-header {
+  border-bottom: 1px solid var(--border);
+  padding: 16px 0;
+  background: var(--bg);
+  position: sticky; top: 0; z-index: 100;
+}
+
+.site-header .container {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.site-logo {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--text);
+}
+
+.site-logo:hover { text-decoration: none; }
+
+.site-nav { flex: 1; display: flex; gap: 16px; }
+.site-nav a { color: var(--text-muted); font-size: .9rem; }
+.site-nav a:hover { color: var(--text); text-decoration: none; }
+
+.cart-icon { font-size: 1.2rem; }
+
+/* ── Main content ──────────────────────────────────────── */
+.site-main { min-height: 70vh; }
+
+/* ── Footer ────────────────────────────────────────────── */
+.site-footer {
+  border-top: 1px solid var(--border);
+  background: var(--bg-alt);
+  padding: 24px 0;
+  font-size: .875rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 60px;
+}
+
+/* ── Typography ────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 { line-height: 1.25; margin-bottom: .5em; }
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.75rem; }
+h3 { font-size: 1.35rem; }
+h4 { font-size: 1.1rem; }
+p  { margin-bottom: 1em; }
+
+.page-heading {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.mt-24  { margin-top: 24px; }
+.mb-24  { margin-bottom: 24px; }
+.mt-16  { margin-top: 16px; }
+.text-muted { color: var(--text-muted); }
+.text-sm    { font-size: .875rem; }
+
+/* ── Buttons ───────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  font-size: .95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+  text-decoration: none;
+}
+.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn-primary:hover { background: var(--accent-h); text-decoration: none; }
+
+/* ── Post grid ─────────────────────────────────────────── */
+.post-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.post-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: box-shadow .15s;
+}
+
+.post-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+.post-title { font-size: 1.1rem; margin-bottom: 6px; }
+.post-title a { color: var(--text); }
+.post-title a:hover { color: var(--accent); text-decoration: none; }
+.post-meta { margin-bottom: 0; }
+
+/* ── Single post ───────────────────────────────────────── */
+.single-post { max-width: 720px; }
+.post-header { border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+.post-content { max-width: 720px; }
+.post-content p { margin-bottom: 1.25em; }
+
+/* ── Product layout ────────────────────────────────────── */
+.product-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 40px;
+  align-items: start;
+}
+
+.product-price { margin: 16px 0; }
+
+@media (max-width: 768px) {
+  .product-layout { grid-template-columns: 1fr; }
+  .post-grid { grid-template-columns: 1fr; }
+  .page-heading { font-size: 1.75rem; }
+}

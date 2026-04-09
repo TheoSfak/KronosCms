@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "slug": "home",
+  "title": "Homepage",
+  "blocks": [
+    {
+      "id": "hero-container",
+      "type": "container",
+      "props": {
+        "className": "hero-section",
+        "style": "padding:4rem 1rem;text-align:center;background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 100%);color:#fff"
+      },
+      "children": [
+        {
+          "id": "hero-heading",
+          "type": "heading",
+          "props": {
+            "level": 1,
+            "text": "Welcome to KronosCMS",
+            "style": "font-size:2.75rem;margin-bottom:1rem;font-weight:800"
+          }
+        },
+        {
+          "id": "hero-text",
+          "type": "text",
+          "props": {
+            "text": "A powerful, flexible, open-source CMS and e-commerce platform built for speed and simplicity.",
+            "style": "font-size:1.2rem;max-width:600px;margin:0 auto 2rem"
+          }
+        },
+        {
+          "id": "hero-cta",
+          "type": "button",
+          "props": {
+            "text": "Get Started",
+            "url": "/install",
+            "style": "background:#fff;color:#1e3a8a;padding:.875rem 2.5rem;border-radius:9999px;font-weight:700;text-decoration:none;display:inline-block;font-size:1.05rem"
+          }
+        }
+      ]
+    },
+    {
+      "id": "features-container",
+      "type": "container",
+      "props": {
+        "className": "features-section",
+        "style": "padding:4rem 1rem;max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem"
+      },
+      "children": [
+        {
+          "id": "feature-1",
+          "type": "container",
+          "props": {
+            "style": "padding:1.5rem;border:1px solid #e5e7eb;border-radius:12px;background:#fff"
+          },
+          "children": [
+            {
+              "id": "feature-1-heading",
+              "type": "heading",
+              "props": { "level": 3, "text": "Dual Mode: CMS & E-Commerce" }
+            },
+            {
+              "id": "feature-1-text",
+              "type": "text",
+              "props": { "text": "Switch seamlessly between content management and full e-commerce with payment processing, cart, and order management." }
+            }
+          ]
+        },
+        {
+          "id": "feature-2",
+          "type": "container",
+          "props": {
+            "style": "padding:1.5rem;border:1px solid #e5e7eb;border-radius:12px;background:#fff"
+          },
+          "children": [
+            {
+              "id": "feature-2-heading",
+              "type": "heading",
+              "props": { "level": 3, "text": "Visual Page Builder" }
+            },
+            {
+              "id": "feature-2-text",
+              "type": "text",
+              "props": { "text": "Drag-and-drop builder with undo/redo, block inspector, and live preview — no coding needed." }
+            }
+          ]
+        },
+        {
+          "id": "feature-3",
+          "type": "container",
+          "props": {
+            "style": "padding:1.5rem;border:1px solid #e5e7eb;border-radius:12px;background:#fff"
+          },
+          "children": [
+            {
+              "id": "feature-3-heading",
+              "type": "heading",
+              "props": { "level": 3, "text": "AI-Powered Content" }
+            },
+            {
+              "id": "feature-3-text",
+              "type": "text",
+              "props": { "text": "Integrated OpenAI assistant for content generation, editing suggestions, and smart automation — streamed in real time." }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

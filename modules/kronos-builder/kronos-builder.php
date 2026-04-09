@@ -47,12 +47,25 @@ class KronosBuilderModule extends KronosModule
             kronos_abort(404);
         }
 
-        $app  = KronosApp::getInstance();
+        $app     = KronosApp::getInstance();
+        $preview = isset($_GET['preview']) && $_GET['preview'] === '1';
+
+        // Preview mode: allow draft posts for authenticated editors
+        if ($preview) {
+            $middleware = new \Kronos\Auth\KronosMiddleware();
+            $user = $middleware->currentUser();
+            if (!$user || !in_array($user['role'] ?? '', ['admin', 'editor'], true)) {
+                $preview = false; // Unauthorised — fall back to published-only
+            }
+        }
+
+        $statusClause = $preview ? "p.status IN ('published','draft')" : "p.status = 'published'";
+
         $post = $app->db()->getRow(
             "SELECT p.*, l.content AS layout_json
              FROM kronos_posts p
              LEFT JOIN kronos_builder_layouts l ON l.id = p.layout_id
-             WHERE p.slug = ? AND p.status = 'published'
+             WHERE p.slug = ? AND {$statusClause}
              LIMIT 1",
             [$slug]
         );
@@ -75,12 +88,21 @@ class KronosBuilderModule extends KronosModule
         $engine = new \Kronos\Builder\RenderEngine();
         $html   = $engine->render((string) ($post['layout_json'] ?? '[]'));
 
+        // Preview mode banner
+        $previewBanner = '';
+        if ($preview) {
+            $status = kronos_e($post['status'] ?? 'draft');
+            $previewBanner = '<div style="background:#fef9c3;border-bottom:2px solid #fde68a;padding:.75rem 1.25rem;font-size:.9rem;font-weight:600;text-align:center">'
+                           . '&#128064; Preview Mode — Status: ' . $status . ' — <a href="' . kronos_url('/dashboard/content') . '" style="color:#92400e">Back to Dashboard</a></div>';
+        }
+
         $appName = kronos_option('app_name', 'KronosCMS');
         $title   = kronos_e($post['title']);
 
         // Apply theme if available; otherwise output a minimal wrapper
         $theme = apply_filters('kronos/theme/template', null, $post);
         if ($theme !== null && is_callable($theme)) {
+            if ($previewBanner) echo $previewBanner;
             call_user_func($theme, $post, $html);
             return;
         }
@@ -91,6 +113,7 @@ class KronosBuilderModule extends KronosModule
         echo "<title>{$title} — " . kronos_e($appName) . '</title>';
         echo '<link rel="stylesheet" href="' . kronos_asset('css/theme.css') . '">';
         echo '</head><body>';
+        if ($previewBanner) echo $previewBanner;
         echo "<main>{$html}</main>";
         echo '</body></html>';
     }

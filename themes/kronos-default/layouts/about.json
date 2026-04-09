@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "slug": "about",
+  "title": "About",
+  "blocks": [
+    {
+      "id": "about-container",
+      "type": "container",
+      "props": {
+        "style": "max-width:900px;margin:3rem auto;padding:0 1rem;display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center"
+      },
+      "children": [
+        {
+          "id": "about-text-col",
+          "type": "container",
+          "props": { "style": "" },
+          "children": [
+            {
+              "id": "about-heading",
+              "type": "heading",
+              "props": { "level": 1, "text": "About KronosCMS" }
+            },
+            {
+              "id": "about-text-1",
+              "type": "text",
+              "props": { "text": "KronosCMS is a standalone PHP 8 content management and e-commerce platform with no WordPress dependency. It was designed to be lightweight, extensible, and developer-friendly." }
+            },
+            {
+              "id": "about-text-2",
+              "type": "text",
+              "props": {
+                "text": "Built with a clean PSR-4 architecture, a hook system inspired by WordPress, JWT authentication, and a visual page builder — KronosCMS gives you everything you need without the bloat.",
+                "style": "margin-top:1rem;color:#4b5563"
+              }
+            },
+            {
+              "id": "about-cta",
+              "type": "button",
+              "props": {
+                "text": "View on GitHub",
+                "url": "https://github.com/TheoSfak/KronosCms",
+                "style": "margin-top:1.5rem;display:inline-block;background:#1e3a8a;color:#fff;padding:.75rem 1.75rem;border-radius:8px;text-decoration:none;font-weight:600"
+              }
+            }
+          ]
+        },
+        {
+          "id": "about-image-col",
+          "type": "image",
+          "props": {
+            "src": "",
+            "alt": "KronosCMS Dashboard Screenshot",
+            "style": "width:100%;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.12)"
+          }
+        }
+      ]
+    }
+  ]
+}

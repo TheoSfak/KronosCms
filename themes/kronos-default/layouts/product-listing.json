@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "slug": "product-listing",
+  "title": "Product Listing",
+  "blocks": [
+    {
+      "id": "listing-header",
+      "type": "container",
+      "props": {
+        "style": "background:#f9fafb;padding:3rem 1rem;text-align:center;border-bottom:1px solid #e5e7eb"
+      },
+      "children": [
+        {
+          "id": "listing-heading",
+          "type": "heading",
+          "props": { "level": 1, "text": "Shop All Products" }
+        },
+        {
+          "id": "listing-sub",
+          "type": "text",
+          "props": {
+            "text": "Browse our collection of products. Free shipping on orders over $50.",
+            "style": "color:#6b7280;max-width:480px;margin:0 auto"
+          }
+        }
+      ]
+    },
+    {
+      "id": "listing-grid",
+      "type": "container",
+      "props": {
+        "className": "product-grid",
+        "style": "max-width:1100px;margin:3rem auto;padding:0 1rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.5rem"
+      },
+      "children": [
+        {
+          "id": "product-card-1",
+          "type": "container",
+          "props": {
+            "style": "border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.07)"
+          },
+          "children": [
+            {
+              "id": "product-card-1-img",
+              "type": "image",
+              "props": {
+                "src": "",
+                "alt": "Product placeholder",
+                "style": "width:100%;height:200px;object-fit:cover;background:#f3f4f6"
+              }
+            },
+            {
+              "id": "product-card-1-body",
+              "type": "container",
+              "props": { "style": "padding:1rem" },
+              "children": [
+                {
+                  "id": "product-card-1-name",
+                  "type": "heading",
+                  "props": { "level": 3, "text": "Sample Product", "style": "margin:0 0 .5rem;font-size:1rem" }
+                },
+                {
+                  "id": "product-card-1-price",
+                  "type": "text",
+                  "props": { "text": "$29.99", "style": "color:#16a34a;font-weight:700;font-size:1.1rem" }
+                },
+                {
+                  "id": "product-card-1-btn",
+                  "type": "button",
+                  "props": {
+                    "text": "Add to Cart",
+                    "url": "#",
+                    "style": "margin-top:.75rem;display:block;text-align:center;background:#2563eb;color:#fff;padding:.5rem 1rem;border-radius:6px;text-decoration:none;font-weight:600"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "listing-note",
+      "type": "container",
+      "props": {
+        "style": "text-align:center;padding:2rem 1rem;color:#9ca3af;font-size:.875rem"
+      },
+      "children": [
+        {
+          "id": "listing-note-text",
+          "type": "text",
+          "props": { "text": "This layout uses the builder to scaffold a static product listing shell. Populate with real products via the Commerce module." }
+        }
+      ]
+    }
+  ]
+}
