@@ -15,9 +15,12 @@
     <nav class="site-nav">
       <?php do_action('kronos/theme/nav'); ?>
     </nav>
-    <?php if (kronos_is_ecommerce()): ?>
-    <a href="/cart" class="cart-icon" aria-label="Cart">🛒</a>
-    <?php endif; ?>
+    <div style="display:flex;align-items:center;gap:1rem">
+      <?php if (kronos_is_ecommerce()): ?>
+      <a href="<?= kronos_url('/cart') ?>" class="cart-icon" aria-label="Cart">🛒</a>
+      <?php endif; ?>
+      <a href="<?= kronos_url('/dashboard/') ?>" style="font-size:.8rem;color:#6b7280;text-decoration:none;padding:.3rem .75rem;border:1px solid #e5e7eb;border-radius:6px">⚙ Admin</a>
+    </div>
   </div>
 </header>
 
