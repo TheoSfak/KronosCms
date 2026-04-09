@@ -83,9 +83,9 @@ require __DIR__ . '/../partials/layout-header.php';
   <div class="page-header">
     <h1><?= $pageTitle ?></h1>
     <div class="page-actions">
-      <a href="/dashboard/content" class="btn btn-secondary">← Back to Content</a>
+      <a href="<?= kronos_url('/dashboard/content') ?>" class="btn btn-secondary">← Back to Content</a>
       <?php if ($isEdit): ?>
-        <a href="/dashboard/builder?layout_id=<?= (int)($post['layout_id'] ?? 0) ?>" class="btn btn-ghost">🔨 Open Builder</a>
+        <a href="<?= kronos_url('/dashboard/builder/' . (int)($post['layout_id'] ?? 1)) ?>" class="btn btn-ghost">🔨 Open Builder</a>
       <?php endif; ?>
     </div>
   </div>

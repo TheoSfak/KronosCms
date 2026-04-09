@@ -18,7 +18,7 @@ if (!in_array($tab, $allowedTabs, true)) {
 
 <div class="settings-tabs">
   <?php foreach ($allowedTabs as $t): ?>
-  <a href="/dashboard/settings?tab=<?= $t ?>" class="settings-tab <?= $tab === $t ? 'active' : '' ?>">
+  <a href="<?= kronos_url('/dashboard/settings') ?>?tab=<?= $t ?>" class="settings-tab <?= $tab === $t ? 'active' : '' ?>">
     <?= match($t) {
         'general'  => '⚙️ General',
         'mode'     => '🔄 Mode',

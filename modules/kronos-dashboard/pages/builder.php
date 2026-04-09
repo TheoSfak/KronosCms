@@ -70,7 +70,7 @@ require __DIR__ . '/../partials/layout-header.php';
 
 <!-- ── Builder Topbar (replaces normal topbar) ── -->
 <div class="topbar" style="gap:10px;">
-  <a href="/dashboard/content" class="btn btn-ghost btn-sm">← Exit Builder</a>
+  <a href="<?= kronos_url('/dashboard/content') ?>" class="btn btn-ghost btn-sm">← Exit Builder</a>
 
   <div style="flex:1;padding:0 12px;">
     <input type="text" id="builder-layout-name"

@@ -14,7 +14,7 @@ $posts = $db->getResults(
 ?>
 
 <div class="toolbar">
-  <a href="/dashboard/content/new" class="btn btn-primary">+ New Post</a>
+  <a href="<?= kronos_url('/dashboard/content/new') ?>" class="btn btn-primary">+ New Post</a>
 </div>
 
 <div class="card">
@@ -31,7 +31,7 @@ $posts = $db->getResults(
     </thead>
     <tbody>
       <?php if (empty($posts)): ?>
-      <tr><td colspan="6" class="text-center text-muted">No posts yet. <a href="/dashboard/content/new">Create your first post →</a></td></tr>
+      <tr><td colspan="6" class="text-center text-muted">No posts yet. <a href="<?= kronos_url('/dashboard/content/new') ?>">Create your first post →</a></td></tr>
       <?php else: ?>
       <?php foreach ($posts as $post): ?>
       <tr>
@@ -41,7 +41,7 @@ $posts = $db->getResults(
         <td><?= kronos_e($post['author'] ?? '—') ?></td>
         <td><?= $post['published_at'] ? kronos_e(date('Y-m-d', strtotime($post['published_at']))) : '—' ?></td>
         <td>
-          <a href="/dashboard/content/<?= (int)$post['id'] ?>" class="action-btn">Edit</a>
+          <a href="<?= kronos_url('/dashboard/content/' . (int)$post['id']) ?>" class="action-btn">Edit</a>
           <button class="action-btn danger" data-delete-post="<?= (int)$post['id'] ?>">Delete</button>
         </td>
       </tr>

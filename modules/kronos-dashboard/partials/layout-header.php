@@ -8,8 +8,13 @@ declare(strict_types=1);
 $user    = kronos_current_user() ?? ['display_name' => 'Guest', 'role' => 'app_user'];
 $mode    = kronos_mode();
 $appName = kronos_option('app_name', 'KronosCMS');
-$appUrl  = kronos_option('app_url', '/');
-$currentUri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+$fullUri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+// Strip the app base path so nav_active() compares /dashboard/* correctly
+$_basePath = rtrim(parse_url(kronos_option('app_url', '/'), PHP_URL_PATH) ?? '', '/');
+$currentUri = str_starts_with($fullUri, $_basePath)
+    ? substr($fullUri, strlen($_basePath))
+    : $fullUri;
+if ($currentUri === '' || $currentUri === false) { $currentUri = '/'; }
 
 function nav_active(string $path): string {
     global $currentUri;
@@ -35,43 +40,43 @@ function nav_active(string $path): string {
   </div>
 
   <nav class="sidebar-nav">
-    <a href="/dashboard" class="nav-item <?= nav_active('/dashboard') !== '' && $currentUri === '/dashboard' ? 'active' : '' ?>">
+    <a href="<?= kronos_url('/dashboard') ?>" class="nav-item <?= $currentUri === '/dashboard' ? 'active' : '' ?>">
       <span class="nav-icon">🏠</span> Overview
     </a>
 
     <?php if ($mode === 'cms'): ?>
-    <a href="/dashboard/content" class="nav-item <?= nav_active('/dashboard/content') ?>">
+    <a href="<?= kronos_url('/dashboard/content') ?>" class="nav-item <?= nav_active('/dashboard/content') ?>">
       <span class="nav-icon">📄</span> Content
     </a>
     <?php endif; ?>
 
     <?php if ($mode === 'ecommerce'): ?>
-    <a href="/dashboard/products" class="nav-item <?= nav_active('/dashboard/products') ?>">
+    <a href="<?= kronos_url('/dashboard/products') ?>" class="nav-item <?= nav_active('/dashboard/products') ?>">
       <span class="nav-icon">📦</span> Products
     </a>
-    <a href="/dashboard/orders" class="nav-item <?= nav_active('/dashboard/orders') ?>">
+    <a href="<?= kronos_url('/dashboard/orders') ?>" class="nav-item <?= nav_active('/dashboard/orders') ?>">
       <span class="nav-icon">🧾</span> Orders
     </a>
     <?php endif; ?>
 
-    <a href="/dashboard/builder/1" class="nav-item <?= nav_active('/dashboard/builder') ?>">
+    <a href="<?= kronos_url('/dashboard/builder/1') ?>" class="nav-item <?= nav_active('/dashboard/builder') ?>">
       <span class="nav-icon">🎨</span> Builder
     </a>
-    <a href="/dashboard/analytics" class="nav-item <?= nav_active('/dashboard/analytics') ?>">
+    <a href="<?= kronos_url('/dashboard/analytics') ?>" class="nav-item <?= nav_active('/dashboard/analytics') ?>">
       <span class="nav-icon">📊</span> Analytics
     </a>
-    <a href="/dashboard/ai" class="nav-item <?= nav_active('/dashboard/ai') ?>">
+    <a href="<?= kronos_url('/dashboard/ai') ?>" class="nav-item <?= nav_active('/dashboard/ai') ?>">
       <span class="nav-icon">🤖</span> AI Chat
     </a>
-    <a href="/dashboard/marketplace" class="nav-item <?= nav_active('/dashboard/marketplace') ?>">
+    <a href="<?= kronos_url('/dashboard/marketplace') ?>" class="nav-item <?= nav_active('/dashboard/marketplace') ?>">
       <span class="nav-icon">🛍️</span> Marketplace
     </a>
 
     <?php if (kronos_user_can('app_manager')): ?>
-    <a href="/dashboard/users" class="nav-item <?= nav_active('/dashboard/users') ?>">
+    <a href="<?= kronos_url('/dashboard/users') ?>" class="nav-item <?= nav_active('/dashboard/users') ?>">
       <span class="nav-icon">👥</span> Users
     </a>
-    <a href="/dashboard/settings" class="nav-item <?= nav_active('/dashboard/settings') ?>">
+    <a href="<?= kronos_url('/dashboard/settings') ?>" class="nav-item <?= nav_active('/dashboard/settings') ?>">
       <span class="nav-icon">⚙️</span> Settings
     </a>
     <?php endif; ?>
@@ -82,7 +87,7 @@ function nav_active(string $path): string {
       <strong><?= kronos_e($user['display_name'] ?? $user['username'] ?? '') ?></strong><br>
       <small><?= kronos_e(ucfirst(str_replace('app_', '', $user['role'] ?? ''))) ?></small>
     </span>
-    <a href="/dashboard/logout" class="logout-btn" title="Logout">⎋</a>
+    <a href="<?= kronos_url('/dashboard/logout') ?>" class="logout-btn" title="Logout">⎋</a>
   </div>
 </aside>
 
@@ -91,7 +96,7 @@ function nav_active(string $path): string {
     <button class="sidebar-toggle" onclick="document.getElementById('sidebar').classList.toggle('collapsed')" aria-label="Toggle sidebar">☰</button>
     <h1 class="page-title"><?= kronos_e($pageTitle ?? 'Dashboard') ?></h1>
     <div class="topbar-actions">
-      <a href="<?= kronos_e($appUrl) ?>/" target="_blank" class="topbar-btn" title="View site">↗ Site</a>
+      <a href="<?= kronos_url('/') ?>" target="_blank" class="topbar-btn" title="View site">↗ Site</a>
     </div>
   </header>
 
