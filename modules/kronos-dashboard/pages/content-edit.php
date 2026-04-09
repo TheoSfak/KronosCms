@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Fetch layouts for selector
-$layouts = $db->getResults('SELECT id, name FROM kronos_builder_layouts ORDER BY name ASC', []) ?? [];
+$layouts = $db->getResults('SELECT id, layout_name AS name FROM kronos_builder_layouts ORDER BY layout_name ASC', []) ?? [];
 
 $pageTitle = $isEdit ? 'Edit: ' . kronos_e($post['title']) : 'New Post';
 
