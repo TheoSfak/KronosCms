@@ -61,7 +61,10 @@ class KronosDashboardModule extends KronosModule
             $payload = $jwt->decode($_COOKIE['kronos_token']);
             $_REQUEST['_kronos_user'] = $payload['data'] ?? [];
         } catch (\RuntimeException) {
-            setcookie('kronos_token', '', ['expires' => time() - 3600, 'path' => '/']);
+            $appUrl     = $this->app->env('APP_URL', '/');
+            $cookiePath = rtrim(parse_url($appUrl, PHP_URL_PATH) ?? '/', '/');
+            $cookiePath = ($cookiePath !== '' ? $cookiePath : '') . '/';
+            setcookie('kronos_token', '', ['expires' => time() - 3600, 'path' => $cookiePath]);
             kronos_redirect('/dashboard/login');
         }
 
@@ -91,9 +94,13 @@ class KronosDashboardModule extends KronosModule
 
     private function logout(): void
     {
+        $appUrl     = $this->app->env('APP_URL', '/');
+        $cookiePath = rtrim(parse_url($appUrl, PHP_URL_PATH) ?? '/', '/');
+        $cookiePath = ($cookiePath !== '' ? $cookiePath : '') . '/';
+
         setcookie('kronos_token', '', [
             'expires'  => time() - 3600,
-            'path'     => '/',
+            'path'     => $cookiePath,
             'httponly' => true,
             'samesite' => 'Strict',
         ]);

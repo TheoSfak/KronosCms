@@ -73,11 +73,12 @@ class KronosMiddleware
     {
         $token = $this->jwt->encode($userData);
 
-        $secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+        $secure   = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+        $cookiePath = $this->cookiePath();
 
         setcookie('kronos_token', $token, [
             'expires'  => time() + (int) KronosApp::getInstance()->env('JWT_EXPIRY', 86400),
-            'path'     => '/',
+            'path'     => $cookiePath,
             'httponly' => true,
             'samesite' => 'Strict',
             'secure'   => $secure,
@@ -140,14 +141,26 @@ class KronosMiddleware
 
     private function issueTokenRaw(string $token): void
     {
-        $secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+        $secure   = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+        $cookiePath = $this->cookiePath();
         setcookie('kronos_token', $token, [
             'expires'  => time() + (int) KronosApp::getInstance()->env('JWT_EXPIRY', 86400),
-            'path'     => '/',
+            'path'     => $cookiePath,
             'httponly' => true,
             'samesite' => 'Strict',
             'secure'   => $secure,
         ]);
+    }
+
+    /**
+     * Derive the cookie path from the app_url so subdirectory installs work.
+     * e.g. http://localhost/KronosCMS/public → /KronosCMS/public
+     */
+    private function cookiePath(): string
+    {
+        $appUrl = KronosApp::getInstance()->env('APP_URL', '/');
+        $path   = rtrim(parse_url($appUrl, PHP_URL_PATH) ?? '/', '/');
+        return $path !== '' ? $path . '/' : '/';
     }
 
     private function sendUnauthorized(string $message): void
