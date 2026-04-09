@@ -1,0 +1,11 @@
+{
+  "name": "kronos-crawler",
+  "version": "1.0.0",
+  "description": "Playwright crawler for KronosCMS dashboard smoke tests",
+  "scripts": {
+    "crawl": "node crawl.js"
+  },
+  "dependencies": {
+    "playwright": "^1.43.0"
+  }
+}

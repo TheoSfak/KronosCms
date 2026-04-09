@@ -23,7 +23,9 @@ class KronosDashboardModule extends KronosModule
         $router->get('/dashboard',                  fn($p) => $this->page('home', $p),       [$auth]);
         $router->get('/dashboard/content',          fn($p) => $this->page('content', $p),    [$auth]);
         $router->get('/dashboard/content/new',      fn($p) => $this->page('content-edit', $p), [$auth]);
+        $router->post('/dashboard/content/new',     fn($p) => $this->page('content-edit', $p), [$auth]);
         $router->get('/dashboard/content/{id:\d+}', fn($p) => $this->page('content-edit', $p), [$auth]);
+        $router->post('/dashboard/content/{id:\d+}',fn($p) => $this->page('content-edit', $p), [$auth]);
         $router->get('/dashboard/builder/{id:\d+}', fn($p) => $this->page('builder', $p),    [$auth]);
         $router->get('/dashboard/products',         fn($p) => $this->page('products', $p),   [$auth]);
         $router->get('/dashboard/orders',           fn($p) => $this->page('orders', $p),     [$auth]);
@@ -32,6 +34,7 @@ class KronosDashboardModule extends KronosModule
         $router->get('/dashboard/marketplace',      fn($p) => $this->page('marketplace', $p),[$auth]);
         $router->get('/dashboard/ai',               fn($p) => $this->page('ai', $p),         [$auth]);
         $router->get('/dashboard/settings',         fn($p) => $this->page('settings', $p),   [$auth]);
+        $router->post('/dashboard/mode-switch',     fn($p) => $this->modeSwitchAction(),      [$auth]);
 
         // Login page (public)
         $router->get('/dashboard/login',  fn($p) => $this->loginPage());
@@ -90,6 +93,27 @@ class KronosDashboardModule extends KronosModule
     {
         $app = $this->app;
         require __DIR__ . '/pages/login.php';
+    }
+
+    private function modeSwitchAction(): void
+    {
+        if (!kronos_user_can('app_manager')) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Permission denied.']);
+            return;
+        }
+
+        $mode = trim($_POST['mode'] ?? '');
+        if (!in_array($mode, ['cms', 'ecommerce'], true)) {
+            http_response_code(422);
+            echo json_encode(['success' => false, 'message' => 'Invalid mode.']);
+            return;
+        }
+
+        kronos_set_option('kronos_active_mode', $mode);
+        http_response_code(200);
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'mode' => $mode]);
     }
 
     private function logout(): void

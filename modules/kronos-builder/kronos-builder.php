@@ -60,7 +60,7 @@ class KronosBuilderModule extends KronosModule
         $statusClause = $preview ? "p.status IN ('published','draft')" : "p.status = 'published'";
 
         $post = $app->db()->getRow(
-            "SELECT p.*, l.content AS layout_json
+            "SELECT p.*, l.json_data AS layout_json
              FROM kronos_posts p
              LEFT JOIN kronos_builder_layouts l ON l.id = p.layout_id
              WHERE p.slug = ? AND {$statusClause}

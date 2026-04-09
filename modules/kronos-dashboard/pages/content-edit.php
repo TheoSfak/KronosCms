@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $data['created_at'] = date('Y-m-d H:i:s');
                 $newId = $db->insert('kronos_posts', $data);
                 if ($newId) {
-                    kronos_redirect('/dashboard/content/' . $newId . '/edit?created=1');
+                    kronos_redirect('/dashboard/content/' . $newId . '?created=1');
                 } else {
                     $errors[] = 'Failed to create post. Please try again.';
                 }

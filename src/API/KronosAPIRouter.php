@@ -33,13 +33,15 @@ class KronosAPIRouter
      */
     public function registerRoutes(): void
     {
-        $auth       = [new Endpoints\AuthEndpoint($this), 'handle'];
-        $builder    = [new Endpoints\BuilderEndpoint($this), 'handle'];
-        $ai         = [new Endpoints\AIEndpoint($this), 'handle'];
-        $stream     = [new Endpoints\StreamEndpoint($this), 'handle'];
-        $system     = [new Endpoints\SystemEndpoint($this), 'handle'];
-        $commerce   = [new Endpoints\CommerceEndpoint($this), 'handle'];
+        $auth        = [new Endpoints\AuthEndpoint($this), 'handle'];
+        $builder     = [new Endpoints\BuilderEndpoint($this), 'handle'];
+        $ai          = [new Endpoints\AIEndpoint($this), 'handle'];
+        $stream      = [new Endpoints\StreamEndpoint($this), 'handle'];
+        $system      = [new Endpoints\SystemEndpoint($this), 'handle'];
+        $commerce    = [new Endpoints\CommerceEndpoint($this), 'handle'];
         $marketplace = [new Endpoints\MarketplaceEndpoint($this), 'handle'];
+        $settings    = [new Endpoints\SettingsEndpoint($this), 'handle'];
+        $users       = [new Endpoints\UsersEndpoint($this), 'handle'];
 
         $authenticated = [$this->middleware->handle()];
         $managerOnly   = [$this->middleware->handle(), $this->middleware->requireRole('app_manager')];
@@ -82,6 +84,16 @@ class KronosAPIRouter
         // Marketplace (manager only)
         $this->router->get('/api/kronos/v1/marketplace/directory',    $marketplace, $managerOnly);
         $this->router->post('/api/kronos/v1/marketplace/install',     $marketplace, $managerOnly);
+
+        // Settings (manager only)
+        $this->router->get('/api/kronos/v1/settings',  $settings, $managerOnly);
+        $this->router->post('/api/kronos/v1/settings', $settings, $managerOnly);
+
+        // Users (manager only)
+        $this->router->get('/api/kronos/v1/users',                   $users, $managerOnly);
+        $this->router->post('/api/kronos/v1/users',                  $users, $managerOnly);
+        $this->router->put('/api/kronos/v1/users/{id:\d+}',          $users, $managerOnly);
+        $this->router->delete('/api/kronos/v1/users/{id:\d+}',       $users, $managerOnly);
     }
 
     public function getMiddleware(): KronosMiddleware

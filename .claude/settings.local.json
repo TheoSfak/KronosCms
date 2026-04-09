@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -n '^$app\\\\|= $app\\\\|function.*app' /c/Users/User/Desktop/KronosCMS/modules/kronos-dashboard/pages/builder.php)",
+      "Bash(grep -n '$app\\\\|function.*app' /c/Users/User/Desktop/KronosCMS/modules/kronos-dashboard/partials/layout-header.php)",
+      "Bash(grep -n '$app' /c/Users/User/Desktop/KronosCMS/modules/kronos-dashboard/partials/layout-footer.php)"
+    ]
+  }
+}
