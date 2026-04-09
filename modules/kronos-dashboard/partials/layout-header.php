@@ -27,6 +27,16 @@ $nav_active = function(string $path) use ($currentUri): string {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?= kronos_e($pageTitle ?? 'Dashboard') ?> — <?= kronos_e($appName) ?></title>
 <link rel="stylesheet" href="<?= kronos_asset('css/dashboard.css') ?>">
+<script src="<?= kronos_asset('js/dashboard.js') ?>"></script>
+<script>
+window.KronosConfig = {
+  appUrl:  <?= json_encode(kronos_option('app_url', '/')) ?>,
+  apiBase: <?= json_encode(kronos_option('app_url', '/') . '/api/kronos/v1') ?>,
+  mode:    <?= json_encode(kronos_mode()) ?>,
+  user:    <?= json_encode(kronos_current_user()) ?>,
+  csrf:    <?= json_encode(kronos_csrf_token()) ?>,
+};
+</script>
 </head>
 <body class="dashboard-body<?= !empty($builderPage) ? ' builder-page' : '' ?>">
 
