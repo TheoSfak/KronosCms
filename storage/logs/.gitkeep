@@ -1,0 +1,3 @@
+# storage/logs — application log files
+# This directory is writable by the web server.
+# File is kept by Git; contents are gitignored.

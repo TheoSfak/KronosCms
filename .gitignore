@@ -1,0 +1,28 @@
+# Dependencies
+/vendor/
+
+# Environment
+.env
+
+# Runtime config (written by installer)
+/config/app.php
+
+# Storage runtime files
+/storage/logs/*.log
+/storage/cache/
+
+# XAMPP deploy artifacts
+*.bat.lock
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Update temp
+/storage/cache/update-tmp/

@@ -1,0 +1,37 @@
+{
+    "name": "theosfak/kronos-cms",
+    "description": "KronosCMS — Standalone PHP CMS & E-Commerce Application",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "TheoSfak",
+            "homepage": "https://github.com/TheoSfak"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "openai-php/client": "^0.10",
+        "vlucas/phpdotenv": "^5.6",
+        "stripe/stripe-php": "^13.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kronos\\": "src/"
+        },
+        "files": [
+            "src/Helpers/functions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Kronos\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

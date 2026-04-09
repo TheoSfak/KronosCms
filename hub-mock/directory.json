@@ -1,0 +1,64 @@
+{
+  "packages": [
+    {
+      "slug": "kronos-seo",
+      "name": "Kronos SEO",
+      "description": "Meta tags, Open Graph, and sitemap generation for KronosCMS.",
+      "version": "1.0.0",
+      "type": "module",
+      "author": "TheoSfak",
+      "download_url": "https://github.com/TheoSfak/kronos-seo/archive/refs/tags/v1.0.0.zip",
+      "license": "free",
+      "requires_license": false,
+      "license_tier": null
+    },
+    {
+      "slug": "kronos-contact-form",
+      "name": "Kronos Contact Form",
+      "description": "Simple drag-and-drop contact form builder with email notifications.",
+      "version": "1.0.0",
+      "type": "module",
+      "author": "TheoSfak",
+      "download_url": "https://github.com/TheoSfak/kronos-contact-form/archive/refs/tags/v1.0.0.zip",
+      "license": "free",
+      "requires_license": false,
+      "license_tier": null
+    },
+    {
+      "slug": "kronos-analytics-plus",
+      "name": "Kronos Analytics Plus",
+      "description": "Enhanced analytics with charts, funnels, and CSV export.",
+      "version": "1.0.0",
+      "type": "module",
+      "author": "TheoSfak",
+      "download_url": "",
+      "license": "premium",
+      "requires_license": true,
+      "license_tier": "pro"
+    },
+    {
+      "slug": "kronos-dark-mode",
+      "name": "Kronos Dark Mode Theme",
+      "description": "A sleek dark variant of the default Kronos theme.",
+      "version": "1.0.0",
+      "type": "theme",
+      "author": "TheoSfak",
+      "download_url": "https://github.com/TheoSfak/kronos-dark-mode/archive/refs/tags/v1.0.0.zip",
+      "license": "free",
+      "requires_license": false,
+      "license_tier": null
+    },
+    {
+      "slug": "kronos-smtp",
+      "name": "Kronos SMTP Mailer",
+      "description": "Route all system emails through a custom SMTP server.",
+      "version": "1.0.0",
+      "type": "module",
+      "author": "TheoSfak",
+      "download_url": "https://github.com/TheoSfak/kronos-smtp/archive/refs/tags/v1.0.0.zip",
+      "license": "free",
+      "requires_license": false,
+      "license_tier": null
+    }
+  ]
+}
