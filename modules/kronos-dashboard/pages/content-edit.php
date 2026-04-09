@@ -104,7 +104,7 @@ require __DIR__ . '/../partials/layout-header.php';
   <div class="alert alert-success">Post created! You can now open the Builder to design its layout.</div>
   <?php endif; ?>
 
-  <form method="POST" action="<?= $isEdit ? "/dashboard/content/{$postId}/edit" : '/dashboard/content/new' ?>">
+  <form method="POST" action="<?= $isEdit ? kronos_url("/dashboard/content/{$postId}/edit") : kronos_url('/dashboard/content/new') ?>">
     <input type="hidden" name="_kronos_csrf" value="<?= kronos_csrf_token() ?>">
 
     <div style="display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start;">
