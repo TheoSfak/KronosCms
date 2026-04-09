@@ -239,15 +239,18 @@ class InstallController
         $config->set('kronos_version', \Kronos\Core\KronosVersion::VERSION);
         $config->set('openai_model', 'gpt-4o');
 
-        // 4. Create admin user
+        // 4. Create or update admin user (upsert — safe to re-run)
         $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
-        $db->insert('kronos_users', [
-            'username'     => $username,
-            'email'        => $email,
-            'password_hash' => $hash,
-            'role'         => 'app_manager',
-            'display_name' => $username,
-        ]);
+        $db->query(
+            "INSERT INTO kronos_users (username, email, password_hash, role, display_name)
+             VALUES (?, ?, ?, 'app_manager', ?)
+             ON DUPLICATE KEY UPDATE
+               email          = VALUES(email),
+               password_hash  = VALUES(password_hash),
+               role           = VALUES(role),
+               display_name   = VALUES(display_name)",
+            [$username, $email, $hash, $username]
+        );
 
         // 5. Write config/app.php (JWT secret, DB dsn for reference)
         $jwtSecret = bin2hex(random_bytes(48)); // 96-char hex
