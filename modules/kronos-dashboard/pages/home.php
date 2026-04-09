@@ -51,33 +51,39 @@ $isCommerce = kronos_is_ecommerce();
   </div>
 </div>
 
+<?php require $dashDir . '/partials/layout-footer.php'; ?>
+
 <script>
 // SSE: live order updates on overview
 (function() {
   const feed = document.getElementById('activity-feed');
+  if (!feed || !window.KronosConfig || !window.KronosConfig.apiBase) return;
   const source = new EventSource(window.KronosConfig.apiBase + '/stream');
 
   source.addEventListener('order_update', function(e) {
-    const d = JSON.parse(e.data);
-    const item = document.createElement('div');
-    item.className = 'activity-item';
-    item.innerHTML = `<span class="activity-icon">🧾</span> Order <strong>#${d.order_number}</strong> — status changed to <strong>${d.status}</strong>`;
-    feed.prepend(item);
-    if (feed.children.length > 20) feed.lastChild.remove();
+    try {
+      const d = JSON.parse(e.data);
+      const item = document.createElement('div');
+      item.className = 'activity-item';
+      item.innerHTML = `<span class="activity-icon">🧾</span> Order <strong>#${d.order_number}</strong> — status changed to <strong>${d.status}</strong>`;
+      feed.prepend(item);
+      if (feed.children.length > 20) feed.lastChild.remove();
+    } catch(_) {}
   });
 
   source.addEventListener('notification', function(e) {
-    const d = JSON.parse(e.data);
-    const item = document.createElement('div');
-    item.className = 'activity-item';
-    item.innerHTML = `<span class="activity-icon">🔔</span> ${d.message || JSON.stringify(d)}`;
-    feed.prepend(item);
+    try {
+      const d = JSON.parse(e.data);
+      const item = document.createElement('div');
+      item.className = 'activity-item';
+      item.innerHTML = `<span class="activity-icon">🔔</span> ${d.message || JSON.stringify(d)}`;
+      feed.prepend(item);
+    } catch(_) {}
   });
 
   source.onerror = function() {
-    feed.innerHTML = '<p class="text-muted">Live feed disconnected. Reconnecting…</p>';
+    source.close();
+    feed.innerHTML = '<p class="text-muted">Live feed unavailable.</p>';
   };
 })();
 </script>
-
-<?php require $dashDir . '/partials/layout-footer.php'; ?>
