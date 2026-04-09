@@ -30,6 +30,11 @@ class KronosCoreModule extends KronosModule
             (new KronosModeSwitcher($app))->handle();
         });
 
+        // Debug inspector (only in APP_DEBUG=true)
+        $router->get('/debug', function (array $params) use ($app): void {
+            require __DIR__ . '/debug.php';
+        });
+
         // Front-page route — serve active theme home template
         $router->get('/', function (array $params) use ($app): void {
             $themeManager = $app->themeManager();
