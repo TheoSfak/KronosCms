@@ -60,25 +60,69 @@ class InstallController
             return;
         }
 
-        // Connect without selecting a database first, then create it if it doesn't exist
+        // 1. Try connecting with the app credentials directly (production path)
+        $appConnected = false;
         try {
-            $dsn = "mysql:host={$host};port={$port};charset=utf8mb4";
-            $pdo = new PDO($dsn, $user, $pass, [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            ]);
+            $dsn = "mysql:host={$host};port={$port};dbname={$dbName};charset=utf8mb4";
+            $pdo = new PDO($dsn, $user, $pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+            unset($pdo);
+            $appConnected = true;
+        } catch (PDOException) {
+            // Will try admin path below
+        }
 
-            // Sanitise DB name (allow only word chars and hyphens)
+        if (!$appConnected) {
+            // 2. Fall back to admin credentials to auto-create DB and user (local/dev path)
+            $adminUser = trim($_POST['admin_user'] ?? '');
+            $adminPass = $_POST['admin_pass'] ?? '';
+
+            if ($adminUser === '') {
+                $this->renderStep(1, [
+                    'Could not connect with the provided credentials. '
+                    . 'Open "Auto-create database & user" and provide a MySQL admin account to create them automatically.',
+                ]);
+                return;
+            }
+
+            // Validate DB name
             if (!preg_match('/^[\w\-]+$/', $dbName)) {
                 $this->renderStep(1, ['Database name contains invalid characters.']);
                 return;
             }
 
-            // Create the database if it doesn't already exist
-            $pdo->exec("CREATE DATABASE IF NOT EXISTS `{$dbName}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-            unset($pdo);
-        } catch (PDOException $e) {
-            $this->renderStep(1, ['Database connection failed: ' . $e->getMessage()]);
-            return;
+            try {
+                $adminDsn = "mysql:host={$host};port={$port};charset=utf8mb4";
+                $admin = new PDO($adminDsn, $adminUser, $adminPass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+
+                // Create database
+                $admin->exec("CREATE DATABASE IF NOT EXISTS `{$dbName}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+
+                // Create user if it doesn't exist and grant privileges
+                // Use ALTER USER if exists, CREATE USER if not — compatible with MySQL 5.7+
+                $quotedPass = $admin->quote($pass);
+                try {
+                    $admin->exec("CREATE USER IF NOT EXISTS '{$user}'@'%' IDENTIFIED BY {$quotedPass}");
+                    $admin->exec("ALTER USER '{$user}'@'%' IDENTIFIED BY {$quotedPass}");
+                } catch (PDOException) {
+                    // User may already exist with different syntax — ignore, grant will confirm
+                }
+                $admin->exec("GRANT ALL PRIVILEGES ON `{$dbName}`.* TO '{$user}'@'%'");
+                $admin->exec("FLUSH PRIVILEGES");
+                unset($admin);
+            } catch (PDOException $e) {
+                $this->renderStep(1, ['Auto-create failed: ' . $e->getMessage()]);
+                return;
+            }
+
+            // Verify app credentials now work
+            try {
+                $dsn = "mysql:host={$host};port={$port};dbname={$dbName};charset=utf8mb4";
+                $pdo = new PDO($dsn, $user, $pass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+                unset($pdo);
+            } catch (PDOException $e) {
+                $this->renderStep(1, ['Database and user created, but connection still failed: ' . $e->getMessage()]);
+                return;
+            }
         }
 
         // Store DB config in session for step 2/3
