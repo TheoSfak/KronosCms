@@ -52,7 +52,7 @@ $guessedUrl = (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . ($_SERVER[
   <div class="errors"><?= htmlspecialchars(implode(', ', $errors), ENT_QUOTES) ?></div>
   <?php endif; ?>
 
-  <form method="POST" action="/install/?step=2" id="step2form">
+  <form method="POST" action="<?= defined('KRONOS_BASE') ? KRONOS_BASE : '' ?>/install/?step=2" id="step2form">
     <label>App Name</label>
     <input type="text" name="app_name" value="<?= htmlspecialchars($_POST['app_name'] ?? 'KronosCMS', ENT_QUOTES) ?>" placeholder="My CMS" required>
 

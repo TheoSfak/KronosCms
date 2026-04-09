@@ -286,7 +286,8 @@ PHP;
 
     private function redirect(int $step): void
     {
-        header('Location: /install/?step=' . $step);
+        $base = defined('KRONOS_BASE') ? KRONOS_BASE : '';
+        header('Location: ' . $base . '/install/?step=' . $step);
         exit;
     }
 

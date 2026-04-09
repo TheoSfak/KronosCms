@@ -150,7 +150,10 @@ class KronosApp
 
         // Allow the install wizard to run without a config file
         if (!file_exists($configFile) && !str_contains($requestUri, '/install')) {
-            header('Location: /install/');
+            // Detect subdirectory prefix (e.g. /KronosCMS when running under XAMPP)
+            $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';           // /KronosCMS/public/index.php
+            $base = rtrim(dirname(dirname($scriptName)), '/');     // /KronosCMS
+            header('Location: ' . $base . '/install/');
             exit;
         }
     }

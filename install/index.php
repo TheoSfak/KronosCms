@@ -8,6 +8,10 @@ declare(strict_types=1);
 
 define('KRONOS_ROOT', dirname(__DIR__));
 
+// Base URL prefix for subdirectory installs (e.g. /KronosCMS when under XAMPP)
+// SCRIPT_NAME = /KronosCMS/install/index.php  → base = /KronosCMS
+define('KRONOS_BASE', rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/'));
+
 // Block if already installed
 if (file_exists(KRONOS_ROOT . '/config/app.php')) {
     http_response_code(403);

@@ -47,7 +47,7 @@ $errors ??= [];
   </ul></div>
   <?php endif; ?>
 
-  <form method="POST" action="/install/?step=3">
+  <form method="POST" action="<?= defined('KRONOS_BASE') ? KRONOS_BASE : '' ?>/install/?step=3">
     <label>Username</label>
     <input type="text" name="admin_username" value="<?= htmlspecialchars($_POST['admin_username'] ?? 'admin', ENT_QUOTES) ?>" minlength="3" required autocomplete="username">
 

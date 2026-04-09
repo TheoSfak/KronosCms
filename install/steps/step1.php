@@ -47,7 +47,7 @@ $errors ??= [];
   </ul></div>
   <?php endif; ?>
 
-  <form method="POST" action="/install/?step=1">
+  <form method="POST" action="<?= defined('KRONOS_BASE') ? KRONOS_BASE : '' ?>/install/?step=1">
     <label>Database Host</label>
     <input type="text" name="db_host" value="<?= htmlspecialchars($_POST['db_host'] ?? '127.0.0.1', ENT_QUOTES) ?>" placeholder="127.0.0.1" required>
 
