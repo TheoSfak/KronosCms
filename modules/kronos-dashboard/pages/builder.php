@@ -121,8 +121,6 @@ require __DIR__ . '/../partials/layout-footer.php';
 
 <script src="<?= kronos_asset('js/builder.js') ?>"></script>
 
-<script src="<?= kronos_asset('js/builder.js') ?>"></script>
-
 <script>
 // Layout name save
 (function(){

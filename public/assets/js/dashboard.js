@@ -367,80 +367,14 @@
 
   function initBuilder() {
     const canvas = document.getElementById('builder-canvas');
-    const ast    = window.KronosBuilderAST || [];
-
     if (!canvas) return;
 
-    // Render initial AST
-    ast.forEach(block => renderBlock(block, canvas));
-
-    // Widget palette drag start
+    // Widget palette drag start — builder.js owns canvas drop/render
     document.querySelectorAll('.widget-item[draggable]').forEach(item => {
       item.addEventListener('dragstart', function (e) {
         e.dataTransfer.setData('widget-type', this.dataset.widgetType || '');
         e.dataTransfer.effectAllowed = 'copy';
       });
-    });
-
-    // Canvas drop targets
-    canvas.addEventListener('dragover', function (e) {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'copy';
-      canvas.classList.add('drag-over');
-    });
-
-    canvas.addEventListener('dragleave', function () { canvas.classList.remove('drag-over'); });
-
-    canvas.addEventListener('drop', function (e) {
-      e.preventDefault();
-      canvas.classList.remove('drag-over');
-      const type = e.dataTransfer.getData('widget-type');
-      if (!type) return;
-      const block = { id: uid(), type, attrs: {} };
-      ast.push(block);
-      renderBlock(block, canvas);
-      triggerSave(ast);
-    });
-
-    function renderBlock(block, container) {
-      const el = document.createElement('div');
-      el.className = 'canvas-block';
-      el.dataset.blockId = block.id;
-
-      const widget = KronosWidgets[block.type];
-      if (widget) {
-        el.innerHTML = widget.render(block.attrs);
-      } else {
-        el.innerHTML = `<span class="text-muted text-sm">[${escHtml(block.type)}]</span>`;
-      }
-
-      // Delete button
-      const del = document.createElement('button');
-      del.className = 'action-btn danger';
-      del.style.cssText = 'position:absolute;top:6px;right:6px;';
-      del.textContent = '✕';
-      del.addEventListener('click', function (e) {
-        e.stopPropagation();
-        const idx = ast.findIndex(b => b.id === block.id);
-        if (idx > -1) ast.splice(idx, 1);
-        el.remove();
-        triggerSave(ast);
-      });
-
-      el.style.position = 'relative';
-      el.appendChild(del);
-      container.appendChild(el);
-    }
-
-    // Inspector panel updates
-    canvas.addEventListener('click', function (e) {
-      const block_el = e.target.closest('.canvas-block');
-      if (!block_el) return;
-      document.querySelectorAll('.canvas-block').forEach(b => b.classList.remove('selected'));
-      block_el.classList.add('selected');
-      const id = block_el.dataset.blockId;
-      const block = ast.find(b => b.id === id);
-      if (block) renderInspector(block, ast, canvas);
     });
   }
 
