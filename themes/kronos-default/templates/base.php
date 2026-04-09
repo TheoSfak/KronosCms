@@ -11,7 +11,7 @@
 
 <header class="site-header">
   <div class="container">
-    <a href="/" class="site-logo"><?= kronos_e(kronos_option('app_name', 'KronosCMS')) ?></a>
+    <a href="<?= kronos_url('/') ?>" class="site-logo"><?= kronos_e(kronos_option('app_name', 'KronosCMS')) ?></a>
     <nav class="site-nav">
       <?php do_action('kronos/theme/nav'); ?>
     </nav>

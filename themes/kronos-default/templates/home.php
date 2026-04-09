@@ -20,7 +20,7 @@ ob_start();
   <div class="post-grid">
     <?php foreach ($posts as $post): ?>
     <article class="post-card">
-      <h2 class="post-title"><a href="/page/<?= kronos_e($post['slug']) ?>"><?= kronos_e($post['title']) ?></a></h2>
+      <h2 class="post-title"><a href="<?= kronos_url('/page/' . $post['slug']) ?>"><?= kronos_e($post['title']) ?></a></h2>
       <p class="post-meta text-muted text-sm"><?= date('F j, Y', strtotime($post['created_at'])) ?></p>
     </article>
     <?php endforeach; ?>

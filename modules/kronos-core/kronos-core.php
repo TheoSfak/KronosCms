@@ -30,6 +30,30 @@ class KronosCoreModule extends KronosModule
             (new KronosModeSwitcher($app))->handle();
         });
 
+        // Front-page route — serve active theme home template
+        $router->get('/', function (array $params) use ($app): void {
+            $themeManager = $app->themeManager();
+            $theme        = $themeManager->getActiveTheme();
+            $slug         = $themeManager->getActiveSlug();
+
+            $homeTpl = null;
+            if ($theme && !empty($theme['templates']['home'])) {
+                $path = $app->rootDir() . '/themes/' . $slug . '/' . $theme['templates']['home'];
+                if (file_exists($path)) {
+                    $homeTpl = $path;
+                }
+            }
+
+            if ($homeTpl) {
+                require $homeTpl;
+            } else {
+                // Fallback: redirect to dashboard
+                $base = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
+                header('Location: ' . $base . '/dashboard/');
+                exit;
+            }
+        });
+
         // Fire init hook for other modules to attach to
         do_action('kronos/core/init', $app);
     }
