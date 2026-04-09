@@ -60,12 +60,21 @@ class InstallController
             return;
         }
 
-        // Test connection
+        // Connect without selecting a database first, then create it if it doesn't exist
         try {
-            $dsn = "mysql:host={$host};port={$port};dbname={$dbName};charset=utf8mb4";
+            $dsn = "mysql:host={$host};port={$port};charset=utf8mb4";
             $pdo = new PDO($dsn, $user, $pass, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             ]);
+
+            // Sanitise DB name (allow only word chars and hyphens)
+            if (!preg_match('/^[\w\-]+$/', $dbName)) {
+                $this->renderStep(1, ['Database name contains invalid characters.']);
+                return;
+            }
+
+            // Create the database if it doesn't already exist
+            $pdo->exec("CREATE DATABASE IF NOT EXISTS `{$dbName}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
             unset($pdo);
         } catch (PDOException $e) {
             $this->renderStep(1, ['Database connection failed: ' . $e->getMessage()]);

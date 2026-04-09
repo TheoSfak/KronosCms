@@ -54,7 +54,8 @@ $errors ??= [];
     <div class="row">
       <div>
         <label>Database Name</label>
-        <input type="text" name="db_name" value="<?= htmlspecialchars($_POST['db_name'] ?? '', ENT_QUOTES) ?>" placeholder="kronos_cms" required>
+        <input type="text" name="db_name" value="<?= htmlspecialchars($_POST['db_name'] ?? 'kronos_cms', ENT_QUOTES) ?>" placeholder="kronos_cms" required>
+        <small style="color:#6b7280;display:block;margin-top:.25rem">The database will be created automatically if it doesn't exist.</small>
       </div>
       <div>
         <label>Port</label>
@@ -68,7 +69,7 @@ $errors ??= [];
     <label>Database Password</label>
     <input type="password" name="db_pass" value="" placeholder="Leave empty if none">
 
-    <button type="submit" class="btn">Test & Continue →</button>
+    <button type="submit" class="btn">Create Database & Continue →</button>
   </form>
 </div>
 </body>
