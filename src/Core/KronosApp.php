@@ -153,16 +153,13 @@ class KronosApp
 
     private function checkInstalled(string $rootDir): void
     {
-        $configFile = $rootDir . '/config/app.php';
         $envFile    = $rootDir . '/.env';
         $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 
-        // Consider installed only when BOTH config/app.php AND .env are present
-        $isInstalled = file_exists($configFile) && file_exists($envFile);
-
-        if (!$isInstalled && !str_contains($requestUri, '/install')) {
-            // Detect subdirectory prefix (e.g. /KronosCMS when running under XAMPP)
-            $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';       // /KronosCMS/public/index.php
+        // .env is the authoritative installed marker — config/app.php is generated metadata
+        // and must not be used as a check because sync tools may purge it
+        if (!file_exists($envFile) && !str_contains($requestUri, '/install')) {
+            $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
             $base = rtrim(dirname(dirname($scriptName)), '/');
             header('Location: ' . $base . '/install/');
             exit;
