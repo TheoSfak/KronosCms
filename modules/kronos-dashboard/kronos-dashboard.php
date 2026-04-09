@@ -85,6 +85,7 @@ class KronosDashboardModule extends KronosModule
 
     private function loginPage(): void
     {
+        $app = $this->app;
         require __DIR__ . '/pages/login.php';
     }
 
