@@ -21,8 +21,20 @@ class SettingsEndpoint
     private const ALLOWED_KEYS = [
         'app_name',
         'app_url',
+        'tagline',
         'openai_model',
         'kronos_active_mode',
+        // Homepage content
+        'color_scheme',
+        'hero_style',
+        'homepage_about_title',
+        'homepage_about_text',
+        'homepage_stat1_num',  'homepage_stat1_label',
+        'homepage_stat2_num',  'homepage_stat2_label',
+        'homepage_stat3_num',  'homepage_stat3_label',
+        'homepage_stat4_num',  'homepage_stat4_label',
+        'homepage_cta_title',
+        'homepage_cta_sub',
     ];
 
     public function __construct(KronosAPIRouter $api)

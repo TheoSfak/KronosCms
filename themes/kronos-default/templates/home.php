@@ -6,6 +6,25 @@ $appName    = kronos_option('app_name', 'KronosCMS');
 $tagline    = kronos_option('tagline', 'Build beautiful websites without limits.');
 $heroStyle  = kronos_option('hero_style', 'full');
 
+// Homepage-editable content
+$aboutTitle = kronos_option('homepage_about_title',
+    $isEcom ? 'A store built around your customers' : 'A platform built around you');
+$aboutText  = kronos_option('homepage_about_text', '');
+$ctaTitle   = kronos_option('homepage_cta_title',
+    $isEcom ? 'Start selling today' : 'Start building today');
+$ctaSub     = kronos_option('homepage_cta_sub',
+    $isEcom
+        ? 'Your store is one click away. Set up, customise, and launch.'
+        : 'Use the drag-and-drop builder to create stunning pages in minutes.');
+
+// Stats bar — each editable from Settings → Homepage
+$stats = [
+    [kronos_option('homepage_stat1_num', '10+'),  kronos_option('homepage_stat1_label', 'Modules')],
+    [kronos_option('homepage_stat2_num', '5'),    kronos_option('homepage_stat2_label', 'Color Schemes')],
+    [kronos_option('homepage_stat3_num', '\u221e'),   kronos_option('homepage_stat3_label', 'Possibilities')],
+    [kronos_option('homepage_stat4_num', '100%'), kronos_option('homepage_stat4_label', 'Open Source')],
+];
+
 if ($isEcom) {
     $items = $app->db()->getResults(
         "SELECT * FROM kronos_posts WHERE status='published' AND post_type='product' ORDER BY created_at DESC LIMIT 8",
@@ -112,10 +131,12 @@ ob_start();
 <div class="stats-strip">
   <div class="container">
     <div class="stats-grid">
-      <div class="stat-item"><span class="stat-number">10+</span><span class="stat-label">Modules</span></div>
-      <div class="stat-item"><span class="stat-number">5</span><span class="stat-label">Color Schemes</span></div>
-      <div class="stat-item"><span class="stat-number">∞</span><span class="stat-label">Possibilities</span></div>
-      <div class="stat-item"><span class="stat-number">100%</span><span class="stat-label">Open Source</span></div>
+      <?php foreach ($stats as [$num, $label]): ?>
+      <div class="stat-item">
+        <span class="stat-number"><?= kronos_e($num) ?></span>
+        <span class="stat-label"><?= kronos_e($label) ?></span>
+      </div>
+      <?php endforeach; ?>
     </div>
   </div>
 </div>
@@ -160,12 +181,16 @@ ob_start();
       </div>
       <div class="about-text">
         <span class="section-eyebrow">Who We Are</span>
-        <h2 class="section-title-sm"><?= $isEcom ? 'A store built around your customers' : 'A platform built around you' ?></h2>
+        <h2 class="section-title-sm"><?= kronos_e($aboutTitle) ?></h2>
+        <?php if ($aboutText): ?>
+        <p><?= kronos_e($aboutText) ?></p>
+        <?php else: ?>
         <p><?= $isEcom
             ? 'We built ' . kronos_e($appName) . ' because managing an online store should be effortless. Product pages, checkout flows, payment gateways — it all just works.'
             : kronos_e($appName) . ' gives you the tools to create beautiful content without touching code. A visual builder, AI assistant, analytics, and themes — all in one dashboard.'
         ?></p>
         <p>Everything is customisable. Your domain, your design, your content, your rules.</p>
+        <?php endif; ?>
         <a href="<?= kronos_url('/about') ?>" class="btn btn-primary">Learn More About Us</a>
       </div>
     </div>
@@ -336,8 +361,8 @@ ob_start();
 <!-- ── CTA banner ──────────────────────────────────── -->
 <section class="cta-banner">
   <div class="container">
-    <h2><?= $isEcom ? 'Start selling today' : 'Start building today' ?></h2>
-    <p><?= $isEcom ? 'Your store is one click away. Set up, customise, and launch.' : 'Use the drag-and-drop builder to create stunning pages in minutes.' ?></p>
+    <h2><?= kronos_e($ctaTitle) ?></h2>
+    <p><?= kronos_e($ctaSub) ?></p>
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
       <a href="<?= kronos_url('/dashboard/') ?>" class="btn btn-white btn-lg">Open Dashboard</a>
       <a href="<?= kronos_url('/contact') ?>" class="btn btn-outline btn-lg">Contact Us</a>

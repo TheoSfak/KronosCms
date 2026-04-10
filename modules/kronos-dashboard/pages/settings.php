@@ -10,7 +10,7 @@ $appName    = $cfg->get('app_name', 'KronosCMS');
 $appUrl     = $cfg->get('app_url', '');
 $aiModel    = $cfg->get('openai_model', 'gpt-4o');
 $tab        = $_GET['tab'] ?? 'general';
-$allowedTabs = ['general', 'mode', 'ai', 'payments', 'update', 'design'];
+$allowedTabs = ['general', 'homepage', 'design', 'mode', 'ai', 'payments', 'update'];
 if (!in_array($tab, $allowedTabs, true)) {
     $tab = 'general';
 }
@@ -21,6 +21,7 @@ if (!in_array($tab, $allowedTabs, true)) {
   <a href="<?= kronos_url('/dashboard/settings') ?>?tab=<?= $t ?>" class="settings-tab <?= $tab === $t ? 'active' : '' ?>">
     <?= match($t) {
         'general'  => '⚙️ General',
+        'homepage' => '🏠 Homepage',
         'mode'     => '🔄 Mode',
         'ai'       => '🤖 AI',
         'payments' => '💳 Payments',
@@ -44,7 +45,66 @@ if (!in_array($tab, $allowedTabs, true)) {
       <label>App URL</label>
       <input type="url" name="app_url" value="<?= kronos_e($appUrl) ?>">
     </div>
+    <div class="form-group">
+      <label>Tagline</label>
+      <input type="text" name="tagline" value="<?= kronos_e(kronos_option('tagline', 'Build beautiful websites without limits.')) ?>" placeholder="Your homepage hero subtitle">
+    </div>
     <button type="submit" class="btn btn-primary">Save General Settings</button>
+  </form>
+
+<?php elseif ($tab === 'homepage'): ?>
+  <?php
+    $hAboutTitle = kronos_option('homepage_about_title', 'A platform built around you');
+    $hAboutText  = kronos_option('homepage_about_text', '');
+    $stats = [
+      ['10+',  'Modules'],
+      ['5',    'Color Schemes'],
+      ['∞',    'Possibilities'],
+      ['100%', 'Open Source'],
+    ];
+    for ($i = 1; $i <= 4; $i++) {
+      $stats[$i-1][0] = kronos_option('homepage_stat'.$i.'_num',   $stats[$i-1][0]);
+      $stats[$i-1][1] = kronos_option('homepage_stat'.$i.'_label', $stats[$i-1][1]);
+    }
+    $ctaTitle = kronos_option('homepage_cta_title', 'Start building today');
+    $ctaSub   = kronos_option('homepage_cta_sub',   'Use the drag-and-drop builder to create stunning pages in minutes.');
+  ?>
+  <h2 class="card-title">Homepage Content</h2>
+  <form id="settings-homepage-form" class="settings-form">
+
+    <h3 style="margin:0 0 12px;font-size:1rem;font-weight:700;color:var(--text-muted)">About Section</h3>
+    <div class="form-group">
+      <label>About Headline</label>
+      <input type="text" name="homepage_about_title" value="<?= kronos_e($hAboutTitle) ?>">
+    </div>
+    <div class="form-group">
+      <label>About Text</label>
+      <textarea name="homepage_about_text" rows="3" style="width:100%;resize:vertical"><?= kronos_e($hAboutText) ?></textarea>
+      <small class="text-muted">Leave blank to use the default.</small>
+    </div>
+
+    <h3 style="margin:24px 0 12px;font-size:1rem;font-weight:700;color:var(--text-muted)">Stats Bar</h3>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px">
+      <?php for ($i = 1; $i <= 4; $i++): ?>
+      <div style="display:flex;flex-direction:column;gap:8px;padding:14px;background:var(--bg-alt);border-radius:10px;border:1px solid var(--border)">
+        <label style="font-weight:600;font-size:.85rem">Stat <?= $i ?></label>
+        <input type="text" name="homepage_stat<?= $i ?>_num" value="<?= kronos_e($stats[$i-1][0]) ?>" placeholder="Number / value" style="margin-bottom:6px">
+        <input type="text" name="homepage_stat<?= $i ?>_label" value="<?= kronos_e($stats[$i-1][1]) ?>" placeholder="Label">
+      </div>
+      <?php endfor; ?>
+    </div>
+
+    <h3 style="margin:24px 0 12px;font-size:1rem;font-weight:700;color:var(--text-muted)">CTA Banner</h3>
+    <div class="form-group">
+      <label>CTA Headline</label>
+      <input type="text" name="homepage_cta_title" value="<?= kronos_e($ctaTitle) ?>">
+    </div>
+    <div class="form-group">
+      <label>CTA Subtext</label>
+      <input type="text" name="homepage_cta_sub" value="<?= kronos_e($ctaSub) ?>">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Homepage Settings</button>
   </form>
 
 <?php elseif ($tab === 'mode'): ?>
@@ -160,6 +220,17 @@ if (!in_array($tab, $allowedTabs, true)) {
       // Direct POST to set options via a lightweight settings endpoint (handled by dashboard JS)
       await window.KronosDash.saveOptions(data);
       alert('Settings saved.');
+    });
+  }
+
+  // Homepage settings save
+  const hpForm = document.getElementById('settings-homepage-form');
+  if (hpForm) {
+    hpForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(this));
+      await window.KronosDash.saveOptions(data);
+      alert('Homepage settings saved.');
     });
   }
 
