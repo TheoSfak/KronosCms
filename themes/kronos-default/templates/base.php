@@ -7,7 +7,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
-<link rel="stylesheet" href="<?= kronos_asset('css/theme.css') ?>">
+<?php
+// Always inline theme CSS directly from source — bypasses public/assets/ copy entirely
+// so there is NEVER a stale-cache or copy problem.
+$_themeCssFile = dirname(__DIR__) . '/assets/theme.css';
+if (file_exists($_themeCssFile)) {
+    echo '<style>' . file_get_contents($_themeCssFile) . '</style>';
+} else {
+    echo '<link rel="stylesheet" href="' . kronos_asset('css/theme.css') . '">';
+}
+?>
 <?php do_action('kronos/theme/head'); ?>
 </head>
 <body class="<?= $bodyClass ?? '' ?>" data-scheme="<?= kronos_e(kronos_option('color_scheme', 'default')) ?>">
