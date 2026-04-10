@@ -44,15 +44,18 @@ class KronosThemeManager
         // Hook: allow other code to query the manager via filter
         add_filter('kronos/theme/manager', function () { return $this; });
 
+        // Auto-sync active theme assets whenever source files are newer than public copies
+        $slug = $this->getActiveSlug();
+        $this->syncAssetsIfStale($slug);
+
         // Load active theme's functions.php so it can register hooks & routes
-        $slug          = $this->getActiveSlug();
         $functionsFile = $this->themesDir . '/' . $slug . '/functions.php';
         if (file_exists($functionsFile)) {
             $app = $this->app;
             require_once $functionsFile;
         }
 
-        do_action('kronos/theme/loaded', $this->getActiveSlug());
+        do_action('kronos/theme/loaded', $slug);
     }
 
     /**
@@ -191,4 +194,36 @@ class KronosThemeManager
             }
         }
     }
+
+    /**
+     * Sync theme assets to public/assets/ only when source is newer.
+     * Called on every boot — cheap (2 filemtime checks per asset).
+     */
+    private function syncAssetsIfStale(string $slug): void
+    {
+        $themeAssets = $this->themesDir . '/' . $slug . '/assets';
+        if (!is_dir($themeAssets)) return;
+
+        $cssDir = $this->publicAssetsDir . '/css';
+        $jsDir  = $this->publicAssetsDir . '/js';
+
+        foreach (scandir($themeAssets) ?: [] as $file) {
+            if ($file === '.' || $file === '..') continue;
+            $src = $themeAssets . '/' . $file;
+            if (!is_file($src)) continue;
+
+            if (str_ends_with($file, '.css') && is_dir($cssDir)) {
+                $dst = $cssDir . '/' . $file;
+                if (!file_exists($dst) || filemtime($src) > filemtime($dst)) {
+                    copy($src, $dst);
+                }
+            } elseif (str_ends_with($file, '.js') && is_dir($jsDir)) {
+                $dst = $jsDir . '/' . $file;
+                if (!file_exists($dst) || filemtime($src) > filemtime($dst)) {
+                    copy($src, $dst);
+                }
+            }
+        }
+    }
 }
+
