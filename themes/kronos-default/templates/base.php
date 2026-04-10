@@ -4,10 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?= $title ?? kronos_option('app_name', 'KronosCMS') ?></title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
 <link rel="stylesheet" href="<?= kronos_asset('css/theme.css') ?>">
 <?php do_action('kronos/theme/head'); ?>
 </head>
-<body class="<?= $bodyClass ?? '' ?>">
+<body class="<?= $bodyClass ?? '' ?>" data-scheme="<?= kronos_e(kronos_option('color_scheme', 'default')) ?>">
 
 <header class="site-header">
   <div class="container">
@@ -15,11 +18,11 @@
     <nav class="site-nav">
       <?php do_action('kronos/theme/nav'); ?>
     </nav>
-    <div style="display:flex;align-items:center;gap:1rem">
+    <div class="header-actions">
       <?php if (kronos_is_ecommerce()): ?>
       <a href="<?= kronos_url('/cart') ?>" class="cart-icon" aria-label="Cart">🛒</a>
       <?php endif; ?>
-      <a href="<?= kronos_url('/dashboard/') ?>" style="font-size:.8rem;color:#6b7280;text-decoration:none;padding:.3rem .75rem;border:1px solid #e5e7eb;border-radius:6px">⚙ Admin</a>
+      <a href="<?= kronos_url('/dashboard/') ?>" class="btn-admin">⚙ Admin</a>
     </div>
   </div>
 </header>
@@ -30,8 +33,21 @@
 
 <footer class="site-footer">
   <div class="container">
-    <p>&copy; <?= date('Y') ?> <?= kronos_e(kronos_option('app_name', 'KronosCMS')) ?>.
-       Powered by <a href="https://github.com/TheoSfak/KronosCms">KronosCMS</a>.</p>
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="<?= kronos_url('/') ?>" class="footer-logo"><?= kronos_e(kronos_option('app_name', 'KronosCMS')) ?></a>
+        <p class="text-muted"><?= kronos_e(kronos_option('tagline', '')) ?></p>
+      </div>
+      <div class="footer-links">
+        <nav>
+          <?php do_action('kronos/theme/footer-nav'); ?>
+        </nav>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; <?= date('Y') ?> <?= kronos_e(kronos_option('app_name', 'KronosCMS')) ?>.
+         Powered by <a href="https://github.com/TheoSfak/KronosCms">KronosCMS</a>.</p>
+    </div>
   </div>
 </footer>
 

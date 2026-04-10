@@ -10,7 +10,7 @@ $appName    = $cfg->get('app_name', 'KronosCMS');
 $appUrl     = $cfg->get('app_url', '');
 $aiModel    = $cfg->get('openai_model', 'gpt-4o');
 $tab        = $_GET['tab'] ?? 'general';
-$allowedTabs = ['general', 'mode', 'ai', 'payments', 'update'];
+$allowedTabs = ['general', 'mode', 'ai', 'payments', 'update', 'design'];
 if (!in_array($tab, $allowedTabs, true)) {
     $tab = 'general';
 }
@@ -25,6 +25,7 @@ if (!in_array($tab, $allowedTabs, true)) {
         'ai'       => '🤖 AI',
         'payments' => '💳 Payments',
         'update'   => '🔁 Update',
+        'design'   => '🎨 Design',
     } ?>
   </a>
   <?php endforeach; ?>
@@ -81,6 +82,63 @@ if (!in_array($tab, $allowedTabs, true)) {
     <input type="text" value="<?= kronos_e((string)($app->env('PAYPAL_MODE', 'sandbox'))) ?>" readonly>
   </div>
 
+<?php elseif ($tab === 'design'): ?>
+  <?php
+    $colorScheme = kronos_option('color_scheme', 'default');
+    $heroStyle   = kronos_option('hero_style', 'full');
+  ?>
+  <h2 class="card-title">Design Settings</h2>
+  <form id="settings-design-form" class="settings-form">
+
+    <div class="form-group">
+      <label>Color Scheme</label>
+      <div class="scheme-grid">
+        <?php foreach ([
+          'default' => ['label' => 'Default', 'accent' => '#4f46e5', 'bg' => '#fff'],
+          'dark'    => ['label' => 'Dark',    'accent' => '#818cf8', 'bg' => '#0f172a'],
+          'ocean'   => ['label' => 'Ocean',   'accent' => '#0891b2', 'bg' => '#fff'],
+          'rose'    => ['label' => 'Rose',    'accent' => '#e11d48', 'bg' => '#fff'],
+          'forest'  => ['label' => 'Forest',  'accent' => '#16a34a', 'bg' => '#fff'],
+        ] as $slug => $meta): ?>
+        <label class="scheme-card <?= $colorScheme === $slug ? 'active' : '' ?>">
+          <input type="radio" name="color_scheme" value="<?= $slug ?>" <?= $colorScheme === $slug ? 'checked' : '' ?> hidden>
+          <span class="scheme-swatch" style="background:<?= $meta['bg'] ?>;border:3px solid <?= $meta['accent'] ?>"></span>
+          <span class="scheme-name"><?= $meta['label'] ?></span>
+        </label>
+        <?php endforeach; ?>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Hero Style</label>
+      <div class="hero-style-grid">
+        <?php foreach (['full' => 'Full (120px)', 'compact' => 'Compact (72px)', 'minimal' => 'Minimal (48px)'] as $v => $label): ?>
+        <label class="hero-style-card <?= $heroStyle === $v ? 'active' : '' ?>">
+          <input type="radio" name="hero_style" value="<?= $v ?>" <?= $heroStyle === $v ? 'checked' : '' ?> hidden>
+          <span class="hero-style-label"><?= $label ?></span>
+        </label>
+        <?php endforeach; ?>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Design Settings</button>
+  </form>
+
+  <style>
+    .scheme-grid { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+    .scheme-card { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer;
+      padding: 10px 14px; border-radius: 10px; border: 2px solid transparent;
+      transition: border-color .15s; background: var(--bg-alt); }
+    .scheme-card.active, .scheme-card:hover { border-color: var(--accent); }
+    .scheme-swatch { width: 48px; height: 48px; border-radius: 50%; display: block; }
+    .scheme-name { font-size: .8rem; font-weight: 600; }
+    .hero-style-grid { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+    .hero-style-card { padding: 12px 22px; border-radius: 8px; border: 2px solid var(--border);
+      cursor: pointer; transition: border-color .15s; background: var(--bg-alt); }
+    .hero-style-card.active, .hero-style-card:hover { border-color: var(--accent); }
+    .hero-style-label { font-size: .9rem; font-weight: 600; }
+  </style>
+
 <?php elseif ($tab === 'update'): ?>
   <h2 class="card-title">Update KronosCMS</h2>
   <p class="text-muted">Current version: <strong>v<?= kronos_e(\Kronos\Core\KronosVersion::VERSION) ?></strong></p>
@@ -130,6 +188,25 @@ if (!in_array($tab, $allowedTabs, true)) {
       if (res.ok) location.reload();
     });
   });
+
+  // Design settings save
+  const dForm = document.getElementById('settings-design-form');
+  if (dForm) {
+    // Highlight scheme/hero cards on radio change
+    dForm.querySelectorAll('.scheme-card input, .hero-style-card input').forEach(radio => {
+      radio.addEventListener('change', function() {
+        const grid = this.closest('.scheme-grid, .hero-style-grid');
+        grid.querySelectorAll('.scheme-card, .hero-style-card').forEach(c => c.classList.remove('active'));
+        this.closest('.scheme-card, .hero-style-card').classList.add('active');
+      });
+    });
+    dForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(this));
+      await window.KronosDash.saveOptions(data);
+      alert('Design settings saved. Reload the site to see changes.');
+    });
+  }
 
   // Update check
   const checkBtn = document.getElementById('check-update-btn');
