@@ -37,6 +37,74 @@ ob_start();
         <?php endif; ?>
       </div>
     </div>
+    <!-- Dashboard mockup visual -->
+    <div class="hero-visual">
+      <div class="mockup-browser">
+        <div class="mockup-titlebar">
+          <span class="mb-dot red"></span>
+          <span class="mb-dot yellow"></span>
+          <span class="mb-dot green"></span>
+          <span class="mb-url"><?= kronos_e($appName) ?> &mdash; Dashboard</span>
+        </div>
+        <div class="mockup-body">
+          <div class="mockup-sidebar">
+            <div class="mockup-logo-dot"></div>
+            <div class="mockup-nav-dot active"></div>
+            <div class="mockup-nav-dot"></div>
+            <div class="mockup-nav-dot"></div>
+            <div class="mockup-nav-dot"></div>
+            <div class="mockup-nav-dot"></div>
+          </div>
+          <div class="mockup-content">
+            <div class="mockup-topbar">
+              <div class="mockup-page-title"></div>
+              <div class="mockup-new-btn"></div>
+            </div>
+            <div class="mockup-stats">
+              <div class="mockup-stat-card blue">
+                <div class="mockup-stat-num"></div>
+                <div class="mockup-stat-lbl"></div>
+              </div>
+              <div class="mockup-stat-card purple">
+                <div class="mockup-stat-num"></div>
+                <div class="mockup-stat-lbl"></div>
+              </div>
+              <div class="mockup-stat-card green">
+                <div class="mockup-stat-num"></div>
+                <div class="mockup-stat-lbl"></div>
+              </div>
+            </div>
+            <div class="mockup-chart">
+              <div class="mockup-bar" style="height:55%"></div>
+              <div class="mockup-bar" style="height:75%"></div>
+              <div class="mockup-bar" style="height:40%"></div>
+              <div class="mockup-bar" style="height:90%"></div>
+              <div class="mockup-bar" style="height:65%"></div>
+              <div class="mockup-bar" style="height:50%"></div>
+              <div class="mockup-bar" style="height:80%"></div>
+              <div class="mockup-bar" style="height:45%"></div>
+            </div>
+            <div class="mockup-rows">
+              <div class="mockup-row"></div>
+              <div class="mockup-row"></div>
+              <div class="mockup-row"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Floating badges -->
+      <div class="hero-visual-badge">
+        <div class="hero-badge-icon">✨</div>
+        <div class="hero-badge-text">
+          <strong>AI-Powered</strong>
+          <span>Content generation</span>
+        </div>
+      </div>
+      <div class="hero-visual-badge2">
+        <span class="badge2-dot"></span>
+        <span class="badge2-text">Live preview</span>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -57,9 +125,37 @@ ob_start();
   <div class="container">
     <div class="about-split">
       <div class="about-visual">
-        <div class="about-image-placeholder">
-          <span><?= $isEcom ? '🛒' : '🏗️' ?></span>
-          <p><?= $isEcom ? 'Your store, your rules' : 'Build without limits' ?></p>
+        <div class="about-browser-mockup">
+          <div class="about-browser-bar">
+            <span class="mb-dot red"></span>
+            <span class="mb-dot yellow"></span>
+            <span class="mb-dot green"></span>
+            <span class="about-browser-url"><?= kronos_e($appName) ?></span>
+          </div>
+          <div class="about-browser-body">
+            <div class="about-page-hero">
+              <div class="about-page-hero-title"></div>
+              <div class="about-page-hero-sub"></div>
+              <div class="about-page-hero-btn"></div>
+            </div>
+            <div class="about-page-body">
+              <div class="about-page-card">
+                <div class="about-page-card-dot" style="background:rgba(99,102,241,.4)"></div>
+                <div class="about-page-card-line"></div>
+                <div class="about-page-card-line short"></div>
+              </div>
+              <div class="about-page-card">
+                <div class="about-page-card-dot" style="background:rgba(139,92,246,.4)"></div>
+                <div class="about-page-card-line"></div>
+                <div class="about-page-card-line short"></div>
+              </div>
+              <div class="about-page-card">
+                <div class="about-page-card-dot" style="background:rgba(16,185,129,.4)"></div>
+                <div class="about-page-card-line"></div>
+                <div class="about-page-card-line short"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="about-text">
@@ -107,24 +203,34 @@ ob_start();
     <?php else: ?>
     <div class="features-grid">
       <div class="feature-card">
-        <div class="feature-icon">📝</div>
+        <div class="feature-icon-wrap violet">📝</div>
         <h3>Visual Builder</h3>
         <p>Drag, drop, and publish. Create stunning pages without writing a single line of code.</p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">🤖</div>
+        <div class="feature-icon-wrap purple">🤖</div>
         <h3>AI Writing</h3>
         <p>Generate copy, headlines, and entire posts with GPT-4o built directly into the dashboard.</p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">📊</div>
+        <div class="feature-icon-wrap sky">📊</div>
         <h3>Analytics</h3>
         <p>Real-time page views and audience insights baked in — no third-party trackers needed.</p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">🎨</div>
+        <div class="feature-icon-wrap rose">🎨</div>
         <h3>Design Control</h3>
         <p>Five colour schemes, multiple hero styles, and full CSS control — make it yours.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon-wrap emerald">⚡</div>
+        <h3>Blazing Fast</h3>
+        <p>Zero heavy dependencies. Pure PHP with sub-50ms responses even on shared hosting.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon-wrap amber">🔒</div>
+        <h3>Secure by Default</h3>
+        <p>CSRF protection, prepared statements, and role-based access control built in from day one.</p>
       </div>
     </div>
     <?php endif; ?>

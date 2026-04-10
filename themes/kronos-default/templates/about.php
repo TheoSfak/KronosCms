@@ -24,9 +24,37 @@ ob_start();
         <a href="<?= kronos_url('/contact') ?>" class="btn btn-primary">Get in Touch</a>
       </div>
       <div class="about-visual">
-        <div class="about-image-placeholder">
-          <span>🏗️</span>
-          <p>Building the future of CMS</p>
+        <div class="about-browser-mockup">
+          <div class="about-browser-bar">
+            <span class="mb-dot red"></span>
+            <span class="mb-dot yellow"></span>
+            <span class="mb-dot green"></span>
+            <span class="about-browser-url"><?= kronos_e($appName) ?> &mdash; Dashboard</span>
+          </div>
+          <div class="about-browser-body">
+            <div class="about-page-hero">
+              <div class="about-page-hero-title"></div>
+              <div class="about-page-hero-sub"></div>
+              <div class="about-page-hero-btn"></div>
+            </div>
+            <div class="about-page-body">
+              <div class="about-page-card">
+                <div class="about-page-card-dot" style="background:rgba(99,102,241,.5)"></div>
+                <div class="about-page-card-line"></div>
+                <div class="about-page-card-line short"></div>
+              </div>
+              <div class="about-page-card">
+                <div class="about-page-card-dot" style="background:rgba(239,68,68,.5)"></div>
+                <div class="about-page-card-line"></div>
+                <div class="about-page-card-line short"></div>
+              </div>
+              <div class="about-page-card">
+                <div class="about-page-card-dot" style="background:rgba(245,158,11,.5)"></div>
+                <div class="about-page-card-line"></div>
+                <div class="about-page-card-line short"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -41,22 +69,22 @@ ob_start();
     </div>
     <div class="features-grid">
       <div class="feature-card">
-        <div class="feature-icon">🎯</div>
+        <div class="feature-icon-wrap rose">🎯</div>
         <h3>Purpose-Built</h3>
         <p>Every feature exists because users asked for it. We don't build for the sake of complexity.</p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">🔒</div>
+        <div class="feature-icon-wrap violet">🔒</div>
         <h3>Security First</h3>
         <p>CSRF protection, parameterised queries, role-based access — security is baked in from day one, not added later.</p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">⚡</div>
+        <div class="feature-icon-wrap amber">⚡</div>
         <h3>Performance</h3>
         <p>No bloat. No unnecessary requests. Pages load fast because every millisecond matters for your visitors.</p>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">🌍</div>
+        <div class="feature-icon-wrap emerald">🌍</div>
         <h3>Open &amp; Extensible</h3>
         <p>Themes, modules, hooks, filters — it's your platform. Extend it any way you need.</p>
       </div>
