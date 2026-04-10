@@ -44,6 +44,14 @@ class KronosThemeManager
         // Hook: allow other code to query the manager via filter
         add_filter('kronos/theme/manager', function () { return $this; });
 
+        // Load active theme's functions.php so it can register hooks & routes
+        $slug          = $this->getActiveSlug();
+        $functionsFile = $this->themesDir . '/' . $slug . '/functions.php';
+        if (file_exists($functionsFile)) {
+            $app = $this->app;
+            require_once $functionsFile;
+        }
+
         do_action('kronos/theme/loaded', $this->getActiveSlug());
     }
 

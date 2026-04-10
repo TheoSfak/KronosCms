@@ -1,21 +1,25 @@
 {
   "name": "Kronos Default",
   "slug": "kronos-default",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "TheoSfak",
-  "description": "Clean, minimal default theme for KronosCMS.",
+  "description": "Turn-key ready default theme for KronosCMS — home, about, services, contact, full sections.",
   "mode": "both",
   "templates": {
-    "base":    "templates/base.php",
-    "home":    "templates/home.php",
-    "page":    "templates/page.php",
-    "single":  "templates/single.php",
-    "product": "templates/product.php",
-    "404":     "templates/404.php"
+    "base":     "templates/base.php",
+    "home":     "templates/home.php",
+    "about":    "templates/about.php",
+    "services": "templates/services.php",
+    "contact":  "templates/contact.php",
+    "page":     "templates/page.php",
+    "single":   "templates/single.php",
+    "product":  "templates/product.php",
+    "404":      "templates/404.php"
   },
   "assets": {
     "css": "assets/theme.css",
     "js":  "assets/theme.js"
   },
+  "functions": "functions.php",
   "supports": ["builder", "ecommerce"]
 }
