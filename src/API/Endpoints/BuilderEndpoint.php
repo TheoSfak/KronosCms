@@ -11,7 +11,7 @@ use Kronos\Core\KronosDB;
  * BuilderEndpoint — CRUD for visual page builder layouts.
  * Routes: GET/POST/PUT/DELETE /api/kronos/v1/builder/layouts
  */
-class BuilderEndpoint
+class BuilderEndpoint extends ApiEndpoint
 {
     private KronosAPIRouter $api;
     private KronosDB $db;
@@ -116,15 +116,4 @@ class BuilderEndpoint
         kronos_json(['success' => true]);
     }
 
-    /** @return array<string, mixed> */
-    private function getJsonBody(): array
-    {
-        $raw = file_get_contents('php://input') ?: '{}';
-        try {
-            $decoded = json_decode($raw, true, 32, JSON_THROW_ON_ERROR);
-        } catch (\JsonException) {
-            kronos_abort(400, 'Invalid JSON body.');
-        }
-        return is_array($decoded) ? $decoded : [];
-    }
 }

@@ -13,7 +13,7 @@ use OpenAI;
  * Route: POST /api/kronos/v1/ai/chat
  * Logs all exchanges to kronos_ai_logs.
  */
-class AIEndpoint
+class AIEndpoint extends ApiEndpoint
 {
     private KronosAPIRouter $api;
     private KronosDB $db;
@@ -113,15 +113,4 @@ class AIEndpoint
         }
     }
 
-    /** @return array<string, mixed> */
-    private function getJsonBody(): array
-    {
-        $raw = file_get_contents('php://input') ?: '{}';
-        try {
-            $decoded = json_decode($raw, true, 10, JSON_THROW_ON_ERROR);
-        } catch (\JsonException) {
-            kronos_abort(400, 'Invalid JSON body.');
-        }
-        return is_array($decoded) ? $decoded : [];
-    }
 }

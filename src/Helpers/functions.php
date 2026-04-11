@@ -31,6 +31,11 @@ function add_action(string $hook, callable $callback, int $priority = 10): void
     KronosApp::getInstance()->hooks()->addAction($hook, $callback, $priority);
 }
 
+function remove_action(string $hook, callable $callback, int $priority = 10): void
+{
+    KronosApp::getInstance()->hooks()->removeAction($hook, $callback, $priority);
+}
+
 function do_action(string $hook, mixed ...$args): void
 {
     KronosApp::getInstance()->hooks()->doAction($hook, ...$args);
@@ -39,6 +44,11 @@ function do_action(string $hook, mixed ...$args): void
 function add_filter(string $hook, callable $callback, int $priority = 10): void
 {
     KronosApp::getInstance()->hooks()->addFilter($hook, $callback, $priority);
+}
+
+function remove_filter(string $hook, callable $callback, int $priority = 10): void
+{
+    KronosApp::getInstance()->hooks()->removeFilter($hook, $callback, $priority);
 }
 
 function apply_filters(string $hook, mixed $value, mixed ...$args): mixed

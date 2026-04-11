@@ -1,10 +1,16 @@
 <?php
 declare(strict_types=1);
 
-// Show ALL errors immediately — remove before production
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
+// Error reporting — display only when APP_DEBUG=true, always log
 error_reporting(E_ALL);
+if (filter_var($_ENV['APP_DEBUG'] ?? getenv('APP_DEBUG'), FILTER_VALIDATE_BOOLEAN)) {
+    ini_set('display_errors', '1');
+    ini_set('display_startup_errors', '1');
+} else {
+    ini_set('display_errors', '0');
+    ini_set('display_startup_errors', '0');
+    ini_set('log_errors', '1');
+}
 
 /**
  * KronosCMS Front Controller

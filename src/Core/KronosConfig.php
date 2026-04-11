@@ -63,21 +63,19 @@ class KronosConfig
 
     /**
      * Set (insert or update) an option value.
+     * Uses INSERT … ON DUPLICATE KEY UPDATE to avoid a read-then-write race condition.
      */
     public function set(string $key, mixed $value): void
     {
         $serialized = $this->maybeSerialize($value);
 
-        $existing = $this->db->getRow(
-            'SELECT id FROM kronos_options WHERE option_key = ? LIMIT 1',
-            [$key]
+        // Atomic upsert — requires UNIQUE key on option_key (enforced by schema)
+        $this->db->query(
+            'INSERT INTO `kronos_options` (`option_key`, `option_value`)
+             VALUES (?, ?)
+             ON DUPLICATE KEY UPDATE `option_value` = VALUES(`option_value`)',
+            [$key, $serialized]
         );
-
-        if ($existing !== null) {
-            $this->db->update('kronos_options', ['option_value' => $serialized], ['option_key' => $key]);
-        } else {
-            $this->db->insert('kronos_options', ['option_key' => $key, 'option_value' => $serialized]);
-        }
 
         $this->cache[$key] = $value;
     }

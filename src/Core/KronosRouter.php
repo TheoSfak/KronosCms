@@ -67,9 +67,9 @@ class KronosRouter
     public function dispatch(): bool
     {
         $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
-        // Support method override via POST field or X-HTTP-Method-Override header
+        // Support method override via header only (not POST field — CSRF vector)
         if ($method === 'POST') {
-            $override = $_POST['_method'] ?? ($_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] ?? '');
+            $override = $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE'] ?? '';
             if (in_array(strtoupper($override), ['PUT', 'DELETE', 'PATCH'], true)) {
                 $method = strtoupper($override);
             }
@@ -99,7 +99,14 @@ class KronosRouter
                     };
                 }
 
-                $next();
+                try {
+                    $next();
+                } catch (\Throwable $e) {
+                    error_log('[KronosRouter] Handler error on ' . $method . ' ' . $uri . ': ' . $e->getMessage());
+                    if (!headers_sent()) {
+                        kronos_abort(500, 'Internal Server Error');
+                    }
+                }
                 return true;
             }
         }

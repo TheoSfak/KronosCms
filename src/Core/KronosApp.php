@@ -62,7 +62,8 @@ class KronosApp
                 pass:   $this->env('DB_PASS', '')
             );
         } catch (\Throwable $e) {
-            // DB unreachable — send user back to installer
+            // Log the actual error so the failure is diagnosable
+            error_log('[KronosApp] Database initialization failed: ' . $e->getMessage());
             $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
             $base = rtrim(dirname(dirname($scriptName)), '/');
             header('Location: ' . $base . '/install/');
@@ -132,7 +133,7 @@ class KronosApp
 
     public function env(string $key, mixed $default = null): mixed
     {
-        return $this->env[$key] ?? $_ENV[$key] ?? getenv($key) ?: $default;
+        return $this->env[$key] ?? $_ENV[$key] ?? getenv($key) ?? $default;
     }
 
     // ------------------------------------------------------------------

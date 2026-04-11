@@ -182,6 +182,47 @@ class KronosDB
         return $this->pdo;
     }
 
+    // ------------------------------------------------------------------
+    // Transactions
+    // ------------------------------------------------------------------
+
+    public function beginTransaction(): void
+    {
+        $this->pdo->beginTransaction();
+    }
+
+    public function commit(): void
+    {
+        $this->pdo->commit();
+    }
+
+    public function rollback(): void
+    {
+        if ($this->pdo->inTransaction()) {
+            $this->pdo->rollBack();
+        }
+    }
+
+    /**
+     * Execute $callback inside a transaction. Rolls back on any exception.
+     *
+     * @template T
+     * @param callable(): T $callback
+     * @return T
+     */
+    public function transaction(callable $callback): mixed
+    {
+        $this->beginTransaction();
+        try {
+            $result = $callback();
+            $this->commit();
+            return $result;
+        } catch (\Throwable $e) {
+            $this->rollback();
+            throw $e;
+        }
+    }
+
     /**
      * Sanitize a table or column identifier (allow only alphanumeric and underscores).
      */

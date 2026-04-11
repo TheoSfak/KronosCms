@@ -64,6 +64,16 @@ class KronosJWT
 
         [$header, $payload, $signature] = $parts;
 
+        // Validate header algorithm BEFORE checking signature — prevents alg=none attacks
+        try {
+            $headerData = json_decode($this->base64UrlDecode($header), true, 4, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            throw new \RuntimeException('JWT header is not valid JSON.');
+        }
+        if (!is_array($headerData) || ($headerData['alg'] ?? '') !== 'HS256') {
+            throw new \RuntimeException('JWT algorithm mismatch — only HS256 is accepted.');
+        }
+
         // Verify signature
         $expectedSig = $this->sign($header . '.' . $payload);
         if (!hash_equals($expectedSig, $signature)) {

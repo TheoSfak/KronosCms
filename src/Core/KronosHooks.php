@@ -9,10 +9,10 @@ namespace Kronos\Core;
  */
 class KronosHooks
 {
-    /** @var array<string, array<int, array<array{callback: callable, priority: int}>>> */
+    /** @var array<string, array<int, callable[]>> */
     private array $actions = [];
 
-    /** @var array<string, array<int, array<array{callback: callable, priority: int}>>> */
+    /** @var array<string, array<int, callable[]>> */
     private array $filters = [];
 
     /**
@@ -20,7 +20,21 @@ class KronosHooks
      */
     public function addAction(string $hook, callable $callback, int $priority = 10): void
     {
-        $this->actions[$hook][$priority][] = ['callback' => $callback, 'priority' => $priority];
+        $this->actions[$hook][$priority][] = $callback;
+    }
+
+    /**
+     * Remove a previously registered action callback.
+     */
+    public function removeAction(string $hook, callable $callback, int $priority = 10): void
+    {
+        if (empty($this->actions[$hook][$priority])) {
+            return;
+        }
+        $this->actions[$hook][$priority] = array_values(array_filter(
+            $this->actions[$hook][$priority],
+            static fn(callable $cb) => $cb !== $callback
+        ));
     }
 
     /**
@@ -34,8 +48,8 @@ class KronosHooks
 
         ksort($this->actions[$hook]);
         foreach ($this->actions[$hook] as $priorityGroup) {
-            foreach ($priorityGroup as $item) {
-                ($item['callback'])(...$args);
+            foreach ($priorityGroup as $callback) {
+                $callback(...$args);
             }
         }
     }
@@ -45,7 +59,21 @@ class KronosHooks
      */
     public function addFilter(string $hook, callable $callback, int $priority = 10): void
     {
-        $this->filters[$hook][$priority][] = ['callback' => $callback, 'priority' => $priority];
+        $this->filters[$hook][$priority][] = $callback;
+    }
+
+    /**
+     * Remove a previously registered filter callback.
+     */
+    public function removeFilter(string $hook, callable $callback, int $priority = 10): void
+    {
+        if (empty($this->filters[$hook][$priority])) {
+            return;
+        }
+        $this->filters[$hook][$priority] = array_values(array_filter(
+            $this->filters[$hook][$priority],
+            static fn(callable $cb) => $cb !== $callback
+        ));
     }
 
     /**
@@ -59,8 +87,8 @@ class KronosHooks
 
         ksort($this->filters[$hook]);
         foreach ($this->filters[$hook] as $priorityGroup) {
-            foreach ($priorityGroup as $item) {
-                $value = ($item['callback'])($value, ...$args);
+            foreach ($priorityGroup as $callback) {
+                $value = $callback($value, ...$args);
             }
         }
 

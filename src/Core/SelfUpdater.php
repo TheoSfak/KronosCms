@@ -111,6 +111,23 @@ class SelfUpdater
 
         $extractTo = $tmpDir . '/extracted';
         $this->ensureDir($extractTo);
+
+        // Guard against path traversal in ZIP entries before extracting
+        $realExtract = realpath($extractTo);
+        if ($realExtract === false) {
+            throw new \RuntimeException('Could not resolve extraction directory.');
+        }
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $name     = $zip->getNameIndex($i);
+            $resolved = realpath($extractTo . '/' . $name);
+            // realpath returns false for non-existent paths; use prefix check on the raw path
+            $normalized = $realExtract . DIRECTORY_SEPARATOR . ltrim(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $name), DIRECTORY_SEPARATOR);
+            if (strpos($normalized, $realExtract . DIRECTORY_SEPARATOR) !== 0 && $normalized !== $realExtract) {
+                $zip->close();
+                throw new \RuntimeException("Path traversal detected in ZIP entry: {$name}");
+            }
+        }
+
         $zip->extractTo($extractTo);
         $zip->close();
 

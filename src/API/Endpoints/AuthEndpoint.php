@@ -11,7 +11,7 @@ use Kronos\Core\KronosApp;
  * AuthEndpoint — Handles login, refresh, and logout.
  * Routes: POST /api/kronos/v1/auth/{action}
  */
-class AuthEndpoint
+class AuthEndpoint extends ApiEndpoint
 {
     private KronosAPIRouter $api;
     private KronosDB $db;
@@ -112,17 +112,4 @@ class AuthEndpoint
     // Helpers
     // ------------------------------------------------------------------
 
-    /**
-     * @return array<string, mixed>
-     */
-    private function getJsonBody(): array
-    {
-        $raw = file_get_contents('php://input') ?: '{}';
-        try {
-            $decoded = json_decode($raw, true, 10, JSON_THROW_ON_ERROR);
-        } catch (\JsonException) {
-            kronos_abort(400, 'Invalid JSON body.');
-        }
-        return is_array($decoded) ? $decoded : [];
-    }
 }

@@ -11,8 +11,10 @@ use Kronos\Core\KronosDB;
  * CommerceEndpoint — Products, Cart, Orders API.
  * Only active in E-Commerce mode.
  */
-class CommerceEndpoint
+class CommerceEndpoint extends ApiEndpoint
 {
+    private const ALLOWED_STATUSES = ['draft', 'published', 'archived'];
+
     private KronosAPIRouter $api;
     private KronosDB $db;
 
@@ -64,8 +66,7 @@ class CommerceEndpoint
     private function listProducts(): void
     {
         $status = isset($_GET['status']) ? trim((string) $_GET['status']) : 'published';
-        $allowedStatuses = ['draft', 'published', 'archived'];
-        if (!in_array($status, $allowedStatuses, true)) {
+        if (!in_array($status, self::ALLOWED_STATUSES, true)) {
             $status = 'published';
         }
 
@@ -106,7 +107,7 @@ class CommerceEndpoint
             'sale_price'  => isset($body['sale_price']) ? (float) $body['sale_price'] : null,
             'sku'         => (string) ($body['sku'] ?? ''),
             'stock'       => (int)    ($body['stock'] ?? 0),
-            'status'      => in_array($body['status'] ?? '', ['draft', 'published', 'archived'], true)
+            'status'      => in_array($body['status'] ?? '', self::ALLOWED_STATUSES, true)
                                 ? $body['status'] : 'draft',
             'images'      => json_encode($body['images'] ?? [], JSON_THROW_ON_ERROR),
             'meta'        => json_encode($body['meta'] ?? [], JSON_THROW_ON_ERROR),
@@ -140,7 +141,7 @@ class CommerceEndpoint
         if (isset($body['stock'])) {
             $data['stock'] = (int) $body['stock'];
         }
-        if (isset($body['status']) && in_array($body['status'], ['draft', 'published', 'archived'], true)) {
+        if (isset($body['status']) && in_array($body['status'], self::ALLOWED_STATUSES, true)) {
             $data['status'] = $body['status'];
         }
         if (isset($body['images'])) {
@@ -403,15 +404,4 @@ class CommerceEndpoint
         ]);
     }
 
-    /** @return array<string, mixed> */
-    private function getJsonBody(): array
-    {
-        $raw = file_get_contents('php://input') ?: '{}';
-        try {
-            $decoded = json_decode($raw, true, 20, JSON_THROW_ON_ERROR);
-        } catch (\JsonException) {
-            kronos_abort(400, 'Invalid JSON body.');
-        }
-        return is_array($decoded) ? $decoded : [];
-    }
 }

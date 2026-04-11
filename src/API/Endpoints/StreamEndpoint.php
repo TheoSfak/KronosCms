@@ -27,9 +27,9 @@ class StreamEndpoint
 
     public function handle(array $params): void
     {
-        // Allow the SSE stream to run indefinitely (EventSource reconnects after timeout)
+        // Allow the SSE stream to run up to the connection timeout
         set_time_limit(0);
-        ignore_user_abort(true);
+        ignore_user_abort(false); // Stop processing when client disconnects — prevents resource leak
 
         // SSE headers — disable all buffering
         header('Content-Type: text/event-stream; charset=utf-8');

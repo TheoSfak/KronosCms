@@ -15,7 +15,7 @@ use Kronos\Core\KronosDB;
  *   PUT    /api/kronos/v1/users/{id}       → update role / display_name
  *   DELETE /api/kronos/v1/users/{id}       → delete user (cannot delete self)
  */
-class UsersEndpoint
+class UsersEndpoint extends ApiEndpoint
 {
     private KronosAPIRouter $api;
     private KronosDB $db;
@@ -182,20 +182,4 @@ class UsersEndpoint
     }
 
     // ------------------------------------------------------------------
-    // Helpers
-    // ------------------------------------------------------------------
-
-    private function getJsonBody(): array
-    {
-        $raw = file_get_contents('php://input') ?: '{}';
-        try {
-            $body = json_decode($raw, true, 5, JSON_THROW_ON_ERROR);
-        } catch (\JsonException) {
-            kronos_abort(400, 'Invalid JSON body.');
-        }
-        if (!is_array($body)) {
-            kronos_abort(400, 'Expected JSON object.');
-        }
-        return $body;
-    }
 }
