@@ -288,6 +288,7 @@ if (!in_array($tab, $allowedTabs, true)) {
       const statusDiv = document.getElementById('update-status');
       try {
         const res = await window.KronosDash.api('/system/update/check', 'GET');
+        if (!res) { statusDiv.innerHTML = '<p class="text-danger">Could not reach update server.</p>'; this.disabled = false; this.textContent = 'Check for Updates'; return; }
         if (res.update_available) {
           statusDiv.innerHTML = `
             <div class="update-banner">
@@ -308,8 +309,12 @@ if (!in_array($tab, $allowedTabs, true)) {
         } else {
           statusDiv.innerHTML = '<p class="text-success">✅ You are on the latest version.</p>';
         }
+        this.disabled = false;
+        this.textContent = 'Check for Updates';
       } catch(err) {
         statusDiv.innerHTML = `<p class="text-danger">Could not check for updates: ${err.message}</p>`;
+        this.disabled = false;
+        this.textContent = 'Check for Updates';
       }
     });
   }
