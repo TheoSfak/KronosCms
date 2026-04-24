@@ -77,7 +77,7 @@ class PackageInstaller
     private function isAllowedHost(string $url): bool
     {
         $host    = parse_url($url, PHP_URL_HOST) ?? '';
-        $hubHost = parse_url((string) getenv('HUB_API_URL'), PHP_URL_HOST) ?? '';
+        $hubHost = parse_url((string) ($_ENV['HUB_API_URL'] ?? getenv('HUB_API_URL') ?: ''), PHP_URL_HOST) ?? '';
 
         $allowed = [
             'github.com',
@@ -136,14 +136,25 @@ class PackageInstaller
         $this->ensureDir($extractTo);
 
         $realExtract = realpath($extractTo);
+        if ($realExtract === false) {
+            $zip->close();
+            throw new \RuntimeException('Cannot resolve extraction directory.');
+        }
 
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $name = $zip->getNameIndex($i);
             if ($name === false) continue;
 
-            // ZIP-slip protection: ensure no path traversal
-            $dest = realpath($extractTo . '/' . dirname($name));
-            if ($dest === false || !str_starts_with($dest, $realExtract)) {
+            // ZIP-slip protection: validate the normalized target path before extraction.
+            $normalized = $realExtract . DIRECTORY_SEPARATOR . ltrim(
+                str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $name),
+                DIRECTORY_SEPARATOR
+            );
+            if (
+                str_contains($normalized, DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR)
+                || str_ends_with($normalized, DIRECTORY_SEPARATOR . '..')
+                || (!str_starts_with($normalized, $realExtract . DIRECTORY_SEPARATOR) && $normalized !== $realExtract)
+            ) {
                 $zip->close();
                 throw new \RuntimeException('ZIP contains unsafe path: ' . $name);
             }

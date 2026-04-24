@@ -288,6 +288,13 @@ class CommerceEndpoint extends ApiEndpoint
             kronos_abort(404, 'Order not found.');
         }
 
+        if (!kronos_user_can('app_manager')) {
+            $userId = (int) (kronos_current_user()['id'] ?? 0);
+            if ((int) ($order['customer_id'] ?? 0) !== $userId) {
+                kronos_abort(403, 'You do not have permission to view this order.');
+            }
+        }
+
         $items   = $this->db->getResults('SELECT * FROM kronos_order_items WHERE order_id = ?', [$id]);
         $addresses = $this->db->getResults('SELECT * FROM kronos_order_addresses WHERE order_id = ?', [$id]);
 
@@ -353,7 +360,20 @@ class CommerceEndpoint extends ApiEndpoint
         // Fire hook for payment gateway to pick up
         do_action('kronos/commerce/order_created', $orderId, $body);
 
-        kronos_json(['success' => true, 'order_id' => $orderId, 'order_number' => $orderNumber], 201);
+        $paymentIntent = apply_filters('kronos/commerce/payment_intent', null);
+        if (is_array($paymentIntent)) {
+            $gatewayId = (string) ($paymentIntent['intent_id'] ?? $paymentIntent['order_id'] ?? '');
+            if ($gatewayId !== '') {
+                $this->db->update('kronos_orders', ['payment_intent' => $gatewayId], ['id' => $orderId]);
+            }
+        }
+
+        kronos_json([
+            'success' => true,
+            'order_id' => $orderId,
+            'order_number' => $orderNumber,
+            'payment' => $paymentIntent,
+        ], 201);
     }
 
     private function updateOrderStatus(int $id): void

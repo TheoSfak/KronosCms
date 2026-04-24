@@ -29,6 +29,9 @@ class RenderEngine
     {
         $nodes = json_decode($layoutJson, true);
         if (!is_array($nodes)) return '';
+        if (isset($nodes['blocks']) && is_array($nodes['blocks'])) {
+            $nodes = $nodes['blocks'];
+        }
 
         return $this->renderNodes($nodes);
     }
@@ -52,7 +55,7 @@ class RenderEngine
     private function renderNode(array $node): string
     {
         $type  = (string) ($node['type']  ?? '');
-        $attrs = (array)  ($node['attrs'] ?? []);
+        $attrs = (array)  ($node['attrs'] ?? $node['props'] ?? []);
         $children = (array) ($node['children'] ?? []);
 
         $widget = $this->registry[$type] ?? null;

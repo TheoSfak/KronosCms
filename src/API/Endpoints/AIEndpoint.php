@@ -46,6 +46,14 @@ class AIEndpoint extends ApiEndpoint
             $sessionId = bin2hex(random_bytes(16));
         }
 
+        // Fail before writing chat history if the AI service is not configured.
+        $apiKey = (string) $this->app->env('OPENAI_API_KEY', '');
+        if ($apiKey === '') {
+            kronos_abort(503, 'OpenAI API key is not configured.');
+        }
+
+        $model = (string) $this->app->config()->get('openai_model', $this->app->env('OPENAI_MODEL', 'gpt-4o'));
+
         // Retrieve conversation history for this session (last 20 messages)
         $history = $this->db->getResults(
             'SELECT role, content FROM kronos_ai_logs
@@ -74,14 +82,6 @@ class AIEndpoint extends ApiEndpoint
             $messages[] = ['role' => $h['role'], 'content' => $h['content']];
         }
         $messages[] = ['role' => 'user', 'content' => $message];
-
-        // Call OpenAI
-        $apiKey = (string) $this->app->env('OPENAI_API_KEY', '');
-        if ($apiKey === '') {
-            kronos_abort(503, 'OpenAI API key is not configured.');
-        }
-
-        $model = (string) $this->app->config()->get('openai_model', $this->app->env('OPENAI_MODEL', 'gpt-4o'));
 
         try {
             $client   = OpenAI::client($apiKey);

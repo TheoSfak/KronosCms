@@ -16,7 +16,7 @@ $user = $_REQUEST['_kronos_user'] ?? null;
 $app  = \Kronos\Core\KronosApp::getInstance();
 $db   = $app->db();
 
-$layoutId = (int) ($_GET['layout_id'] ?? 0);
+$layoutId = (int) ($params['id'] ?? ($_GET['layout_id'] ?? 0));
 $layout   = null;
 
 if ($layoutId > 0) {
@@ -38,6 +38,7 @@ if (!$layout) {
 
 $ast  = json_decode((string) ($layout['json_data'] ?? '[]'), true);
 if (!is_array($ast)) $ast = [];
+if (isset($ast['blocks']) && is_array($ast['blocks'])) $ast = $ast['blocks'];
 
 // Widget categories for the palette
 $widgetCategories = [
@@ -71,12 +72,13 @@ $widgetsFlat = array_merge(...array_values($widgetCategories));
 $pageTitle   = 'Builder — ' . ($layout['layout_name'] ?? 'Untitled');
 $builderPage = true;
 $topbarExtra = '
+  <span class="builder-editor-badge">Editing layout</span>
   <input type="text" id="builder-layout-name"
     value="' . htmlspecialchars($layout['layout_name'] ?? '', ENT_QUOTES) . '"
     placeholder="Layout name…">
   <span id="builder-save-status" class="builder-save-status">Auto-saved</span>
-  <button id="builder-preview-btn" class="btn btn-ghost btn-sm topbar-btn" title="Preview (P)">👁 Preview</button>
-  <button id="builder-save-btn" class="btn btn-primary btn-sm">💾 Save</button>
+  <button id="builder-preview-btn" class="btn btn-ghost btn-sm topbar-btn" title="Preview (P)">Preview</button>
+  <button id="builder-save-btn" class="btn btn-primary btn-sm">Update</button>
   <a href="' . kronos_url('/dashboard/content') . '" class="btn btn-ghost btn-sm topbar-btn">← Exit</a>';
 $dashDir     = dirname(__DIR__);
 require $dashDir . '/partials/layout-header.php';
@@ -87,6 +89,10 @@ require $dashDir . '/partials/layout-header.php';
 
   <!-- ① Widget Palette -->
   <div class="builder-panel" id="builder-palette">
+    <div class="builder-panel-heading">
+      <span class="builder-panel-kicker">Elements</span>
+      <strong>Widgets</strong>
+    </div>
     <div class="palette-search-wrap">
       <input type="search" id="palette-search" class="palette-search" placeholder="Search blocks…" autocomplete="off">
     </div>
@@ -128,6 +134,10 @@ require $dashDir . '/partials/layout-header.php';
         <button class="canvas-vp-btn" id="canvas-zoom-in"  title="Zoom in">+</button>
       </div>
     </div>
+    <div class="canvas-workspace-label">
+      <span>Live canvas</span>
+      <span>Drag widgets onto the page</span>
+    </div>
     <div class="canvas-scroll" id="canvas-scroll">
       <div class="canvas-scale-wrapper" id="canvas-scale-wrapper">
         <div class="builder-canvas-inner"
@@ -147,8 +157,12 @@ require $dashDir . '/partials/layout-header.php';
 
   <!-- ③ Inspector -->
   <div class="builder-panel" id="builder-inspector">
+    <div class="builder-panel-heading builder-panel-heading-sticky">
+      <span class="builder-panel-kicker">Settings</span>
+      <strong>Block</strong>
+    </div>
     <div class="inspector-empty" id="inspector-empty-state">
-      <div class="inspector-empty-icon">🎨</div>
+      <div class="inspector-empty-icon">□</div>
       <div class="inspector-empty-title">No block selected</div>
       <div class="inspector-empty-label">Click any block on the canvas<br>to edit its properties</div>
     </div>

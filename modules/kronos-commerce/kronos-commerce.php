@@ -3,6 +3,13 @@ declare(strict_types=1);
 
 use Kronos\Core\KronosModule;
 use Kronos\Core\KronosApp;
+use Kronos\Commerce\PaymentManager;
+
+require_once __DIR__ . '/PaymentGatewayInterface.php';
+require_once __DIR__ . '/NullGateway.php';
+require_once __DIR__ . '/StripeGateway.php';
+require_once __DIR__ . '/PayPalGateway.php';
+require_once __DIR__ . '/PaymentManager.php';
 
 /**
  * KronosCommerceModule — wires the commerce payment layer into KronosCMS.
@@ -29,7 +36,7 @@ class KronosCommerceModule extends KronosModule
         $router = $app->router();
 
         // Webhook endpoint (must be unauthenticated for Stripe/PayPal callbacks)
-        $router->add('POST', '/payment/webhook/{gateway}', [$this, 'handleWebhook']);
+        $router->post('/payment/webhook/{gateway}', [$this, 'handleWebhook']);
 
         // Hook: after an order is created, expose the payment intent to the response
         add_action('kronos/commerce/order_created', [$this, 'onOrderCreated'], 10);
@@ -42,11 +49,17 @@ class KronosCommerceModule extends KronosModule
 
     // ── Handlers ───────────────────────────────────────────────────
 
-    public function onOrderCreated(array $orderData): void
+    public function onOrderCreated(int|string $orderId, array $requestData = []): void
     {
         // Fires after order row is inserted. Dispatch payment intent creation.
         // The result is made available via a filter so the API response can include it.
-        add_filter('kronos/commerce/payment_intent', function () use ($orderData) {
+        add_filter('kronos/commerce/payment_intent', function () use ($orderId) {
+            $app = KronosApp::getInstance();
+            $orderData = $app->db()->getRow(
+                'SELECT order_number, total FROM kronos_orders WHERE id = ? LIMIT 1',
+                [$orderId]
+            ) ?? [];
+
             $manager = new PaymentManager();
             return $manager->createIntent(
                 (int) round(($orderData['total'] ?? 0) * 100),

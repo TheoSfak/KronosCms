@@ -23,7 +23,7 @@ class HubClient
     public function __construct(\Kronos\Core\KronosConfig $config, string $hubUrl = '')
     {
         $this->config    = $config;
-        $this->hubUrl    = rtrim($hubUrl ?: (string) getenv('HUB_API_URL'), '/');
+        $this->hubUrl    = rtrim($hubUrl ?: (string) ($_ENV['HUB_API_URL'] ?? getenv('HUB_API_URL') ?: ''), '/');
         $this->userAgent = 'KronosCMS/' . \Kronos\Core\KronosVersion::VERSION;
         $this->cacheTtl  = 3600; // 1 h
     }

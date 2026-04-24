@@ -60,14 +60,14 @@ class BuilderEndpoint extends ApiEndpoint
     private function create(): void
     {
         $body = $this->getJsonBody();
-        $name = trim((string) ($body['layout_name'] ?? ''));
+        $name = trim((string) ($body['layout_name'] ?? $body['name'] ?? ''));
         $type = trim((string) ($body['layout_type'] ?? 'page'));
 
         if ($name === '') {
             kronos_abort(422, 'layout_name is required.');
         }
 
-        $jsonData = json_encode($body['json_data'] ?? [], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+        $jsonData = $this->encodeLayoutData($body['json_data'] ?? $body['content'] ?? []);
 
         $id = $this->db->insert('kronos_builder_layouts', [
             'layout_name' => $name,
@@ -91,11 +91,17 @@ class BuilderEndpoint extends ApiEndpoint
         if (isset($body['layout_name'])) {
             $data['layout_name'] = trim((string) $body['layout_name']);
         }
+        if (isset($body['name'])) {
+            $data['layout_name'] = trim((string) $body['name']);
+        }
         if (isset($body['layout_type'])) {
             $data['layout_type'] = trim((string) $body['layout_type']);
         }
         if (isset($body['json_data'])) {
-            $data['json_data'] = json_encode($body['json_data'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+            $data['json_data'] = $this->encodeLayoutData($body['json_data']);
+        }
+        if (isset($body['content'])) {
+            $data['json_data'] = $this->encodeLayoutData($body['content']);
         }
 
         if (empty($data)) {
@@ -114,6 +120,16 @@ class BuilderEndpoint extends ApiEndpoint
         }
         $this->db->delete('kronos_builder_layouts', ['id' => $id]);
         kronos_json(['success' => true]);
+    }
+
+    private function encodeLayoutData(mixed $value): string
+    {
+        if (is_string($value)) {
+            json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+            return $value;
+        }
+
+        return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
     }
 
 }

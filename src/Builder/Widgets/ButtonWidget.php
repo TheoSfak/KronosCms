@@ -11,10 +11,16 @@ class ButtonWidget extends WidgetBase
 
     public function render(array $attrs, string $innerHtml = ''): string
     {
-        $label = $this->e($this->attr($attrs, 'label', 'Click Me'));
+        $label = $this->e($this->attr($attrs, 'label', $this->attr($attrs, 'text', 'Click Me')));
         $rawUrl = (string) $this->attr($attrs, 'url', '#');
         // Only allow safe URL schemes
-        $url = filter_var($rawUrl, FILTER_VALIDATE_URL) ? $this->e($rawUrl) : '#';
+        $url = (
+            filter_var($rawUrl, FILTER_VALIDATE_URL)
+            || str_starts_with($rawUrl, '/')
+            || str_starts_with($rawUrl, '#')
+            || str_starts_with($rawUrl, 'mailto:')
+            || str_starts_with($rawUrl, 'tel:')
+        ) ? $this->e($rawUrl) : '#';
 
         return "<a href=\"{$url}\" class=\"btn btn-primary\">{$label}</a>\n";
     }

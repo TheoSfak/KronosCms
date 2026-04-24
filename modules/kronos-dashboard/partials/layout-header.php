@@ -27,7 +27,6 @@ $nav_active = function(string $path) use ($currentUri): string {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?= kronos_e($pageTitle ?? 'Dashboard') ?> — <?= kronos_e($appName) ?></title>
 <link rel="stylesheet" href="<?= kronos_asset('css/dashboard.css') ?>">
-<script src="<?= kronos_asset('js/dashboard.js') ?>"></script>
 <script>
 window.KronosConfig = {
   appUrl:  <?= json_encode(kronos_option('app_url', '/')) ?>,
@@ -37,6 +36,7 @@ window.KronosConfig = {
   csrf:    <?= json_encode(kronos_csrf_token()) ?>,
 };
 </script>
+<script src="<?= kronos_asset('js/dashboard.js') ?>"></script>
 </head>
 <body class="dashboard-body<?= !empty($builderPage) ? ' builder-page' : '' ?>">
 
@@ -49,47 +49,54 @@ window.KronosConfig = {
   </div>
 
   <nav class="sidebar-nav">
+    <div class="nav-section-label">Dashboard</div>
     <a href="<?= kronos_url('/dashboard') ?>" class="nav-item <?= $currentUri === '/dashboard' ? 'active' : '' ?>">
-      <span class="nav-icon">🏠</span> Overview
+      <span class="nav-icon">⌂</span> Home
     </a>
 
     <?php if ($mode === 'cms'): ?>
+    <div class="nav-section-label">Content</div>
     <a href="<?= kronos_url('/dashboard/content') ?>" class="nav-item <?= $nav_active('/dashboard/content') ?>">
-      <span class="nav-icon">📄</span> Content
+      <span class="nav-icon">▤</span> Posts & Pages
     </a>
     <?php endif; ?>
 
     <?php if ($mode === 'ecommerce'): ?>
+    <div class="nav-section-label">Commerce</div>
     <a href="<?= kronos_url('/dashboard/products') ?>" class="nav-item <?= $nav_active('/dashboard/products') ?>">
-      <span class="nav-icon">📦</span> Products
+      <span class="nav-icon">□</span> Products
     </a>
     <a href="<?= kronos_url('/dashboard/orders') ?>" class="nav-item <?= $nav_active('/dashboard/orders') ?>">
-      <span class="nav-icon">🧾</span> Orders
+      <span class="nav-icon">≡</span> Orders
     </a>
     <?php endif; ?>
 
+    <div class="nav-section-label">Appearance</div>
     <a href="<?= kronos_url('/dashboard/builder/1') ?>" class="nav-item <?= $nav_active('/dashboard/builder') ?>">
-      <span class="nav-icon">🎨</span> Builder
-    </a>
-    <a href="<?= kronos_url('/dashboard/analytics') ?>" class="nav-item <?= $nav_active('/dashboard/analytics') ?>">
-      <span class="nav-icon">📊</span> Analytics
-    </a>
-    <a href="<?= kronos_url('/dashboard/ai') ?>" class="nav-item <?= $nav_active('/dashboard/ai') ?>">
-      <span class="nav-icon">🤖</span> AI Chat
+      <span class="nav-icon">✎</span> Page Builder
     </a>
     <a href="<?= kronos_url('/dashboard/templates') ?>" class="nav-item <?= $nav_active('/dashboard/templates') ?>">
-      <span class="nav-icon">📐</span> Templates
+      <span class="nav-icon">▦</span> Templates
     </a>
     <a href="<?= kronos_url('/dashboard/marketplace') ?>" class="nav-item <?= $nav_active('/dashboard/marketplace') ?>">
-      <span class="nav-icon">🛍️</span> Marketplace
+      <span class="nav-icon">◈</span> Plugins
+    </a>
+
+    <div class="nav-section-label">Tools</div>
+    <a href="<?= kronos_url('/dashboard/analytics') ?>" class="nav-item <?= $nav_active('/dashboard/analytics') ?>">
+      <span class="nav-icon">↗</span> Analytics
+    </a>
+    <a href="<?= kronos_url('/dashboard/ai') ?>" class="nav-item <?= $nav_active('/dashboard/ai') ?>">
+      <span class="nav-icon">AI</span> AI Assistant
     </a>
 
     <?php if (kronos_user_can('app_manager')): ?>
+    <div class="nav-section-label">Manage</div>
     <a href="<?= kronos_url('/dashboard/users') ?>" class="nav-item <?= $nav_active('/dashboard/users') ?>">
-      <span class="nav-icon">👥</span> Users
+      <span class="nav-icon">◎</span> Users
     </a>
     <a href="<?= kronos_url('/dashboard/settings') ?>" class="nav-item <?= $nav_active('/dashboard/settings') ?>">
-      <span class="nav-icon">⚙️</span> Settings
+      <span class="nav-icon">⚙</span> Settings
     </a>
     <?php endif; ?>
   </nav>

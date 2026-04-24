@@ -42,8 +42,10 @@ class KronosAPIRouter
         $marketplace = [new Endpoints\MarketplaceEndpoint($this), 'handle'];
         $settings    = [new Endpoints\SettingsEndpoint($this), 'handle'];
         $users       = [new Endpoints\UsersEndpoint($this), 'handle'];
+        $content     = [new Endpoints\ContentEndpoint($this), 'handle'];
 
         $authenticated = [$this->middleware->handle()];
+        $editorOnly    = [$this->middleware->handle(), $this->middleware->requireRole('app_editor')];
         $managerOnly   = [$this->middleware->handle(), $this->middleware->requireRole('app_manager')];
 
         // Auth (public)
@@ -61,6 +63,9 @@ class KronosAPIRouter
         // AI (authenticated)
         $this->router->post('/api/kronos/v1/ai/chat', $ai, $authenticated);
 
+        // Content (editor+)
+        $this->router->delete('/api/kronos/v1/content/posts/{id:\d+}', $content, $editorOnly);
+
         // SSE Stream (authenticated)
         $this->router->get('/api/kronos/v1/stream', $stream, $authenticated);
 
@@ -70,6 +75,7 @@ class KronosAPIRouter
 
         // Commerce (authenticated)
         $this->router->get('/api/kronos/v1/commerce/products',          $commerce, $authenticated);
+        $this->router->get('/api/kronos/v1/commerce/products/{id:\d+}',  $commerce, $authenticated);
         $this->router->post('/api/kronos/v1/commerce/products',          $commerce, $managerOnly);
         $this->router->put('/api/kronos/v1/commerce/products/{id:\d+}',  $commerce, $managerOnly);
         $this->router->delete('/api/kronos/v1/commerce/products/{id:\d+}', $commerce, $managerOnly);

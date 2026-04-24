@@ -75,11 +75,14 @@ class MarketplaceEndpoint
         }
 
         $app       = KronosApp::getInstance();
-        $installer = new PackageInstaller($app);
+        $installer = new PackageInstaller($app->rootDir());
 
         try {
-            $installer->install($slug, $downloadUrl, $packageType);
-            kronos_json(['success' => true, 'message' => "Package '{$slug}' installed successfully."]);
+            $result = $installer->install($slug, $downloadUrl, $packageType);
+            if (!($result['success'] ?? false)) {
+                kronos_abort(500, $result['message'] ?? 'Install failed.');
+            }
+            kronos_json(['success' => true, 'message' => $result['message'] ?? "Package '{$slug}' installed successfully."]);
         } catch (\Exception $e) {
             error_log('[KronosCMS Marketplace] Install error: ' . $e->getMessage());
             kronos_abort(500, 'Install failed: ' . $e->getMessage());

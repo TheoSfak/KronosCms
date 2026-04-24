@@ -113,7 +113,7 @@ class KronosMiddleware
     {
         setcookie('kronos_token', '', [
             'expires'  => time() - 3600,
-            'path'     => '/',
+            'path'     => $this->cookiePath(),
             'httponly' => true,
             'samesite' => 'Strict',
         ]);

@@ -39,17 +39,18 @@
         });
         if (refresh.ok) {
           // Retry original request
-          return fetch(url, init).then(r => r.json());
+          const retry = await fetch(url, init);
+          return await readApiResponse(retry);
         } else {
           window.location.href = (cfg.appUrl || '') + '/dashboard/login';
           return null;
         }
       }
 
-      return await res.json();
+      return await readApiResponse(res);
     } catch (err) {
       if (!opts.silent) console.error('[KronosDash]', method, path, err);
-      return null;
+      return normalizeResponse({ success: false, message: err.message || 'Request failed.' });
     }
   }
 
@@ -143,7 +144,7 @@
       if (!orderId) return;
 
       select.disabled = true;
-      const res = await api(`/commerce/orders/${orderId}/status`, 'POST', { status: select.value });
+      const res = await api(`/commerce/orders/${orderId}/status`, 'PUT', { status: select.value });
       select.disabled = false;
 
       if (!res || !res.success) {
@@ -177,15 +178,16 @@
       const btn = e.target.closest('[data-delete-url]');
       if (!btn) return;
 
-      const label = btn.dataset.confirmLabel || 'this item';
-      if (!confirm(`Delete ${label}? This cannot be undone.`)) return;
+      const message = btn.dataset.confirm || `Delete ${btn.dataset.confirmLabel || 'this item'}? This cannot be undone.`;
+      if (!confirm(message)) return;
 
       btn.disabled = true;
-      const parts = btn.dataset.deleteUrl.split(':'); // e.g. "/users/3"
-      const path  = parts[0];
+      const rawPath = btn.dataset.deleteUrl || '';
+      const path = rawPath.replace(/^\/api\/kronos\/v1/, '');
       const res   = await api(path, 'DELETE');
       if (res && res.success) {
-        const row = btn.closest('tr');
+        const target = btn.dataset.deleteTarget ? document.querySelector(btn.dataset.deleteTarget) : null;
+        const row = target || btn.closest('tr');
         if (row) row.remove();
         showToast('Deleted.', 'success');
       } else {
@@ -267,14 +269,14 @@
       if (typing) typing.classList.add('visible');
 
       // Check if SSE streaming is enabled
-      const streamEnabled = cfg.mode !== undefined; // always try streaming
+      const streamEnabled = cfg.aiStreaming === true;
       if (streamEnabled) {
         await sendStream(text, sessionId);
       } else {
         const res = await api('/ai/chat', 'POST', { message: text, session_id: sessionId });
         if (typing) typing.classList.remove('visible');
-        if (res && res.content) {
-          appendMessage('assistant', res.content);
+        if (res && (res.message || res.content)) {
+          appendMessage('assistant', res.message || res.content);
         }
       }
       sendBtn.disabled = false;
@@ -634,6 +636,39 @@
   }
 
   function escAttr(str) { return escHtml(str); }
+
+  function normalizeResponse(data) {
+    if (data && data.error && !data.message) {
+      data.message = data.error;
+    }
+    if (data && typeof data.success === 'undefined' && data.ok === false) {
+      data.success = false;
+    }
+    return data;
+  }
+
+  async function readApiResponse(res) {
+    const text = await res.text();
+    let data = {};
+
+    if (text) {
+      try {
+        data = JSON.parse(text);
+      } catch (_) {
+        data = { message: text };
+      }
+    }
+
+    data = normalizeResponse(data || {});
+    data.ok = res.ok;
+    data.status = res.status;
+
+    if (!res.ok && !data.message) {
+      data.message = res.statusText || 'Request failed.';
+    }
+
+    return data;
+  }
 
   function uid() {
     return 'b_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);

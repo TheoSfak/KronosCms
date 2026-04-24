@@ -12,7 +12,7 @@ $app  = \Kronos\Core\KronosApp::getInstance();
 $db   = $app->db();
 
 // Determine if we're editing an existing post
-$postId = (int) ($routeParams['id'] ?? 0);
+$postId = (int) ($params['id'] ?? 0);
 $isEdit = $postId > 0;
 
 $post = null;
@@ -47,19 +47,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $data = [
             'title'      => $title,
             'slug'       => $slug,
+            'content'    => (string) ($_POST['content'] ?? ($post['content'] ?? '')),
             'post_type'  => $postType,
             'status'     => $status,
             'layout_id'  => $layoutId,
+            'published_at' => $status === 'published' ? date('Y-m-d H:i:s') : null,
             'updated_at' => date('Y-m-d H:i:s'),
         ];
 
         if ($isEdit) {
+            if (($post['status'] ?? '') === 'published' && !empty($post['published_at'])) {
+                unset($data['published_at']);
+            }
             $db->update('kronos_posts', $data, ['id' => $postId]);
             $success = true;
             // Refresh data
             $post = $db->getRow('SELECT * FROM kronos_posts WHERE id = ?', [$postId]);
         } else {
             $data['created_at'] = date('Y-m-d H:i:s');
+            $data['author_id'] = (int) ($user['id'] ?? 0) ?: null;
             $newId = $db->insert('kronos_posts', $data);
             if ($newId) {
                 kronos_redirect('/dashboard/content/' . $newId . '?created=1');
@@ -102,7 +108,7 @@ require __DIR__ . '/../partials/layout-header.php';
   <div class="alert alert-success">Post created! You can now open the Builder to design its layout.</div>
   <?php endif; ?>
 
-  <form method="POST" action="<?= $isEdit ? kronos_url("/dashboard/content/{$postId}/edit") : kronos_url('/dashboard/content/new') ?>">
+  <form method="POST" action="<?= $isEdit ? kronos_url("/dashboard/content/{$postId}") : kronos_url('/dashboard/content/new') ?>">
     <input type="hidden" name="_kronos_csrf" value="<?= kronos_csrf_token() ?>">
 
     <div style="display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start;">

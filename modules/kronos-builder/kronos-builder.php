@@ -50,9 +50,22 @@ class KronosBuilderModule extends KronosModule
 
         // Preview mode: allow draft posts for authenticated editors
         if ($preview) {
-            $middleware = new \Kronos\Auth\KronosMiddleware();
-            $user = $middleware->currentUser();
-            if (!$user || !in_array($user['role'] ?? '', ['admin', 'editor'], true)) {
+            $user = null;
+            $token = $_COOKIE['kronos_token'] ?? '';
+
+            if ($token !== '') {
+                try {
+                    $secret = (string) $app->env('JWT_SECRET', '');
+                    $expiry = (int) $app->env('JWT_EXPIRY', 86400);
+                    $jwt = new \Kronos\Auth\KronosJWT($secret, $expiry);
+                    $payload = $jwt->decode($token);
+                    $user = $payload['data'] ?? null;
+                } catch (\Throwable) {
+                    $user = null;
+                }
+            }
+
+            if (!$user || !in_array($user['role'] ?? '', ['app_manager', 'app_editor'], true)) {
                 $preview = false; // Unauthorised — fall back to published-only
             }
         }

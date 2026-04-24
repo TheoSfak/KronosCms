@@ -23,12 +23,7 @@ class KronosCoreModule extends KronosModule
         $apiRouter = new KronosAPIRouter($app);
         $apiRouter->registerRoutes();
 
-        // Register the mode switch POST route
         $router = $app->router();
-        $router->post('/dashboard/mode-switch', function (array $params) use ($app): void {
-            require_once __DIR__ . '/ModeSwitcher.php';
-            (new KronosModeSwitcher($app))->handle();
-        });
 
         // Debug inspector (only in APP_DEBUG=true)
         $router->get('/debug', function (array $params) use ($app): void {

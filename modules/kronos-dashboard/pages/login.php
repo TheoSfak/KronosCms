@@ -20,13 +20,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 [$username, $username]
             );
 
-            error_log('[KronosLogin] username=' . $username . ' userFound=' . ($user ? 'yes' : 'no'));
-            if ($user) {
-                $hashLen = strlen($user['password_hash'] ?? '');
-                $verifyResult = password_verify($password, $user['password_hash']);
-                error_log('[KronosLogin] hashLen=' . $hashLen . ' verify=' . ($verifyResult ? 'true' : 'false') . ' passLen=' . strlen($password));
-            }
-
             if ($user && password_verify($password, $user['password_hash'])) {
                 $db->update('kronos_users', ['last_login_at' => date('Y-m-d H:i:s')], ['id' => $user['id']]);
 

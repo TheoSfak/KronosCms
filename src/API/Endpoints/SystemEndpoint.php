@@ -24,10 +24,10 @@ class SystemEndpoint
 
     public function handle(array $params): void
     {
-        $uri    = $_SERVER['REQUEST_URI'] ?? '';
+        $uri    = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
         $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
 
-        if (str_ends_with($uri, '/check')) {
+        if (str_ends_with($uri, '/check') && $method === 'GET') {
             $this->check();
         } elseif (str_ends_with($uri, '/apply') && $method === 'POST') {
             $this->apply();
@@ -39,7 +39,7 @@ class SystemEndpoint
     private function check(): void
     {
         $app     = KronosApp::getInstance();
-        $checker = new UpdateChecker($app);
+        $checker = new UpdateChecker($app->config());
         $result  = $checker->check();
         kronos_json($result);
     }
@@ -47,16 +47,19 @@ class SystemEndpoint
     private function apply(): void
     {
         $app     = KronosApp::getInstance();
-        $checker = new UpdateChecker($app);
+        $checker = new UpdateChecker($app->config());
         $info    = $checker->check();
 
         if (!($info['update_available'] ?? false)) {
             kronos_json(['success' => false, 'message' => 'Already up to date.']);
         }
 
-        $updater = new SelfUpdater($app);
+        $updater = new SelfUpdater($app->rootDir(), $app->config());
         try {
-            $updater->apply((string) $info['download_url'], (string) $info['latest_version']);
+            $result = $updater->apply((string) $info['download_url'], (string) $info['latest_version']);
+            if (!($result['success'] ?? false)) {
+                kronos_abort(500, $result['message'] ?? 'Update failed.');
+            }
             kronos_json(['success' => true, 'version' => $info['latest_version']]);
         } catch (\Exception $e) {
             error_log('[KronosCMS SelfUpdater] ' . $e->getMessage());

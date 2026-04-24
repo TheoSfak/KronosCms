@@ -539,8 +539,12 @@
   function clearInspector() {
     const insp = document.getElementById('builder-inspector');
     if (!insp) return;
-    insp.innerHTML = `<div class="inspector-empty" id="inspector-empty-state">
-      <div class="inspector-empty-icon">🎨</div>
+    insp.innerHTML = `<div class="builder-panel-heading builder-panel-heading-sticky">
+      <span class="builder-panel-kicker">Settings</span>
+      <strong>Block</strong>
+    </div>
+    <div class="inspector-empty" id="inspector-empty-state">
+      <div class="inspector-empty-icon">□</div>
       <div class="inspector-empty-title">No block selected</div>
       <div class="inspector-empty-label">Click any block on the canvas<br>to edit its properties</div>
     </div>`;
@@ -560,6 +564,11 @@
     ];
 
     insp.innerHTML = '';
+
+    const panelHead = document.createElement('div');
+    panelHead.className = 'builder-panel-heading builder-panel-heading-sticky';
+    panelHead.innerHTML = '<span class="builder-panel-kicker">Settings</span><strong>Block</strong>';
+    insp.appendChild(panelHead);
 
     // Block header
     const hdr = document.createElement('div');
@@ -814,7 +823,7 @@
       btn.disabled = true; btn.textContent = '…';
       const ast = window.KronosBuilderAST || [];
       const res = API ? await API.api('/builder/layouts/'+meta.id, 'PUT', { name: nameInput?.value||'', content: JSON.stringify(ast) }) : null;
-      btn.disabled = false; btn.textContent = '💾 Save';
+      btn.disabled = false; btn.textContent = 'Update';
       if (status) { status.textContent = res?.success ? 'Saved ✓' : 'Error'; setTimeout(() => status.textContent = 'Auto-saved', 2000); }
     });
 

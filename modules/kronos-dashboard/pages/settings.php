@@ -250,7 +250,7 @@ if (!in_array($tab, $allowedTabs, true)) {
     btn.addEventListener('click', async function() {
       const mode = this.dataset.switchMode;
       if (!confirm(`Switch to ${mode} mode? The page will reload.`)) return;
-      const res = await fetch('/dashboard/mode-switch', {
+      const res = await fetch((window.KronosConfig.appUrl || '') + '/dashboard/mode-switch', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-Kronos-CSRF': window.KronosConfig.csrf },
         body: 'mode=' + mode,

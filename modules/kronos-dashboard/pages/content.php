@@ -34,7 +34,7 @@ $posts = $db->getResults(
       <tr><td colspan="6" class="text-center text-muted">No posts yet. <a href="<?= kronos_url('/dashboard/content/new') ?>">Create your first post →</a></td></tr>
       <?php else: ?>
       <?php foreach ($posts as $post): ?>
-      <tr>
+      <tr id="post-row-<?= (int)$post['id'] ?>">
         <td><strong><?= kronos_e($post['title']) ?></strong><br><small class="text-muted">/<?= kronos_e($post['slug']) ?></small></td>
         <td><span class="badge"><?= kronos_e($post['post_type']) ?></span></td>
         <td><span class="badge badge-<?= kronos_e($post['status']) ?>"><?= kronos_e($post['status']) ?></span></td>
@@ -42,7 +42,12 @@ $posts = $db->getResults(
         <td><?= $post['published_at'] ? kronos_e(date('Y-m-d', strtotime($post['published_at']))) : '—' ?></td>
         <td>
           <a href="<?= kronos_url('/dashboard/content/' . (int)$post['id']) ?>" class="action-btn">Edit</a>
-          <button class="action-btn danger" data-delete-post="<?= (int)$post['id'] ?>">Delete</button>
+          <button class="action-btn danger"
+                  data-delete-url="/api/kronos/v1/content/posts/<?= (int)$post['id'] ?>"
+                  data-delete-target="#post-row-<?= (int)$post['id'] ?>"
+                  data-confirm-label="<?= kronos_e($post['title']) ?>">
+            Delete
+          </button>
         </td>
       </tr>
       <?php endforeach; ?>

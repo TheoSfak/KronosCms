@@ -62,8 +62,8 @@ $users = $db->getResults(
         <input type="text" id="new-display" name="display_name" maxlength="80" autocomplete="off">
       </div>
       <div class="form-group">
-        <label for="new-email">Email</label>
-        <input type="email" id="new-email" name="email" autocomplete="off">
+        <label for="new-email">Email <span class="required">*</span></label>
+        <input type="email" id="new-email" name="email" required autocomplete="off">
       </div>
       <div class="form-group">
         <label for="new-password">Password <span class="required">*</span></label>
@@ -73,7 +73,7 @@ $users = $db->getResults(
         <label for="new-role">Role</label>
         <select id="new-role" name="role">
           <option value="app_editor">Editor</option>
-          <option value="app_viewer">Viewer</option>
+          <option value="app_user">Viewer</option>
           <option value="app_manager">Manager</option>
         </select>
       </div>
@@ -132,23 +132,6 @@ $users = $db->getResults(
     }
   });
 
-  // Delete buttons — delegate via data-delete-url
-  document.querySelectorAll('[data-delete-url]').forEach(function (btn) {
-    btn.addEventListener('click', async function () {
-      const url    = btn.dataset.deleteUrl;
-      const target = document.querySelector(btn.dataset.deleteTarget || '');
-      const msg    = btn.dataset.confirm || 'Delete this user?';
-      if (!confirm(msg)) return;
-      btn.disabled = true;
-      try {
-        await window.KronosDash.api(url.replace('/api/kronos/v1', ''), 'DELETE');
-        if (target) target.remove();
-      } catch (err) {
-        alert(err.message || 'Delete failed.');
-        btn.disabled = false;
-      }
-    });
-  });
 }());
 </script>
 

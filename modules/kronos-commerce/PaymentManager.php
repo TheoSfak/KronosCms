@@ -56,14 +56,19 @@ class PaymentManager
 
     private function resolveGateway(): PaymentGatewayInterface
     {
-        if ((string) getenv('STRIPE_SECRET_KEY') !== '') {
+        if ($this->env('STRIPE_SECRET_KEY') !== '') {
             return new StripeGateway();
         }
 
-        if ((string) getenv('PAYPAL_CLIENT_ID') !== '') {
+        if ($this->env('PAYPAL_CLIENT_ID') !== '') {
             return new PayPalGateway();
         }
 
         return new NullGateway();
+    }
+
+    private function env(string $key): string
+    {
+        return (string) ($_ENV[$key] ?? getenv($key) ?: '');
     }
 }

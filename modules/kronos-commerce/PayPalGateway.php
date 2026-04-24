@@ -21,9 +21,9 @@ class PayPalGateway implements PaymentGatewayInterface
 
     public function __construct()
     {
-        $this->clientId     = (string) getenv('PAYPAL_CLIENT_ID');
-        $this->clientSecret = (string) getenv('PAYPAL_CLIENT_SECRET');
-        $mode               = strtolower((string) getenv('PAYPAL_MODE') ?: 'sandbox');
+        $this->clientId     = (string) ($_ENV['PAYPAL_CLIENT_ID'] ?? getenv('PAYPAL_CLIENT_ID') ?: '');
+        $this->clientSecret = (string) ($_ENV['PAYPAL_CLIENT_SECRET'] ?? getenv('PAYPAL_CLIENT_SECRET') ?: '');
+        $mode               = strtolower((string) ($_ENV['PAYPAL_MODE'] ?? getenv('PAYPAL_MODE') ?: 'sandbox'));
         $this->baseUrl      = $mode === 'live'
             ? 'https://api-m.paypal.com'
             : 'https://api-m.sandbox.paypal.com';

@@ -20,7 +20,7 @@ class UsersEndpoint extends ApiEndpoint
     private KronosAPIRouter $api;
     private KronosDB $db;
 
-    private const ALLOWED_ROLES = ['app_manager', 'app_editor', 'app_viewer'];
+    private const ALLOWED_ROLES = ['app_manager', 'app_editor', 'app_user'];
 
     public function __construct(KronosAPIRouter $api)
     {
@@ -75,8 +75,8 @@ class UsersEndpoint extends ApiEndpoint
         if (!preg_match('/^[a-zA-Z0-9_.\-]{3,40}$/', $username)) {
             kronos_abort(422, 'Username may only contain letters, numbers, underscores, hyphens, or dots (3–40 chars).');
         }
-        if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            kronos_abort(422, 'Invalid email address.');
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            kronos_abort(422, 'A valid email address is required.');
         }
         if (strlen($password) < 8) {
             kronos_abort(422, 'Password must be at least 8 characters.');
@@ -88,7 +88,7 @@ class UsersEndpoint extends ApiEndpoint
         // Uniqueness check
         $exists = $this->db->getRow(
             'SELECT id FROM kronos_users WHERE username = ? OR email = ? LIMIT 1',
-            [$username, $email !== '' ? $email : null]
+            [$username, $email]
         );
         if ($exists !== null) {
             kronos_abort(409, 'Username or email already exists.');
@@ -99,7 +99,7 @@ class UsersEndpoint extends ApiEndpoint
 
         $newId = $this->db->insert('kronos_users', [
             'username'      => $username,
-            'email'         => $email !== '' ? $email : null,
+            'email'         => $email,
             'password_hash' => $hash,
             'role'          => $role,
             'display_name'  => $display_name !== '' ? $display_name : $username,
@@ -137,10 +137,10 @@ class UsersEndpoint extends ApiEndpoint
 
         if (isset($body['email'])) {
             $email = trim((string) $body['email']);
-            if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 kronos_abort(422, 'Invalid email address.');
             }
-            $data['email'] = $email !== '' ? $email : null;
+            $data['email'] = $email;
         }
 
         if (empty($data)) {

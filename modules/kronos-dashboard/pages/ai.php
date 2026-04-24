@@ -30,7 +30,16 @@ $sessionId = bin2hex(random_bytes(8));
   function addMessage(role, text) {
     const div = document.createElement('div');
     div.className = 'ai-message ' + role;
-    div.innerHTML = `<span class="ai-avatar">${role === 'user' ? '👤' : '🤖'}</span><div class="ai-bubble">${text.replace(/</g,'&lt;')}</div>`;
+    const avatar = document.createElement('span');
+    avatar.className = 'ai-avatar';
+    avatar.textContent = role === 'user' ? '👤' : '🤖';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'ai-bubble';
+    bubble.textContent = text;
+
+    div.appendChild(avatar);
+    div.appendChild(bubble);
     messages.appendChild(div);
     messages.scrollTop = messages.scrollHeight;
   }
@@ -51,7 +60,7 @@ $sessionId = bin2hex(random_bytes(8));
     try {
       const res  = await window.KronosDash.api('/ai/chat', 'POST', { message: msg, session_id: sessionId });
       thinking.remove();
-      addMessage('assistant', res.message || 'No response.');
+      addMessage('assistant', (res && res.message) || 'No response.');
     } catch(err) {
       thinking.remove();
       addMessage('assistant', 'Error: ' + err.message);

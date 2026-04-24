@@ -21,8 +21,8 @@ class StripeGateway implements PaymentGatewayInterface
 
     public function __construct()
     {
-        $this->secretKey     = (string) getenv('STRIPE_SECRET_KEY');
-        $this->webhookSecret = (string) getenv('STRIPE_WEBHOOK_SECRET');
+        $this->secretKey     = (string) ($_ENV['STRIPE_SECRET_KEY'] ?? getenv('STRIPE_SECRET_KEY') ?: '');
+        $this->webhookSecret = (string) ($_ENV['STRIPE_WEBHOOK_SECRET'] ?? getenv('STRIPE_WEBHOOK_SECRET') ?: '');
 
         Stripe::setApiKey($this->secretKey);
         Stripe::setAppInfo('KronosCMS', \Kronos\Core\KronosVersion::VERSION, 'https://github.com/TheoSfak/KronosCms');

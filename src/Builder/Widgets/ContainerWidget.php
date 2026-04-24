@@ -14,7 +14,7 @@ class ContainerWidget extends WidgetBase
         $style = '';
 
         // Optional CSS class passthrough
-        $cls = preg_replace('/[^a-zA-Z0-9 _-]/', '', (string) $this->attr($attrs, 'class', ''));
+        $cls = preg_replace('/[^a-zA-Z0-9 _-]/', '', (string) $this->attr($attrs, 'class', $this->attr($attrs, 'className', '')));
 
         // Optional background colour (CSS hex/named)
         $bg = preg_replace('/[^a-zA-Z0-9#(). ,]/', '', (string) $this->attr($attrs, 'background', ''));
@@ -23,6 +23,11 @@ class ContainerWidget extends WidgetBase
         // Optional padding
         $pad = preg_replace('/[^0-9a-z%px ]/', '', (string) $this->attr($attrs, 'padding', ''));
         if ($pad) $style .= "padding:{$pad};";
+
+        $rawStyle = (string) $this->attr($attrs, 'style', '');
+        if ($rawStyle !== '') {
+            $style .= preg_replace('/[<>"\']/', '', $rawStyle);
+        }
 
         $styleAttr = $style ? " style=\"{$style}\"" : '';
         $classAttr = $cls   ? " class=\"" . htmlspecialchars($cls, ENT_QUOTES) . "\"" : '';
