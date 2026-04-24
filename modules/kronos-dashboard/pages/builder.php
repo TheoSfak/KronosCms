@@ -57,7 +57,7 @@ $widgetCategories = [
     'Layout' => [
         ['type' => 'columns',    'label' => 'Columns',    'icon' => '⊞',   'color' => '#0e7490', 'desc' => '2 or 3 column layout'],
         ['type' => 'container',  'label' => 'Container',  'icon' => '▤',   'color' => '#334155', 'desc' => 'Wrapper / section'],
-        ['type' => 'hero-block', 'label' => 'Hero',       'icon' => '⚡',   'color' => '#7c3aed', 'desc' => 'Big hero banner'],
+        ['type' => 'hero-block', 'label' => 'Hero Banner','icon' => '▰',   'color' => '#7c3aed', 'desc' => 'Image and text hero section'],
     ],
     'Content' => [
         ['type' => 'card',       'label' => 'Card',       'icon' => '▭',   'color' => '#0f766e', 'desc' => 'Bordered content card'],

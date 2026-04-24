@@ -81,6 +81,7 @@ class RenderEngine
         $this->registry['image']     = new Widgets\ImageWidget();
         $this->registry['button']    = new Widgets\ButtonWidget();
         $this->registry['container'] = new Widgets\ContainerWidget();
+        $this->registry['hero-block'] = new Widgets\HeroWidget();
 
         // Allow external modules to add or override widgets
         $this->registry = apply_filters('kronos/builder/widget_registry', $this->registry);

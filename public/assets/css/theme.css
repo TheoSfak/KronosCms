@@ -157,16 +157,16 @@ img  { max-width: 100%; display: block; }
 }
 
 .hero-title {
-  font-size: clamp(2.2rem, 6vw, 3.75rem);
+  font-size: 3.75rem;
   font-weight: 900;
   line-height: 1.1;
-  letter-spacing: -.03em;
+  letter-spacing: 0;
   color: var(--hero-text);
   margin-bottom: 20px;
 }
 
 .hero-sub {
-  font-size: clamp(1rem, 2.5vw, 1.2rem);
+  font-size: 1.2rem;
   color: var(--hero-sub);
   margin-bottom: 36px;
   line-height: 1.6;
@@ -847,3 +847,16 @@ p  { margin-bottom: 1em; }
   .pricing-grid   { grid-template-columns: 1fr; }
 }
 
+@media (max-width: 760px) {
+  .kronos-hero-block {
+    grid-template-columns: 1fr !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+
+  .kronos-hero-block h1,
+  .hero-title {
+    font-size: 2.35rem !important;
+    overflow-wrap: anywhere;
+  }
+}

@@ -229,28 +229,68 @@
 
   // ── Hero Block ───────────────────────────────────────
   reg('hero-block', {
-    label: 'Hero', icon: '⚡',
+    label: 'Hero Banner', icon: '▰',
     render: a => {
-      const bg  = a.bg  || 'linear-gradient(135deg,#1e1b4b,#312e81)';
-      const pad = parseInt(a.pad) || 80;
-      return `<div style="background:${escHtml(bg)};padding:${pad}px 40px;border-radius:12px;text-align:${escHtml(a._align||'center')}">
-        ${a.pretitle ? `<p style="font-size:.8rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.6);margin:0 0 12px">${escHtml(a.pretitle)}</p>` : ''}
-        <h1 style="font-size:clamp(1.8rem,4vw,3rem);font-weight:800;color:${escHtml(a.titleColor||'#ffffff')};line-height:1.15;margin:0 0 16px">${escHtml(a.title||'Your Big Headline')}</h1>
-        ${a.subtitle ? `<p style="font-size:1.1rem;color:rgba(255,255,255,.7);max-width:560px;margin:0 auto 28px;line-height:1.6">${escHtml(a.subtitle)}</p>` : ''}
-        ${a.btnLabel ? `<a href="${escHtml(a.btnUrl||'#')}" style="display:inline-block;background:${escHtml(a.btnColor||'#6366f1')};color:#fff;padding:13px 32px;border-radius:8px;text-decoration:none;font-weight:700;font-size:.95rem">${escHtml(a.btnLabel)}</a>` : ''}
-      </div>`;
+      const layout = a.imageLayout || 'split-right';
+      const bg = a.bg || 'linear-gradient(135deg,#111827,#312e81)';
+      const pad = parseInt(a.pad) || 72;
+      const radius = parseInt(a.radius) || 18;
+      const image = String(a.imageUrl || '').trim();
+      const imageAlt = a.imageAlt || '';
+      const imageRadius = parseInt(a.imageRadius) || 18;
+      const minHeight = parseInt(a.minHeight) || 420;
+      const align = a._align || 'left';
+      const reverse = layout === 'split-left';
+      const isBackground = layout === 'background';
+      const textColor = a.titleColor || '#ffffff';
+      const bodyColor = a.bodyColor || 'rgba(255,255,255,.78)';
+      const overlay = Math.min(90, Math.max(0, parseInt(a.overlay || '45')));
+      const imageHtml = image
+        ? `<img src="${escHtml(image)}" alt="${escHtml(imageAlt)}" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:${imageRadius}px">`
+        : `<div style="width:100%;height:100%;min-height:260px;border-radius:${imageRadius}px;background:linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,.05)),radial-gradient(circle at 30% 20%,rgba(255,255,255,.28),transparent 36%),linear-gradient(135deg,#6366f1,#06b6d4);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.82);font-weight:800;letter-spacing:.08em;text-transform:uppercase">Image</div>`;
+      const copyHtml = `
+        <div style="position:relative;z-index:2;max-width:${isBackground ? '680' : '560'}px;text-align:${escHtml(align)}">
+          ${a.pretitle ? `<p style="font-size:.78rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:${escHtml(a.kickerColor||'rgba(255,255,255,.68)')};margin:0 0 12px">${escHtml(a.pretitle)}</p>` : ''}
+          <h1 style="font-size:3.75rem;font-weight:850;color:${escHtml(textColor)};line-height:1.02;margin:0 0 18px;letter-spacing:0">${escHtml(a.title||'Build a page people remember')}</h1>
+          ${a.subtitle ? `<p style="font-size:1.12rem;color:${escHtml(bodyColor)};max-width:620px;margin:${align === 'center' ? '0 auto 30px' : '0 0 30px'};line-height:1.65">${escHtml(a.subtitle)}</p>` : ''}
+          <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:${align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start'}">
+            ${a.btnLabel ? `<a href="${escHtml(a.btnUrl||'#')}" style="display:inline-block;background:${escHtml(a.btnColor||'#ffffff')};color:${escHtml(a.btnText||'#111827')};padding:13px 26px;border-radius:999px;text-decoration:none;font-weight:800;font-size:.92rem">${escHtml(a.btnLabel)}</a>` : ''}
+            ${a.secondBtnLabel ? `<a href="${escHtml(a.secondBtnUrl||'#')}" style="display:inline-block;border:1px solid rgba(255,255,255,.5);color:${escHtml(a.secondBtnText||'#ffffff')};padding:12px 24px;border-radius:999px;text-decoration:none;font-weight:750;font-size:.92rem">${escHtml(a.secondBtnLabel)}</a>` : ''}
+          </div>
+        </div>`;
+
+      if (isBackground) {
+        const bgImage = image ? `background-image:linear-gradient(90deg,rgba(0,0,0,${overlay/100}),rgba(0,0,0,${Math.max(overlay - 15, 0)/100})),url('${escHtml(image)}');background-size:cover;background-position:${escHtml(a.imagePosition||'center center')};` : `background:${escHtml(bg)};`;
+        return `<section class="builder-hero-block" style="${bgImage}min-height:${minHeight}px;padding:${pad}px 48px;border-radius:${radius}px;display:flex;align-items:center;justify-content:${align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start'};overflow:hidden">${copyHtml}</section>`;
+      }
+
+      return `<section class="builder-hero-block" style="background:${escHtml(bg)};min-height:${minHeight}px;padding:${pad}px 48px;border-radius:${radius}px;display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,.92fr);gap:42px;align-items:center;overflow:hidden">
+        ${reverse ? `<div style="position:relative;z-index:1;min-height:300px">${imageHtml}</div>${copyHtml}` : `${copyHtml}<div style="position:relative;z-index:1;min-height:300px">${imageHtml}</div>`}
+      </section>`;
     },
     getControls: () => [
-      { tab: 'content', key: 'pretitle',   label: 'Pre-title',    type: 'text',     default: '' },
-      { tab: 'content', key: 'title',      label: 'Headline',     type: 'textarea', default: 'Your Big Headline' },
-      { tab: 'content', key: 'subtitle',   label: 'Subheading',   type: 'textarea', default: '' },
-      { tab: 'content', key: 'btnLabel',   label: 'Button Text',  type: 'text',     default: '' },
+      { tab: 'content', key: 'pretitle',   label: 'Eyebrow',      type: 'text',     default: 'Featured' },
+      { tab: 'content', key: 'title',      label: 'Headline',     type: 'textarea', default: 'Build a page people remember' },
+      { tab: 'content', key: 'subtitle',   label: 'Subheading',   type: 'textarea', default: 'Pair a strong message with a striking image, a focused call to action, and a layout that feels modern.' },
+      { tab: 'content', key: 'btnLabel',   label: 'Primary Button', type: 'text',   default: 'Get Started' },
       { tab: 'content', key: 'btnUrl',     label: 'Button URL',   type: 'url',      default: '#' },
+      { tab: 'content', key: 'secondBtnLabel', label: 'Secondary Button', type: 'text', default: 'Learn More' },
+      { tab: 'content', key: 'secondBtnUrl',   label: 'Secondary URL',    type: 'url',  default: '#' },
+      { tab: 'content', key: 'imageUrl',   label: 'Hero Image URL', type: 'url',    default: '' },
+      { tab: 'content', key: 'imageAlt',   label: 'Image Alt Text', type: 'text',   default: '' },
+      { tab: 'style',   key: 'imageLayout', label: 'Hero Layout', type: 'select', default: 'split-right',
+        options: [{value:'split-right',label:'Text Left / Image Right'},{value:'split-left',label:'Image Left / Text Right'},{value:'background',label:'Background Image'}] },
       { tab: 'style',   key: 'bg',         label: 'Background (CSS)', type: 'text', default: 'linear-gradient(135deg,#1e1b4b,#312e81)' },
       { tab: 'style',   key: 'titleColor', label: 'Title Color',  type: 'color',    default: '#ffffff' },
-      { tab: 'style',   key: 'btnColor',   label: 'Button Color', type: 'color',    default: '#6366f1' },
-      { tab: 'style',   key: '_align',     label: 'Alignment',    type: 'align',    default: 'center' },
-      { tab: 'style',   key: 'pad',        label: 'Padding (px)', type: 'range',    default: '80', min: 20, max: 200 },
+      { tab: 'style',   key: 'bodyColor',  label: 'Body Color',   type: 'color',    default: '#dbeafe' },
+      { tab: 'style',   key: 'btnColor',   label: 'Button Color', type: 'color',    default: '#ffffff' },
+      { tab: 'style',   key: 'btnText',    label: 'Button Text',  type: 'color',    default: '#111827' },
+      { tab: 'style',   key: '_align',     label: 'Text Alignment', type: 'align',  default: 'left' },
+      { tab: 'style',   key: 'pad',        label: 'Padding (px)', type: 'range',    default: '72', min: 20, max: 200 },
+      { tab: 'style',   key: 'minHeight',  label: 'Min Height (px)', type: 'range', default: '420', min: 260, max: 820 },
+      { tab: 'style',   key: 'radius',     label: 'Section Radius', type: 'range', default: '18', min: 0, max: 48 },
+      { tab: 'style',   key: 'imageRadius', label: 'Image Radius', type: 'range', default: '18', min: 0, max: 48 },
+      { tab: 'style',   key: 'overlay',    label: 'Image Overlay %', type: 'range', default: '45', min: 0, max: 90 },
     ],
   });
 
@@ -435,7 +475,7 @@
   function addBlockAt(type, idx, ast) {
     const hint = document.getElementById('builder-empty-hint');
     if (hint) hint.remove();
-    const block = { id: uid(), type, attrs: {} };
+    const block = { id: uid(), type, attrs: defaultAttrs(type) };
     ast.splice(idx, 0, block);
     window.KronosBuilderAST = ast;
     rebuildCanvas(ast);
@@ -444,6 +484,32 @@
       const el = document.querySelector(`[data-block-id="${block.id}"]`);
       if (el) el.click();
     }, 60);
+  }
+
+  function defaultAttrs(type) {
+    if (type === 'hero-block') {
+      return {
+        pretitle: 'Featured',
+        title: 'Build a page people remember',
+        subtitle: 'Pair a strong message with a striking image, a focused call to action, and a layout that feels modern.',
+        btnLabel: 'Get Started',
+        btnUrl: '#',
+        secondBtnLabel: 'Learn More',
+        secondBtnUrl: '#',
+        imageLayout: 'split-right',
+        bg: 'linear-gradient(135deg,#111827,#312e81)',
+        titleColor: '#ffffff',
+        bodyColor: '#dbeafe',
+        btnColor: '#ffffff',
+        btnText: '#111827',
+        _align: 'left',
+        pad: '72',
+        minHeight: '420',
+        radius: '18',
+        imageRadius: '18',
+      };
+    }
+    return {};
   }
 
   /* ══════════════════════════════════════════════════════
