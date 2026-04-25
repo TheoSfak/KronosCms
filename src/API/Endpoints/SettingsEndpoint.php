@@ -35,6 +35,15 @@ class SettingsEndpoint
         'homepage_stat4_num',  'homepage_stat4_label',
         'homepage_cta_title',
         'homepage_cta_sub',
+        // Permalinks and theme customizer
+        'permalink_page_base',
+        'permalink_post_base',
+        'site_logo_url',
+        'site_logo_alt',
+        'header_layout',
+        'footer_layout',
+        'body_font',
+        'heading_font',
     ];
 
     public function __construct(KronosAPIRouter $api)

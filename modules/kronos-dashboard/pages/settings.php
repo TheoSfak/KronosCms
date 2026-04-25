@@ -2,19 +2,54 @@
 declare(strict_types=1);
 $pageTitle = 'Settings';
 $dashDir   = dirname(__DIR__);
-require $dashDir . '/partials/layout-header.php';
-
 $cfg        = $app->config();
 $activeMode = kronos_mode();
 $appName    = $cfg->get('app_name', 'KronosCMS');
 $appUrl     = $cfg->get('app_url', '');
 $aiModel    = $cfg->get('openai_model', 'gpt-4o');
 $tab        = $_GET['tab'] ?? 'general';
-$allowedTabs = ['general', 'homepage', 'design', 'mode', 'ai', 'payments', 'update'];
+$settingsNotice = '';
+$settingsError = '';
+$allowedSettingsKeys = [
+    'app_name', 'app_url', 'tagline', 'color_scheme', 'hero_style',
+    'homepage_about_title', 'homepage_about_text',
+    'homepage_stat1_num', 'homepage_stat1_label', 'homepage_stat2_num', 'homepage_stat2_label',
+    'homepage_stat3_num', 'homepage_stat3_label', 'homepage_stat4_num', 'homepage_stat4_label',
+    'homepage_cta_title', 'homepage_cta_sub',
+    'permalink_page_base', 'permalink_post_base',
+    'site_logo_url', 'site_logo_alt', 'header_layout', 'footer_layout', 'body_font', 'heading_font',
+];
+$allowedTabs = ['general', 'homepage', 'customizer', 'permalinks', 'design', 'mode', 'ai', 'payments', 'tools', 'update'];
 if (!in_array($tab, $allowedTabs, true)) {
     $tab = 'general';
 }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'import_settings') {
+    kronos_verify_csrf();
+    $rawJson = trim((string) ($_POST['settings_json'] ?? ''));
+    try {
+        $decoded = json_decode($rawJson, true, 20, JSON_THROW_ON_ERROR);
+        if (!is_array($decoded)) {
+            throw new \RuntimeException('Expected a JSON object.');
+        }
+        $saved = 0;
+        foreach ($decoded as $key => $value) {
+            if (in_array((string) $key, $allowedSettingsKeys, true) && is_scalar($value)) {
+                kronos_set_option((string) $key, (string) $value);
+                $saved++;
+            }
+        }
+        $settingsNotice = $saved . ' setting(s) imported.';
+    } catch (\Throwable $e) {
+        $settingsError = 'Import failed: ' . $e->getMessage();
+    }
+}
+
+require $dashDir . '/partials/layout-header.php';
 ?>
+
+<?php if ($settingsNotice): ?><div class="alert alert-success"><?= kronos_e($settingsNotice) ?></div><?php endif; ?>
+<?php if ($settingsError): ?><div class="alert alert-error"><?= kronos_e($settingsError) ?></div><?php endif; ?>
 
 <div class="settings-tabs">
   <?php foreach ($allowedTabs as $t): ?>
@@ -22,9 +57,12 @@ if (!in_array($tab, $allowedTabs, true)) {
     <?= match($t) {
         'general'  => '⚙️ General',
         'homepage' => '🏠 Homepage',
+        'customizer' => '🖌 Customizer',
+        'permalinks' => '🔗 Permalinks',
         'mode'     => '🔄 Mode',
         'ai'       => '🤖 AI',
         'payments' => '💳 Payments',
+        'tools'    => '↕ Tools',
         'update'   => '🔁 Update',
         'design'   => '🎨 Design',
     } ?>
@@ -116,6 +154,73 @@ if (!in_array($tab, $allowedTabs, true)) {
     <button class="btn <?= $activeMode === 'ecommerce' ? 'btn-primary' : 'btn-secondary' ?>" data-switch-mode="ecommerce">🛒 E-Commerce Mode</button>
   </div>
 
+<?php elseif ($tab === 'customizer'): ?>
+  <h2 class="card-title">Theme Customizer</h2>
+  <form id="settings-customizer-form" class="settings-form">
+    <div class="form-group">
+      <label>Logo URL</label>
+      <input type="text" name="site_logo_url" value="<?= kronos_e(kronos_option('site_logo_url', '')) ?>" placeholder="<?= kronos_url('/uploads/logo.png') ?>">
+    </div>
+    <div class="form-group">
+      <label>Logo alt text</label>
+      <input type="text" name="site_logo_alt" value="<?= kronos_e(kronos_option('site_logo_alt', $appName)) ?>">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Header layout</label>
+        <select name="header_layout">
+          <?php foreach (['default' => 'Default', 'centered' => 'Centered navigation', 'compact' => 'Compact'] as $value => $label): ?>
+            <option value="<?= $value ?>" <?= kronos_option('header_layout', 'default') === $value ? 'selected' : '' ?>><?= $label ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Footer layout</label>
+        <select name="footer_layout">
+          <?php foreach (['columns' => 'Brand + links', 'simple' => 'Simple centered', 'stacked' => 'Stacked'] as $value => $label): ?>
+            <option value="<?= $value ?>" <?= kronos_option('footer_layout', 'columns') === $value ? 'selected' : '' ?>><?= $label ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Body font</label>
+        <select name="body_font">
+          <?php foreach (['Inter' => 'Inter', 'Arial' => 'Arial', 'Georgia' => 'Georgia', 'system-ui' => 'System UI'] as $value => $label): ?>
+            <option value="<?= $value ?>" <?= kronos_option('body_font', 'Inter') === $value ? 'selected' : '' ?>><?= $label ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Heading font</label>
+        <select name="heading_font">
+          <?php foreach (['Inter' => 'Inter', 'Arial' => 'Arial', 'Georgia' => 'Georgia', 'system-ui' => 'System UI'] as $value => $label): ?>
+            <option value="<?= $value ?>" <?= kronos_option('heading_font', 'Inter') === $value ? 'selected' : '' ?>><?= $label ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Save Customizer Settings</button>
+  </form>
+
+<?php elseif ($tab === 'permalinks'): ?>
+  <h2 class="card-title">Permalink Settings</h2>
+  <p class="text-muted">These bases prepare the CMS for WordPress-style URL control. Current public routes remain compatible with existing /page/ and /post/ links.</p>
+  <form id="settings-permalinks-form" class="settings-form">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Page base</label>
+        <input type="text" name="permalink_page_base" value="<?= kronos_e(kronos_option('permalink_page_base', 'page')) ?>" placeholder="page">
+      </div>
+      <div class="form-group">
+        <label>Post base</label>
+        <input type="text" name="permalink_post_base" value="<?= kronos_e(kronos_option('permalink_post_base', 'post')) ?>" placeholder="post">
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Save Permalinks</button>
+  </form>
+
 <?php elseif ($tab === 'ai'): ?>
   <h2 class="card-title">AI Settings</h2>
   <form id="settings-ai-form" class="settings-form">
@@ -199,6 +304,31 @@ if (!in_array($tab, $allowedTabs, true)) {
     .hero-style-label { font-size: .9rem; font-weight: 600; }
   </style>
 
+<?php elseif ($tab === 'tools'): ?>
+  <?php
+    $exportData = [];
+    foreach ($allowedSettingsKeys as $key) {
+        $exportData[$key] = kronos_option($key, '');
+    }
+  ?>
+  <h2 class="card-title">Import / Export</h2>
+  <div class="tool-grid">
+    <div>
+      <h3>Export Settings</h3>
+      <textarea rows="14" readonly><?= kronos_e(json_encode($exportData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) ?></textarea>
+    </div>
+    <div>
+      <h3>Import Settings</h3>
+      <form method="post" action="<?= kronos_url('/dashboard/settings?tab=tools') ?>">
+        <input type="hidden" name="_kronos_csrf" value="<?= kronos_csrf_token() ?>">
+        <input type="hidden" name="action" value="import_settings">
+        <textarea name="settings_json" rows="10" placeholder='{"tagline":"My site"}'></textarea>
+        <button type="submit" class="btn btn-secondary">Import Allowed Settings</button>
+      </form>
+      <p class="text-muted mt-16">Posts, pages, menus, and media export will build on this foundation next.</p>
+    </div>
+  </div>
+
 <?php elseif ($tab === 'update'): ?>
   <h2 class="card-title">Update KronosCMS</h2>
   <p class="text-muted">Current version: <strong>v<?= kronos_e(\Kronos\Core\KronosVersion::VERSION) ?></strong></p>
@@ -242,6 +372,28 @@ if (!in_array($tab, $allowedTabs, true)) {
       const data = Object.fromEntries(new FormData(this));
       await window.KronosDash.saveOptions(data);
       alert('AI settings saved.');
+    });
+  }
+
+  const customizerForm = document.getElementById('settings-customizer-form');
+  if (customizerForm) {
+    customizerForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(this));
+      await window.KronosDash.saveOptions(data);
+      alert('Customizer settings saved.');
+    });
+  }
+
+  const permalinkForm = document.getElementById('settings-permalinks-form');
+  if (permalinkForm) {
+    permalinkForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(this));
+      data.permalink_page_base = (data.permalink_page_base || 'page').replace(/[^a-z0-9-]/g, '').replace(/^-+|-+$/g, '') || 'page';
+      data.permalink_post_base = (data.permalink_post_base || 'post').replace(/[^a-z0-9-]/g, '').replace(/^-+|-+$/g, '') || 'post';
+      await window.KronosDash.saveOptions(data);
+      alert('Permalink settings saved.');
     });
   }
 

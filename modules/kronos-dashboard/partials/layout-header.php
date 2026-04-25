@@ -56,8 +56,17 @@ window.KronosConfig = {
 
     <?php if ($mode === 'cms'): ?>
     <div class="nav-section-label">Content</div>
-    <a href="<?= kronos_url('/dashboard/content') ?>" class="nav-item <?= $nav_active('/dashboard/content') ?>">
-      <span class="nav-icon">▤</span> Posts & Pages
+    <a href="<?= kronos_url('/dashboard/posts') ?>" class="nav-item <?= $nav_active('/dashboard/posts') ?>">
+      <span class="nav-icon">▤</span> Posts
+    </a>
+    <a href="<?= kronos_url('/dashboard/pages') ?>" class="nav-item <?= $nav_active('/dashboard/pages') ?>">
+      <span class="nav-icon">▣</span> Pages
+    </a>
+    <a href="<?= kronos_url('/dashboard/media') ?>" class="nav-item <?= $nav_active('/dashboard/media') ?>">
+      <span class="nav-icon">▧</span> Media
+    </a>
+    <a href="<?= kronos_url('/dashboard/taxonomies?taxonomy=category') ?>" class="nav-item <?= $nav_active('/dashboard/taxonomies') ?>">
+      <span class="nav-icon">#</span> Categories & Tags
     </a>
     <?php endif; ?>
 
@@ -74,6 +83,9 @@ window.KronosConfig = {
     <div class="nav-section-label">Appearance</div>
     <a href="<?= kronos_url('/dashboard/builder/1') ?>" class="nav-item <?= $nav_active('/dashboard/builder') ?>">
       <span class="nav-icon">✎</span> Page Builder
+    </a>
+    <a href="<?= kronos_url('/dashboard/menus') ?>" class="nav-item <?= $nav_active('/dashboard/menus') ?>">
+      <span class="nav-icon">☷</span> Menus
     </a>
     <a href="<?= kronos_url('/dashboard/templates') ?>" class="nav-item <?= $nav_active('/dashboard/templates') ?>">
       <span class="nav-icon">▦</span> Templates
@@ -104,7 +116,7 @@ window.KronosConfig = {
   <div class="sidebar-footer">
     <span class="sidebar-user-info">
       <strong><?= kronos_e($user['display_name'] ?? $user['username'] ?? '') ?></strong><br>
-      <small><?= kronos_e(ucfirst(str_replace('app_', '', $user['role'] ?? ''))) ?></small>
+      <small><?= kronos_e(kronos_role_label((string) ($user['role'] ?? 'subscriber'))) ?></small>
     </span>
     <a href="<?= kronos_url('/dashboard/logout') ?>" class="logout-btn" title="Logout">⎋</a>
   </div>

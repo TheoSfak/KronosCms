@@ -12,36 +12,22 @@ declare(strict_types=1);
 
 // ── Nav links ────────────────────────────────────────────────────
 add_action('kronos/theme/nav', function () {
-    $links = [
+    echo kronos_render_menu('header', [
         '/'         => 'Home',
         '/about'    => 'About',
         '/services' => 'Services',
         '/contact'  => 'Contact',
-    ];
-    $current = strtok($_SERVER['REQUEST_URI'] ?? '/', '?');
-    // Strip sub-folder prefix
-    $base = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'] ?? '')), '/');
-    if ($base && strpos($current, $base) === 0) {
-        $current = substr($current, strlen($base)) ?: '/';
-    }
-    foreach ($links as $href => $label) {
-        $url    = kronos_url($href);
-        $active = ($current === $href) ? ' class="active"' : '';
-        echo '<a href="' . $url . '"' . $active . '>' . htmlspecialchars($label, ENT_QUOTES) . '</a>';
-    }
+    ]);
 });
 
 add_action('kronos/theme/footer-nav', function () {
-    $links = [
+    echo kronos_render_menu('footer', [
         '/'         => 'Home',
         '/about'    => 'About',
         '/services' => 'Services',
         '/contact'  => 'Contact',
         '/dashboard/' => 'Admin',
-    ];
-    foreach ($links as $href => $label) {
-        echo '<a href="' . kronos_url($href) . '">' . htmlspecialchars($label, ENT_QUOTES) . '</a>';
-    }
+    ]);
 });
 
 // ── Route registration ────────────────────────────────────────────

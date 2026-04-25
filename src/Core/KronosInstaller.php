@@ -135,7 +135,7 @@ class KronosInstaller
                 `slug`        VARCHAR(191) NOT NULL,
                 `content`     LONGTEXT NOT NULL,
                 `post_type`   VARCHAR(60) NOT NULL DEFAULT 'page',
-                `status`      ENUM('draft','published','archived') NOT NULL DEFAULT 'draft',
+                `status`      ENUM('draft','published','scheduled','private','archived') NOT NULL DEFAULT 'draft',
                 `author_id`   INT UNSIGNED NULL,
                 `layout_id`   INT UNSIGNED NULL COMMENT 'FK to kronos_builder_layouts',
                 `meta`        JSON NULL,
@@ -169,6 +169,74 @@ class KronosInstaller
                 `post_id` INT UNSIGNED NOT NULL,
                 `term_id` INT UNSIGNED NOT NULL,
                 PRIMARY KEY (`post_id`, `term_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+            // ---------------------------------------------------------------
+            // Revisions
+            // ---------------------------------------------------------------
+            "CREATE TABLE IF NOT EXISTS `kronos_post_revisions` (
+                `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+                `post_id` INT UNSIGNED NOT NULL,
+                `user_id` INT UNSIGNED NULL,
+                `title` VARCHAR(500) NOT NULL DEFAULT '',
+                `content` LONGTEXT NOT NULL,
+                `meta` JSON NULL,
+                `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (`id`),
+                KEY `idx_revision_post` (`post_id`, `created_at`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+            // ---------------------------------------------------------------
+            // Navigation menus
+            // ---------------------------------------------------------------
+            "CREATE TABLE IF NOT EXISTS `kronos_menus` (
+                `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                `name` VARCHAR(191) NOT NULL,
+                `slug` VARCHAR(191) NOT NULL,
+                `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `uq_menu_slug` (`slug`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+            "CREATE TABLE IF NOT EXISTS `kronos_menu_items` (
+                `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                `menu_id` INT UNSIGNED NOT NULL,
+                `parent_id` INT UNSIGNED NULL,
+                `title` VARCHAR(191) NOT NULL,
+                `url` VARCHAR(500) NOT NULL DEFAULT '',
+                `item_type` VARCHAR(40) NOT NULL DEFAULT 'custom',
+                `object_type` VARCHAR(60) NOT NULL DEFAULT '',
+                `object_id` INT UNSIGNED NULL,
+                `target` VARCHAR(20) NOT NULL DEFAULT '_self',
+                `sort_order` INT NOT NULL DEFAULT 0,
+                `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (`id`),
+                KEY `idx_menu_sort` (`menu_id`, `sort_order`),
+                KEY `idx_menu_object` (`object_type`, `object_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+            // ---------------------------------------------------------------
+            // Media library
+            // ---------------------------------------------------------------
+            "CREATE TABLE IF NOT EXISTS `kronos_media` (
+                `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                `file_name` VARCHAR(255) NOT NULL,
+                `file_path` VARCHAR(500) NOT NULL,
+                `file_url` VARCHAR(500) NOT NULL,
+                `mime_type` VARCHAR(120) NOT NULL DEFAULT '',
+                `file_size` INT UNSIGNED NOT NULL DEFAULT 0,
+                `width` INT UNSIGNED NULL,
+                `height` INT UNSIGNED NULL,
+                `alt_text` VARCHAR(255) NOT NULL DEFAULT '',
+                `caption` TEXT NULL,
+                `uploaded_by` INT UNSIGNED NULL,
+                `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `uq_media_file_url` (`file_url`),
+                KEY `idx_media_mime` (`mime_type`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
 
             // ---------------------------------------------------------------

@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.3] — 2026-04-25
+
+### Added
+- WordPress-style Posts and Pages split with status views for published, draft, scheduled, private, and archived content.
+- Menu editor with header/footer locations, post/page linking, drag ordering, nested parent selection, and public dropdown rendering.
+- Taxonomy manager for categories and tags, plus category/tag assignment in the content editor.
+- Media Library with uploads, DB-backed attachment metadata, attachment detail pages, and usage tracking.
+- Featured images for posts/pages with public theme rendering.
+- Editor improvements: publish date, preview links, revision snapshots, local autosave, and quick insert buttons.
+- Content list table bulk status actions and per-page screen options.
+- Customizer, Permalinks, and Tools settings foundations.
+- Theme logo, typography, header layout, and footer layout settings.
+- Marketplace compatibility badges and install warnings.
+- WordPress-style role/capability aliases.
+
+### Changed
+- Public content routing now supports `/post/{slug}` and unpublished preview states for authenticated editors.
+- Default theme navigation now renders configured menus instead of fixed links when menus exist.
+- Dashboard navigation and styling moved closer to WordPress while keeping the existing Kronos builder workflow.
+
+---
+
 ## [1.0.0] — 2025 — Stable Release
 
 ### Added

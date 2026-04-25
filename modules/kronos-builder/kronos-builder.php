@@ -24,8 +24,9 @@ class KronosBuilderModule extends KronosModule
         $app    = KronosApp::getInstance();
         $router = $app->router();
 
-        // Rendered page output (public-facing, no auth)
+        // Rendered content output (public-facing, no auth)
         $router->get('/page/{slug}', [$this, 'renderPage']);
+        $router->get('/post/{slug}', [$this, 'renderPost']);
 
         // Register built-in widgets via hook
         do_action('kronos/builder/register_widgets');
@@ -39,6 +40,16 @@ class KronosBuilderModule extends KronosModule
     // ── Route handler ───────────────────────────────────────────────
 
     public function renderPage(array $params): void
+    {
+        $this->renderContent($params, 'page');
+    }
+
+    public function renderPost(array $params): void
+    {
+        $this->renderContent($params, 'post');
+    }
+
+    private function renderContent(array $params, string $postType): void
     {
         $slug = kronos_sanitize_slug($params['slug'] ?? '');
         if (!$slug) {
@@ -70,15 +81,17 @@ class KronosBuilderModule extends KronosModule
             }
         }
 
-        $statusClause = $preview ? "p.status IN ('published','draft')" : "p.status = 'published'";
+        $statusClause = $preview
+            ? "p.status IN ('published','draft','scheduled','private','archived')"
+            : "(p.status = 'published' OR (p.status = 'scheduled' AND p.published_at IS NOT NULL AND p.published_at <= NOW()))";
 
         $post = $app->db()->getRow(
             "SELECT p.*, l.json_data AS layout_json
              FROM kronos_posts p
              LEFT JOIN kronos_builder_layouts l ON l.id = p.layout_id
-             WHERE p.slug = ? AND {$statusClause}
+             WHERE p.slug = ? AND p.post_type = ? AND {$statusClause}
              LIMIT 1",
-            [$slug]
+            [$slug, $postType]
         );
 
         if (!$post) {
@@ -104,7 +117,7 @@ class KronosBuilderModule extends KronosModule
         if ($preview) {
             $status = kronos_e($post['status'] ?? 'draft');
             $previewBanner = '<div style="background:#fef9c3;border-bottom:2px solid #fde68a;padding:.75rem 1.25rem;font-size:.9rem;font-weight:600;text-align:center">'
-                           . '&#128064; Preview Mode — Status: ' . $status . ' — <a href="' . kronos_url('/dashboard/content') . '" style="color:#92400e">Back to Dashboard</a></div>';
+                           . '&#128064; Preview Mode — Status: ' . $status . ' — <a href="' . kronos_url('/dashboard/content/' . (int) $post['id']) . '" style="color:#92400e">Back to Editor</a></div>';
         }
 
         $appName = kronos_option('app_name', 'KronosCMS');

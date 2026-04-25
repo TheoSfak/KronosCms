@@ -18,12 +18,24 @@ if (file_exists($_themeCssFile)) {
 }
 ?>
 <?php do_action('kronos/theme/head'); ?>
+<style>
+  :root {
+    --font: <?= json_encode(kronos_option('body_font', 'Inter')) ?>, system-ui, -apple-system, sans-serif;
+    --heading-font: <?= json_encode(kronos_option('heading_font', 'Inter')) ?>, system-ui, -apple-system, sans-serif;
+  }
+</style>
 </head>
-<body class="<?= $bodyClass ?? '' ?>" data-scheme="<?= kronos_e(kronos_option('color_scheme', 'default')) ?>">
+<body class="<?= kronos_e(trim(($bodyClass ?? '') . ' header-' . kronos_option('header_layout', 'default') . ' footer-' . kronos_option('footer_layout', 'columns'))) ?>" data-scheme="<?= kronos_e(kronos_option('color_scheme', 'default')) ?>">
 
 <header class="site-header">
   <div class="container">
-    <a href="<?= kronos_url('/') ?>" class="site-logo"><?= kronos_e(kronos_option('app_name', 'KronosCMS')) ?></a>
+    <a href="<?= kronos_url('/') ?>" class="site-logo">
+      <?php if (kronos_option('site_logo_url', '') !== ''): ?>
+        <img src="<?= kronos_e(kronos_option('site_logo_url', '')) ?>" alt="<?= kronos_e(kronos_option('site_logo_alt', kronos_option('app_name', 'KronosCMS'))) ?>">
+      <?php else: ?>
+        <?= kronos_e(kronos_option('app_name', 'KronosCMS')) ?>
+      <?php endif; ?>
+    </a>
     <nav class="site-nav">
       <?php do_action('kronos/theme/nav'); ?>
     </nav>
@@ -44,7 +56,13 @@ if (file_exists($_themeCssFile)) {
   <div class="container">
     <div class="footer-inner">
       <div class="footer-brand">
-        <a href="<?= kronos_url('/') ?>" class="footer-logo"><?= kronos_e(kronos_option('app_name', 'KronosCMS')) ?></a>
+        <a href="<?= kronos_url('/') ?>" class="footer-logo">
+          <?php if (kronos_option('site_logo_url', '') !== ''): ?>
+            <img src="<?= kronos_e(kronos_option('site_logo_url', '')) ?>" alt="<?= kronos_e(kronos_option('site_logo_alt', kronos_option('app_name', 'KronosCMS'))) ?>">
+          <?php else: ?>
+            <?= kronos_e(kronos_option('app_name', 'KronosCMS')) ?>
+          <?php endif; ?>
+        </a>
         <p class="text-muted"><?= kronos_e(kronos_option('tagline', '')) ?></p>
       </div>
       <div class="footer-links">

@@ -36,7 +36,7 @@ $isNew    = $postCount === 0 && $layoutCount <= 1;
   </div>
   <div class="overview-quick-actions">
     <?php if (!$isCommerce): ?>
-    <a href="<?= kronos_url('/dashboard/content/new') ?>" class="btn btn-primary">+ New Post</a>
+    <a href="<?= kronos_url('/dashboard/posts/new') ?>" class="btn btn-primary">+ New Post</a>
     <?php else: ?>
     <a href="<?= kronos_url('/dashboard/products') ?>" class="btn btn-primary">+ New Product</a>
     <?php endif; ?>
@@ -51,7 +51,7 @@ $isNew    = $postCount === 0 && $layoutCount <= 1;
     <div class="stat-icon">📄</div>
     <div class="stat-value"><?= $postCount ?></div>
     <div class="stat-label">Posts / Pages</div>
-    <div class="stat-sub"><a href="<?= kronos_url('/dashboard/content') ?>">Manage →</a></div>
+    <div class="stat-sub"><a href="<?= kronos_url('/dashboard/posts') ?>">Manage Posts →</a></div>
   </div>
   <div class="stat-card">
     <div class="stat-icon">🎨</div>
@@ -88,12 +88,12 @@ $isNew    = $postCount === 0 && $layoutCount <= 1;
   <div class="card">
     <div class="card-header">
       <span class="card-title">Recent Content</span>
-      <a href="<?= kronos_url('/dashboard/content') ?>" class="btn btn-ghost btn-sm">View all</a>
+      <a href="<?= kronos_url('/dashboard/posts') ?>" class="btn btn-ghost btn-sm">View posts</a>
     </div>
     <?php if (empty($recentPosts)): ?>
     <div class="empty-state">
       <p>No content yet.</p>
-      <a href="<?= kronos_url('/dashboard/content/new') ?>" class="btn btn-primary btn-sm">Create your first post →</a>
+      <a href="<?= kronos_url('/dashboard/posts/new') ?>" class="btn btn-primary btn-sm">Create your first post →</a>
     </div>
     <?php else: ?>
     <table class="data-table">
@@ -133,7 +133,7 @@ $isNew    = $postCount === 0 && $layoutCount <= 1;
         <li>
           <span class="gs-check">○</span>
           <div><strong>Create your first post</strong><br><small class="text-muted">Add content to your site</small></div>
-          <a href="<?= kronos_url('/dashboard/content/new') ?>" class="btn btn-primary btn-sm">Create→</a>
+          <a href="<?= kronos_url('/dashboard/posts/new') ?>" class="btn btn-primary btn-sm">Create→</a>
         </li>
         <li>
           <span class="gs-check">○</span>
