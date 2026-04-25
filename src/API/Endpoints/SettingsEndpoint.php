@@ -112,6 +112,21 @@ class SettingsEndpoint
                     kronos_abort(422, $key . ' must be a hex color like #4f46e5.');
                 }
             }
+            if (in_array($key, ['permalink_page_base', 'permalink_post_base'], true)) {
+                $value = kronos_sanitize_slug((string) $value);
+                if ($value === '') {
+                    $value = $key === 'permalink_page_base' ? 'page' : 'post';
+                }
+                if (in_array($value, ['api', 'assets', 'cart', 'checkout', 'contact', 'dashboard', 'debug', 'product', 'uploads'], true)) {
+                    kronos_abort(422, $key . ' uses a reserved path.');
+                }
+                $otherKey = $key === 'permalink_page_base' ? 'permalink_post_base' : 'permalink_page_base';
+                $otherDefault = $otherKey === 'permalink_page_base' ? 'page' : 'post';
+                $otherValue = kronos_sanitize_slug((string) ($body[$otherKey] ?? $cfg->get($otherKey, $otherDefault)));
+                if ($otherValue === $value) {
+                    kronos_abort(422, 'Page and post permalink bases must be different.');
+                }
+            }
 
             $cfg->set($key, (string) $value);
             $saved[] = $key;

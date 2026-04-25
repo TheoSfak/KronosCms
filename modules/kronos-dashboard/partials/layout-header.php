@@ -65,6 +65,9 @@ window.KronosConfig = {
     <a href="<?= kronos_url('/dashboard/media') ?>" class="nav-item <?= $nav_active('/dashboard/media') ?>">
       <span class="nav-icon">▧</span> Media
     </a>
+    <a href="<?= kronos_url('/dashboard/comments') ?>" class="nav-item <?= $nav_active('/dashboard/comments') ?>">
+      <span class="nav-icon">☰</span> Comments
+    </a>
     <a href="<?= kronos_url('/dashboard/taxonomies?taxonomy=category') ?>" class="nav-item <?= $nav_active('/dashboard/taxonomies') ?>">
       <span class="nav-icon">#</span> Categories & Tags
     </a>

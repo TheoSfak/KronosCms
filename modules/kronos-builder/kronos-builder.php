@@ -8,7 +8,7 @@ use Kronos\Core\KronosApp;
  * KronosBuilderModule — page builder engine.
  *
  * Responsibilities:
- *  - Registers the RenderEngine with the front-end router (GET /page/{slug})
+ *  - Registers the RenderEngine with the front-end router
  *  - Exposes the KronosAPI.Widgets.register() extension point via a hook
  *  - Provides apply_filters('kronos/builder/render_block', ...) for output
  */
@@ -23,10 +23,20 @@ class KronosBuilderModule extends KronosModule
     {
         $app    = KronosApp::getInstance();
         $router = $app->router();
+        $pageBase = kronos_permalink_base('page');
+        $postBase = kronos_permalink_base('post');
 
         // Rendered content output (public-facing, no auth)
-        $router->get('/page/{slug}', [$this, 'renderPage']);
-        $router->get('/post/{slug}', [$this, 'renderPost']);
+        $router->get('/' . $pageBase . '/{slug}', [$this, 'renderPage']);
+        $router->get('/' . $postBase . '/{slug}', [$this, 'renderPost']);
+        $router->post('/' . $postBase . '/{slug}/comment', [$this, 'submitComment']);
+        if ($pageBase !== 'page') {
+            $router->get('/page/{slug}', [$this, 'renderPage']);
+        }
+        if ($postBase !== 'post') {
+            $router->get('/post/{slug}', [$this, 'renderPost']);
+            $router->post('/post/{slug}/comment', [$this, 'submitComment']);
+        }
 
         // Register built-in widgets via hook
         do_action('kronos/builder/register_widgets');
@@ -47,6 +57,60 @@ class KronosBuilderModule extends KronosModule
     public function renderPost(array $params): void
     {
         $this->renderContent($params, 'post');
+    }
+
+    public function submitComment(array $params): void
+    {
+        kronos_verify_csrf();
+
+        $slug = kronos_sanitize_slug($params['slug'] ?? '');
+        if (!$slug) {
+            kronos_abort(404);
+        }
+
+        $app = KronosApp::getInstance();
+        kronos_ensure_comment_tables();
+
+        $post = $app->db()->getRow(
+            "SELECT id, slug, post_type FROM kronos_posts
+             WHERE slug = ? AND post_type = 'post'
+               AND (status = 'published' OR (status = 'scheduled' AND published_at IS NOT NULL AND published_at <= NOW()))
+             LIMIT 1",
+            [$slug]
+        );
+        if (!$post) {
+            kronos_abort(404);
+        }
+
+        $name = trim((string) ($_POST['author_name'] ?? ''));
+        $email = trim((string) ($_POST['author_email'] ?? ''));
+        $url = trim((string) ($_POST['author_url'] ?? ''));
+        $content = trim((string) ($_POST['content'] ?? ''));
+        $postPath = kronos_public_content_path($post);
+
+        if ($name === '' || $content === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            kronos_redirect($postPath . '?comment_error=1#comments');
+        }
+
+        if ($url !== '' && !filter_var($url, FILTER_VALIDATE_URL)) {
+            $url = '';
+        }
+
+        $app->db()->insert('kronos_comments', [
+            'post_id' => (int) $post['id'],
+            'parent_id' => null,
+            'author_name' => substr($name, 0, 191),
+            'author_email' => substr($email, 0, 191),
+            'author_url' => substr($url, 0, 500),
+            'author_ip' => substr((string) ($_SERVER['REMOTE_ADDR'] ?? ''), 0, 64),
+            'content' => substr($content, 0, 5000),
+            'status' => 'pending',
+            'user_agent' => substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 500),
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+
+        kronos_redirect($postPath . '?comment_sent=1#comments');
     }
 
     private function renderContent(array $params, string $postType): void

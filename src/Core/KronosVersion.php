@@ -9,7 +9,7 @@ namespace Kronos\Core;
  */
 final class KronosVersion
 {
-    public const VERSION = '1.0.4';
+    public const VERSION = '1.0.5';
     public const RELEASE_DATE = '2026-04-25';
     public const MIN_PHP = '8.0.0';
     public const MIN_MYSQL = '5.7.0';

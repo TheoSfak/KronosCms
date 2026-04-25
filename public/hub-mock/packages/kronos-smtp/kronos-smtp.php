@@ -85,39 +85,56 @@ class KronosSmtpModule extends KronosModule
           <form class="editor-main" method="post" action="<?= kronos_url('/dashboard/smtp') ?>">
             <input type="hidden" name="_kronos_csrf" value="<?= kronos_csrf_token() ?>">
             <input type="hidden" name="action" value="save">
-            <div class="card">
-              <h2>SMTP Mailer</h2>
-              <div class="form-group"><label>Mode</label><select name="smtp_mode">
-                <?php foreach (['log' => 'Log only', 'php_mail' => 'PHP mail()', 'smtp' => 'SMTP server'] as $value => $label): ?>
-                <option value="<?= kronos_e($value) ?>" <?= kronos_option('smtp_mode', 'log') === $value ? 'selected' : '' ?>><?= kronos_e($label) ?></option>
-                <?php endforeach; ?>
-              </select></div>
-              <div class="form-group"><label>SMTP Host</label><input name="smtp_host" value="<?= kronos_e(kronos_option('smtp_host', '')) ?>"></div>
-              <div class="form-group"><label>Port</label><input name="smtp_port" value="<?= kronos_e(kronos_option('smtp_port', '587')) ?>"></div>
-              <div class="form-group"><label>Encryption</label><select name="smtp_encryption">
-                <?php foreach (['none', 'tls', 'ssl'] as $value): ?>
-                <option value="<?= kronos_e($value) ?>" <?= kronos_option('smtp_encryption', 'tls') === $value ? 'selected' : '' ?>><?= kronos_e(strtoupper($value)) ?></option>
-                <?php endforeach; ?>
-              </select></div>
-              <div class="form-group"><label>Username</label><input name="smtp_username" value="<?= kronos_e(kronos_option('smtp_username', '')) ?>"></div>
-              <div class="form-group"><label>Password</label><input type="password" name="smtp_password" value="<?= kronos_e(kronos_option('smtp_password', '')) ?>"></div>
-              <div class="form-group"><label>From Email</label><input name="smtp_from_email" value="<?= kronos_e(kronos_option('smtp_from_email', kronos_option('admin_email', ''))) ?>"></div>
-              <div class="form-group"><label>From Name</label><input name="smtp_from_name" value="<?= kronos_e(kronos_option('smtp_from_name', kronos_option('app_name', 'KronosCMS'))) ?>"></div>
-              <button class="btn btn-primary">Save SMTP Settings</button>
+            <div class="card plugin-settings-card smtp-card">
+              <div class="plugin-hero smtp-hero">
+                <span class="plugin-hero-icon">@</span>
+                <div>
+                  <p class="plugin-eyebrow">Mail delivery</p>
+                  <h2>SMTP Mailer</h2>
+                  <p>Control how KronosCMS sends site notifications, form submissions, and test messages.</p>
+                </div>
+              </div>
+              <div class="form-grid two-col">
+                <div class="form-group form-span-2"><label>Mode</label><select name="smtp_mode">
+                  <?php foreach (['log' => 'Log only', 'php_mail' => 'PHP mail()', 'smtp' => 'SMTP server'] as $value => $label): ?>
+                  <option value="<?= kronos_e($value) ?>" <?= kronos_option('smtp_mode', 'log') === $value ? 'selected' : '' ?>><?= kronos_e($label) ?></option>
+                  <?php endforeach; ?>
+                </select><small class="field-hint">Use log mode while testing, then switch to a real SMTP provider when the site goes live.</small></div>
+                <div class="form-group"><label>SMTP Host</label><input name="smtp_host" autocomplete="off" placeholder="smtp.example.com" value="<?= kronos_e(kronos_option('smtp_host', '')) ?>"></div>
+                <div class="form-group"><label>Port</label><input name="smtp_port" inputmode="numeric" autocomplete="off" value="<?= kronos_e(kronos_option('smtp_port', '587')) ?>"></div>
+                <div class="form-group"><label>Encryption</label><select name="smtp_encryption">
+                  <?php foreach (['none', 'tls', 'ssl'] as $value): ?>
+                  <option value="<?= kronos_e($value) ?>" <?= kronos_option('smtp_encryption', 'tls') === $value ? 'selected' : '' ?>><?= kronos_e(strtoupper($value)) ?></option>
+                  <?php endforeach; ?>
+                </select></div>
+                <div class="form-group"><label>Username</label><input name="smtp_username" autocomplete="username" value="<?= kronos_e(kronos_option('smtp_username', '')) ?>"></div>
+                <div class="form-group form-span-2"><label>Password</label><input type="password" name="smtp_password" autocomplete="current-password" value="<?= kronos_e(kronos_option('smtp_password', '')) ?>"></div>
+                <div class="form-group"><label>From Email</label><input type="email" name="smtp_from_email" autocomplete="email" value="<?= kronos_e(kronos_option('smtp_from_email', kronos_option('admin_email', ''))) ?>"></div>
+                <div class="form-group"><label>From Name</label><input name="smtp_from_name" autocomplete="organization" value="<?= kronos_e(kronos_option('smtp_from_name', kronos_option('app_name', 'KronosCMS'))) ?>"></div>
+              </div>
+              <div class="settings-actions">
+                <button class="btn btn-primary">Save SMTP Settings</button>
+              </div>
             </div>
           </form>
           <aside class="editor-sidebar">
-            <form class="card" method="post" action="<?= kronos_url('/dashboard/smtp') ?>">
+            <form class="card plugin-side-card" method="post" action="<?= kronos_url('/dashboard/smtp') ?>">
               <input type="hidden" name="_kronos_csrf" value="<?= kronos_csrf_token() ?>">
               <input type="hidden" name="action" value="test">
               <h3>Send Test</h3>
-              <input type="email" name="test_email" value="<?= kronos_e(kronos_option('admin_email', '')) ?>">
+              <p class="text-muted">Send one message through the current mail mode and inspect the result below.</p>
+              <div class="form-group"><label>Recipient</label><input type="email" name="test_email" value="<?= kronos_e(kronos_option('admin_email', '')) ?>"></div>
               <button class="btn btn-secondary mt-2">Send Test</button>
             </form>
-            <div class="card"><h3>Recent Mail Log</h3>
+            <div class="card plugin-side-card"><h3>Recent Mail Log</h3>
+              <div class="smtp-log-list">
               <?php foreach ($logs as $log): ?>
-              <div class="activity-item"><strong><?= kronos_e($log['subject']) ?></strong><small><?= kronos_e($log['status']) ?> - <?= kronos_e($log['created_at']) ?></small></div>
+              <div class="smtp-log-item">
+                <strong><?= kronos_e($log['subject']) ?></strong>
+                <small><span><?= kronos_e($log['status']) ?></span><?= kronos_e($log['created_at']) ?></small>
+              </div>
               <?php endforeach; ?>
+              </div>
               <?php if (!$logs): ?><p class="text-muted">No mail processed yet.</p><?php endif; ?>
             </div>
           </aside>

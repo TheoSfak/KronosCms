@@ -245,6 +245,27 @@ class KronosInstaller
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
 
             // ---------------------------------------------------------------
+            // Comments
+            // ---------------------------------------------------------------
+            "CREATE TABLE IF NOT EXISTS `kronos_comments` (
+                `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+                `post_id` INT UNSIGNED NOT NULL,
+                `parent_id` BIGINT UNSIGNED NULL,
+                `author_name` VARCHAR(191) NOT NULL DEFAULT '',
+                `author_email` VARCHAR(191) NOT NULL DEFAULT '',
+                `author_url` VARCHAR(500) NOT NULL DEFAULT '',
+                `author_ip` VARCHAR(64) NOT NULL DEFAULT '',
+                `content` TEXT NOT NULL,
+                `status` ENUM('pending','approved','spam','trash') NOT NULL DEFAULT 'pending',
+                `user_agent` VARCHAR(500) NOT NULL DEFAULT '',
+                `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                PRIMARY KEY (`id`),
+                KEY `idx_comments_post_status` (`post_id`, `status`, `created_at`),
+                KEY `idx_comments_status` (`status`, `created_at`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+
+            // ---------------------------------------------------------------
             // E-Commerce: Products
             // ---------------------------------------------------------------
             "CREATE TABLE IF NOT EXISTS `kronos_products` (

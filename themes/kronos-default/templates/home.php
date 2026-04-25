@@ -44,6 +44,7 @@ ob_start();
 <section class="site-hero hero-<?= kronos_e($heroStyle) ?>">
   <div class="container">
     <div class="hero-content">
+      <p class="hero-kicker">WordPress-style publishing. Elementor-style building.</p>
       <h1 class="hero-title"><?= kronos_e($appName) ?></h1>
       <p class="hero-sub"><?= kronos_e($tagline) ?></p>
       <div class="hero-actions">
@@ -54,6 +55,11 @@ ob_start();
         <a href="#latest-posts" class="btn btn-primary btn-lg">📖 Read the Blog</a>
         <a href="<?= kronos_url('/about') ?>" class="btn btn-outline btn-lg">👋 About Us</a>
         <?php endif; ?>
+      </div>
+      <div class="hero-proof-row" aria-label="Platform highlights">
+        <span>Visual builder</span>
+        <span>Menus &amp; themes</span>
+        <span>Plugins ready</span>
       </div>
     </div>
     <!-- Dashboard mockup visual -->
@@ -123,12 +129,20 @@ ob_start();
         <span class="badge2-dot"></span>
         <span class="badge2-text">Live preview</span>
       </div>
+      <div class="hero-floating-panel hero-floating-panel-one">
+        <strong>90%</strong>
+        <span>WordPress workflow</span>
+      </div>
+      <div class="hero-floating-panel hero-floating-panel-two">
+        <strong>Drag</strong>
+        <span>Drop. Style. Publish.</span>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- ── Stats strip ─────────────────────────────────── -->
-<div class="stats-strip">
+<div class="stats-strip home-stats-strip">
   <div class="container">
     <div class="stats-grid">
       <?php foreach ($stats as [$num, $label]): ?>
@@ -142,7 +156,7 @@ ob_start();
 </div>
 
 <!-- ── About teaser ────────────────────────────────── -->
-<section class="section">
+<section class="section home-about-section">
   <div class="container">
     <div class="about-split">
       <div class="about-visual">
@@ -198,7 +212,7 @@ ob_start();
 </section>
 
 <!-- ── Services / Features ─────────────────────────── -->
-<section class="section section-alt">
+<section class="section section-alt home-feature-section">
   <div class="container">
     <div class="section-header">
       <span class="section-eyebrow"><?= $isEcom ? 'What We Sell' : 'What We Do' ?></span>
@@ -259,16 +273,19 @@ ob_start();
       </div>
     </div>
     <?php endif; ?>
-    <div style="text-align:center;margin-top:40px">
+    <div class="section-action">
       <a href="<?= kronos_url('/services') ?>" class="btn btn-primary">View All Services</a>
     </div>
   </div>
 </section>
 
 <!-- ── Latest posts / Featured products ───────────── -->
-<section class="section" id="latest-posts">
+<section class="section home-latest-section" id="latest-posts">
   <div class="container">
-    <h2 class="section-title"><?= $isEcom ? 'Featured Products' : 'Latest Posts' ?></h2>
+    <div class="section-header">
+      <span class="section-eyebrow"><?= $isEcom ? 'Shop highlights' : 'Fresh from the site' ?></span>
+      <h2 class="section-title"><?= $isEcom ? 'Featured Products' : 'Latest Posts' ?></h2>
+    </div>
     <?php if (empty($items)): ?>
     <p class="text-muted"><?= $isEcom
         ? 'No products yet. <a href="' . kronos_url('/dashboard/content') . '">Add your first product →</a>'
@@ -295,16 +312,17 @@ ob_start();
     <div class="post-grid">
       <?php foreach ($items as $post): ?>
       <article class="post-card">
+        <?php $postPath = kronos_public_content_path($post); ?>
         <div class="post-card-image"></div>
         <div class="post-card-body">
           <p class="post-meta text-muted text-sm"><?= date('F j, Y', strtotime($post['created_at'])) ?></p>
           <h2 class="post-title">
-            <a href="<?= kronos_url('/page/' . kronos_e($post['slug'])) ?>"><?= kronos_e($post['title']) ?></a>
+            <a href="<?= kronos_url($postPath) ?>"><?= kronos_e($post['title']) ?></a>
           </h2>
           <?php if (!empty($post['excerpt'])): ?>
           <p class="post-excerpt text-muted"><?= kronos_e($post['excerpt']) ?></p>
           <?php endif; ?>
-          <a href="<?= kronos_url('/page/' . kronos_e($post['slug'])) ?>" class="read-more">Read more →</a>
+          <a href="<?= kronos_url($postPath) ?>" class="read-more">Read more →</a>
         </div>
       </article>
       <?php endforeach; ?>
@@ -314,7 +332,7 @@ ob_start();
 </section>
 
 <!-- ── Testimonials ────────────────────────────────── -->
-<section class="section section-alt">
+<section class="section section-alt home-testimonials-section">
   <div class="container">
     <div class="section-header">
       <span class="section-eyebrow">Testimonials</span>
@@ -322,6 +340,7 @@ ob_start();
     </div>
     <div class="testimonials-grid">
       <div class="testimonial-card">
+        <span class="testimonial-quote-mark">&ldquo;</span>
         <div class="testimonial-stars">★★★★★</div>
         <p class="testimonial-text">"KronosCMS is the cleanest CMS I've ever used. Went from zero to published in under an hour."</p>
         <div class="testimonial-author">
@@ -333,6 +352,7 @@ ob_start();
         </div>
       </div>
       <div class="testimonial-card">
+        <span class="testimonial-quote-mark">&ldquo;</span>
         <div class="testimonial-stars">★★★★★</div>
         <p class="testimonial-text">"The visual builder is genuinely impressive. My entire team can now manage content without any training."</p>
         <div class="testimonial-author">
@@ -344,6 +364,7 @@ ob_start();
         </div>
       </div>
       <div class="testimonial-card">
+        <span class="testimonial-quote-mark">&ldquo;</span>
         <div class="testimonial-stars">★★★★★</div>
         <p class="testimonial-text">"Switched from WordPress and never looked back. Lighter, faster, and the code is actually clean."</p>
         <div class="testimonial-author">
@@ -359,7 +380,7 @@ ob_start();
 </section>
 
 <!-- ── CTA banner ──────────────────────────────────── -->
-<section class="cta-banner">
+<section class="cta-banner cta-banner-premium">
   <div class="container">
     <h2><?= kronos_e($ctaTitle) ?></h2>
     <p><?= kronos_e($ctaSub) ?></p>
@@ -371,7 +392,7 @@ ob_start();
 </section>
 
 <!-- ── Quick contact strip ─────────────────────────── -->
-<section class="section">
+<section class="section home-contact-section">
   <div class="container">
     <div class="contact-strip">
       <div class="contact-strip-text">
@@ -389,4 +410,5 @@ ob_start();
 <?php
 $content = ob_get_clean();
 $title   = $appName;
+$bodyClass = 'home-template';
 include __DIR__ . '/base.php';

@@ -13,6 +13,8 @@ $isCommerce = kronos_is_ecommerce();
 $postCount   = (int) $db->getVar('SELECT COUNT(*) FROM kronos_posts');
 $userCount   = (int) $db->getVar('SELECT COUNT(*) FROM kronos_users');
 $layoutCount = (int) $db->getVar('SELECT COUNT(*) FROM kronos_builder_layouts');
+kronos_ensure_comment_tables();
+$commentCounts = kronos_comment_counts();
 $orderCount  = $isCommerce ? (int) $db->getVar('SELECT COUNT(*) FROM kronos_orders') : 0;
 $revenue     = $isCommerce ? (float) ($db->getVar("SELECT SUM(total) FROM kronos_orders WHERE status = 'completed'") ?? 0) : 0.0;
 
@@ -64,6 +66,12 @@ $isNew    = $postCount === 0 && $layoutCount <= 1;
     <div class="stat-value"><?= $userCount ?></div>
     <div class="stat-label">Users</div>
     <div class="stat-sub"><a href="<?= kronos_url('/dashboard/users') ?>">Manage →</a></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">☰</div>
+    <div class="stat-value"><?= (int) $commentCounts['pending'] ?></div>
+    <div class="stat-label">Pending Comments</div>
+    <div class="stat-sub"><a href="<?= kronos_url('/dashboard/comments?status=pending') ?>">Moderate →</a></div>
   </div>
   <?php if ($isCommerce): ?>
   <div class="stat-card">

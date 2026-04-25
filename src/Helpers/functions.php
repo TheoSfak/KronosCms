@@ -117,9 +117,7 @@ function kronos_asset(string $path): string
 
 function kronos_public_url_for_post(array $post): string
 {
-    $slug = (string) ($post['slug'] ?? '');
-    $type = (string) ($post['post_type'] ?? 'post');
-    return kronos_url(($type === 'page' ? '/page/' : '/post/') . $slug);
+    return kronos_url(kronos_public_content_path($post));
 }
 
 /**
@@ -241,6 +239,36 @@ function kronos_ensure_media_table(): void
             PRIMARY KEY (`id`),
             UNIQUE KEY `uq_media_file_url` (`file_url`),
             KEY `idx_media_mime` (`mime_type`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+    ]);
+
+    $done = true;
+}
+
+function kronos_ensure_comment_tables(): void
+{
+    static $done = false;
+    if ($done) {
+        return;
+    }
+
+    KronosApp::getInstance()->db()->runSchema([
+        "CREATE TABLE IF NOT EXISTS `kronos_comments` (
+            `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            `post_id` INT UNSIGNED NOT NULL,
+            `parent_id` BIGINT UNSIGNED NULL,
+            `author_name` VARCHAR(191) NOT NULL DEFAULT '',
+            `author_email` VARCHAR(191) NOT NULL DEFAULT '',
+            `author_url` VARCHAR(500) NOT NULL DEFAULT '',
+            `author_ip` VARCHAR(64) NOT NULL DEFAULT '',
+            `content` TEXT NOT NULL,
+            `status` ENUM('pending','approved','spam','trash') NOT NULL DEFAULT 'pending',
+            `user_agent` VARCHAR(500) NOT NULL DEFAULT '',
+            `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            KEY `idx_comments_post_status` (`post_id`, `status`, `created_at`),
+            KEY `idx_comments_status` (`status`, `created_at`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
     ]);
 
@@ -491,13 +519,21 @@ function kronos_get_public_page_by_slug(string $slug, bool $preview = false): ?a
  *
  * @param array<string, mixed> $post
  */
+function kronos_permalink_base(string $postType): string
+{
+    $default = $postType === 'page' ? 'page' : 'post';
+    $key = $postType === 'page' ? 'permalink_page_base' : 'permalink_post_base';
+    $base = kronos_sanitize_slug((string) kronos_option($key, $default));
+    return $base !== '' ? $base : $default;
+}
+
 function kronos_public_content_path(array $post): string
 {
     $slug = kronos_sanitize_slug((string) ($post['slug'] ?? ''));
     if (($post['post_type'] ?? 'post') === 'page') {
-        return $slug === 'home' ? '/' : '/page/' . $slug;
+        return $slug === 'home' ? '/' : '/' . kronos_permalink_base('page') . '/' . $slug;
     }
-    return '/post/' . $slug;
+    return '/' . kronos_permalink_base('post') . '/' . $slug;
 }
 
 function kronos_render_cms_page_by_slug(string $slug, bool $asHome = false, ?bool $preview = null): bool
@@ -534,6 +570,99 @@ function kronos_render_cms_page_by_slug(string $slug, bool $asHome = false, ?boo
     }
 
     return false;
+}
+
+/**
+ * @return array<string, int>
+ */
+function kronos_comment_counts(?int $postId = null): array
+{
+    kronos_ensure_comment_tables();
+    $db = KronosApp::getInstance()->db();
+    $where = $postId !== null ? ' WHERE post_id = ?' : '';
+    $args = $postId !== null ? [$postId] : [];
+    $rows = $db->getResults(
+        "SELECT status, COUNT(*) AS total FROM kronos_comments{$where} GROUP BY status",
+        $args
+    );
+    $counts = ['pending' => 0, 'approved' => 0, 'spam' => 0, 'trash' => 0, 'all' => 0];
+    foreach ($rows as $row) {
+        $status = (string) ($row['status'] ?? '');
+        if (array_key_exists($status, $counts)) {
+            $counts[$status] = (int) $row['total'];
+            $counts['all'] += (int) $row['total'];
+        }
+    }
+    return $counts;
+}
+
+function kronos_render_comments(array $post): string
+{
+    if (($post['post_type'] ?? '') !== 'post') {
+        return '';
+    }
+
+    kronos_ensure_comment_tables();
+    $postId = (int) ($post['id'] ?? 0);
+    if ($postId <= 0) {
+        return '';
+    }
+
+    $db = KronosApp::getInstance()->db();
+    $comments = $db->getResults(
+        "SELECT * FROM kronos_comments
+         WHERE post_id = ? AND status = 'approved'
+         ORDER BY created_at ASC, id ASC",
+        [$postId]
+    );
+
+    $sent = isset($_GET['comment_sent']);
+    $error = isset($_GET['comment_error']);
+    $action = kronos_url(kronos_public_content_path($post) . '/comment');
+
+    ob_start();
+    ?>
+    <section class="comments-area" id="comments">
+      <div class="comments-header">
+        <h2>Comments</h2>
+        <span><?= count($comments) ?> approved</span>
+      </div>
+      <?php if ($sent): ?>
+      <div class="comment-notice success">Your comment is waiting for moderation.</div>
+      <?php endif; ?>
+      <?php if ($error): ?>
+      <div class="comment-notice error">Please enter your name, a valid email, and a comment.</div>
+      <?php endif; ?>
+
+      <?php if (!$comments): ?>
+      <p class="text-muted">No approved comments yet.</p>
+      <?php else: ?>
+      <ol class="comment-list">
+        <?php foreach ($comments as $comment): ?>
+        <li class="comment-item">
+          <div class="comment-meta">
+            <strong><?= kronos_e((string) $comment['author_name']) ?></strong>
+            <time><?= kronos_e(date('M j, Y H:i', strtotime((string) $comment['created_at']))) ?></time>
+          </div>
+          <p><?= nl2br(kronos_e((string) $comment['content'])) ?></p>
+        </li>
+        <?php endforeach; ?>
+      </ol>
+      <?php endif; ?>
+
+      <form class="comment-form" method="post" action="<?= kronos_e($action) ?>">
+        <input type="hidden" name="_kronos_csrf" value="<?= kronos_csrf_token() ?>">
+        <div class="comment-form-grid">
+          <label>Name <input type="text" name="author_name" required maxlength="191"></label>
+          <label>Email <input type="email" name="author_email" required maxlength="191"></label>
+        </div>
+        <label>Website <input type="url" name="author_url" maxlength="500" placeholder="https://"></label>
+        <label>Comment <textarea name="content" rows="5" required></textarea></label>
+        <button type="submit" class="btn btn-primary">Post Comment</button>
+      </form>
+    </section>
+    <?php
+    return (string) ob_get_clean();
 }
 
 /**

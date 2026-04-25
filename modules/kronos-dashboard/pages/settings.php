@@ -68,6 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'impor
             . $counts['taxonomies'] . ' taxonomies, '
             . $counts['media'] . ' media records, '
             . $counts['content'] . ' content records, '
+            . ($counts['comments'] ?? 0) . ' comments, '
             . $counts['menus'] . ' menus.';
     } catch (\Throwable $e) {
         $settingsError = 'Bundle import failed: ' . $e->getMessage();
@@ -270,7 +271,7 @@ require $dashDir . '/partials/layout-header.php';
 
 <?php elseif ($tab === 'permalinks'): ?>
   <h2 class="card-title">Permalink Settings</h2>
-  <p class="text-muted">These bases prepare the CMS for WordPress-style URL control. Current public routes remain compatible with existing /page/ and /post/ links.</p>
+  <p class="text-muted">Public post and page URLs use these bases. Legacy /page/ and /post/ routes remain available for compatibility.</p>
   <form id="settings-permalinks-form" class="settings-form">
     <div class="form-row">
       <div class="form-group">
@@ -376,7 +377,7 @@ require $dashDir . '/partials/layout-header.php';
   <div class="tool-grid">
     <div>
       <h3>Export Site Bundle</h3>
-      <p class="text-muted">Includes settings, posts, pages, builder layout links, menus, media metadata, categories, and tags.</p>
+      <p class="text-muted">Includes settings, posts, pages, comments, builder layout links, menus, media metadata, categories, and tags.</p>
       <p class="text-muted">Bundle schema: <code>kronos-site-bundle-v1</code></p>
       <textarea rows="18" readonly><?= kronos_e(json_encode($exportData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) ?></textarea>
     </div>
@@ -386,7 +387,7 @@ require $dashDir . '/partials/layout-header.php';
         <input type="hidden" name="_kronos_csrf" value="<?= kronos_csrf_token() ?>">
         <input type="hidden" name="action" value="import_site_bundle">
         <textarea name="site_bundle_json" rows="12" placeholder='{"schema":"kronos-site-bundle-v1",...}'></textarea>
-        <button type="submit" class="btn btn-primary">Import Posts, Pages, Menus, Media, Taxonomies</button>
+        <button type="submit" class="btn btn-primary">Import Posts, Pages, Comments, Menus, Media, Taxonomies</button>
       </form>
       <hr class="settings-divider">
       <h3>Import Settings Only</h3>
@@ -502,8 +503,8 @@ require $dashDir . '/partials/layout-header.php';
     permalinkForm.addEventListener('submit', async function(e) {
       e.preventDefault();
       const data = Object.fromEntries(new FormData(this));
-      data.permalink_page_base = (data.permalink_page_base || 'page').replace(/[^a-z0-9-]/g, '').replace(/^-+|-+$/g, '') || 'page';
-      data.permalink_post_base = (data.permalink_post_base || 'post').replace(/[^a-z0-9-]/g, '').replace(/^-+|-+$/g, '') || 'post';
+      data.permalink_page_base = (data.permalink_page_base || 'page').toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/^-+|-+$/g, '') || 'page';
+      data.permalink_post_base = (data.permalink_post_base || 'post').toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/^-+|-+$/g, '') || 'post';
       await window.KronosDash.saveOptions(data);
       alert('Permalink settings saved.');
     });

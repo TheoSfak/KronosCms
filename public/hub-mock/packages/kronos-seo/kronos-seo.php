@@ -117,7 +117,7 @@ class KronosSeoModule extends KronosModule
         foreach ($rows as $row) {
             $path = ($row['post_type'] === 'page' && $row['slug'] === 'home')
                 ? '/'
-                : (($row['post_type'] === 'page' ? '/page/' : '/post/') . $row['slug']);
+                : kronos_public_content_path($row);
             echo "  <url><loc>" . htmlspecialchars(kronos_url($path), ENT_XML1) . "</loc><lastmod>" . date('c', strtotime((string) $row['updated_at'])) . "</lastmod></url>\n";
         }
         echo "</urlset>";

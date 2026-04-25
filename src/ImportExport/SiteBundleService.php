@@ -74,6 +74,12 @@ class SiteBundleService
             'taxonomies' => $this->db->getResults('SELECT * FROM kronos_terms ORDER BY taxonomy ASC, id ASC'),
             'media' => $this->db->getResults('SELECT * FROM kronos_media ORDER BY id ASC'),
             'content' => $content,
+            'comments' => $this->db->getResults(
+                'SELECT c.*, p.slug AS post_slug, p.post_type
+                 FROM kronos_comments c
+                 LEFT JOIN kronos_posts p ON p.id = c.post_id
+                 ORDER BY c.id ASC'
+            ),
             'menus' => $menus,
         ];
     }
@@ -88,7 +94,7 @@ class SiteBundleService
         $this->validateBundle($bundle);
 
         return $this->db->transaction(function () use ($bundle): array {
-            $counts = ['settings' => 0, 'taxonomies' => 0, 'media' => 0, 'content' => 0, 'menus' => 0];
+            $counts = ['settings' => 0, 'taxonomies' => 0, 'media' => 0, 'content' => 0, 'comments' => 0, 'menus' => 0];
             $now = date('Y-m-d H:i:s');
 
             foreach (($bundle['settings'] ?? []) as $key => $value) {
@@ -211,6 +217,40 @@ class SiteBundleService
                 $counts['content']++;
             }
 
+            foreach (($bundle['comments'] ?? []) as $comment) {
+                if (!is_array($comment)) {
+                    continue;
+                }
+                $postId = !empty($comment['post_id']) ? (int) $comment['post_id'] : 0;
+                if (!empty($comment['post_slug'])) {
+                    $post = $this->db->getRow(
+                        'SELECT id FROM kronos_posts WHERE slug = ? AND post_type = ? LIMIT 1',
+                        [kronos_sanitize_slug((string) $comment['post_slug']), in_array(($comment['post_type'] ?? ''), ['post', 'page'], true) ? (string) $comment['post_type'] : 'post']
+                    );
+                    $postId = (int) ($post['id'] ?? $postId);
+                }
+                if ($postId <= 0) {
+                    continue;
+                }
+                $status = in_array(($comment['status'] ?? ''), ['pending', 'approved', 'spam', 'trash'], true)
+                    ? (string) $comment['status']
+                    : 'pending';
+                $this->db->insert('kronos_comments', [
+                    'post_id' => $postId,
+                    'parent_id' => null,
+                    'author_name' => substr((string) ($comment['author_name'] ?? ''), 0, 191),
+                    'author_email' => substr((string) ($comment['author_email'] ?? ''), 0, 191),
+                    'author_url' => substr((string) ($comment['author_url'] ?? ''), 0, 500),
+                    'author_ip' => substr((string) ($comment['author_ip'] ?? ''), 0, 64),
+                    'content' => (string) ($comment['content'] ?? ''),
+                    'status' => $status,
+                    'user_agent' => substr((string) ($comment['user_agent'] ?? ''), 0, 500),
+                    'created_at' => !empty($comment['created_at']) ? (string) $comment['created_at'] : $now,
+                    'updated_at' => $now,
+                ]);
+                $counts['comments']++;
+            }
+
             foreach (($bundle['menus'] ?? []) as $menu) {
                 if (!is_array($menu)) {
                     continue;
@@ -291,7 +331,7 @@ class SiteBundleService
             throw new \RuntimeException('Unsupported bundle schema.');
         }
 
-        foreach (['settings', 'taxonomies', 'media', 'content', 'menus'] as $key) {
+        foreach (['settings', 'taxonomies', 'media', 'content', 'comments', 'menus'] as $key) {
             if (isset($bundle[$key]) && !is_array($bundle[$key])) {
                 throw new \RuntimeException("Bundle field {$key} must be an array.");
             }
@@ -351,6 +391,7 @@ class SiteBundleService
         kronos_ensure_default_site_pages();
         kronos_ensure_taxonomy_tables();
         kronos_ensure_media_table();
+        kronos_ensure_comment_tables();
         kronos_ensure_menu_tables();
     }
 }

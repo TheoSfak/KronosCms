@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'menu_id' => $selectedMenuId,
                     'parent_id' => null,
                     'title' => (string) $post['title'],
-                    'url' => ($post['post_type'] === 'page' ? '/page/' : '/post/') . (string) $post['slug'],
+                    'url' => kronos_public_content_path($post),
                     'item_type' => 'post',
                     'object_type' => (string) $post['post_type'],
                     'object_id' => (int) $post['id'],

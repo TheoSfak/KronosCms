@@ -41,6 +41,8 @@ class KronosDashboardModule extends KronosModule
         $router->post('/dashboard/media',           fn($p) => $this->page('media', $p),     [$auth]);
         $router->get('/dashboard/media/{id:\d+}',   fn($p) => $this->page('media-detail', $p), [$auth]);
         $router->post('/dashboard/media/{id:\d+}',  fn($p) => $this->page('media-detail', $p), [$auth]);
+        $router->get('/dashboard/comments',         fn($p) => $this->page('comments', $p),  [$auth]);
+        $router->post('/dashboard/comments',        fn($p) => $this->page('comments', $p),  [$auth]);
         $router->get('/dashboard/builder/{id:\d+}', fn($p) => $this->page('builder', $p),    [$auth]);
         $router->get('/dashboard/menus',            fn($p) => $this->page('menus', $p),      [$auth]);
         $router->post('/dashboard/menus',           fn($p) => $this->page('menus', $p),      [$auth]);
