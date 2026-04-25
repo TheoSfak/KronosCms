@@ -7,7 +7,7 @@
       "version": "1.0.0",
       "type": "module",
       "author": "TheoSfak",
-      "download_url": "https://github.com/TheoSfak/kronos-seo/archive/refs/tags/v1.0.0.zip",
+      "download_url": "http://localhost/KronosCMS/public/hub-mock/packages/kronos-seo",
       "license": "free",
       "requires_license": false,
       "license_tier": null
@@ -19,7 +19,7 @@
       "version": "1.0.0",
       "type": "module",
       "author": "TheoSfak",
-      "download_url": "https://github.com/TheoSfak/kronos-contact-form/archive/refs/tags/v1.0.0.zip",
+      "download_url": "http://localhost/KronosCMS/public/hub-mock/packages/kronos-contact-form",
       "license": "free",
       "requires_license": false,
       "license_tier": null
@@ -31,7 +31,7 @@
       "version": "1.0.0",
       "type": "module",
       "author": "TheoSfak",
-      "download_url": "",
+      "download_url": "http://localhost/KronosCMS/public/hub-mock/packages/kronos-analytics-plus",
       "license": "premium",
       "requires_license": true,
       "license_tier": "pro"
@@ -43,7 +43,7 @@
       "version": "1.0.0",
       "type": "theme",
       "author": "TheoSfak",
-      "download_url": "https://github.com/TheoSfak/kronos-dark-mode/archive/refs/tags/v1.0.0.zip",
+      "download_url": "http://localhost/KronosCMS/public/hub-mock/packages/kronos-dark-mode",
       "license": "free",
       "requires_license": false,
       "license_tier": null
@@ -55,7 +55,7 @@
       "version": "1.0.0",
       "type": "module",
       "author": "TheoSfak",
-      "download_url": "https://github.com/TheoSfak/kronos-smtp/archive/refs/tags/v1.0.0.zip",
+      "download_url": "http://localhost/KronosCMS/public/hub-mock/packages/kronos-smtp",
       "license": "free",
       "requires_license": false,
       "license_tier": null

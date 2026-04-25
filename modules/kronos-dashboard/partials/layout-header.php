@@ -68,6 +68,7 @@ window.KronosConfig = {
     <a href="<?= kronos_url('/dashboard/taxonomies?taxonomy=category') ?>" class="nav-item <?= $nav_active('/dashboard/taxonomies') ?>">
       <span class="nav-icon">#</span> Categories & Tags
     </a>
+    <?php do_action('kronos/dashboard/nav/content', $currentUri); ?>
     <?php endif; ?>
 
     <?php if ($mode === 'ecommerce'): ?>
@@ -101,6 +102,7 @@ window.KronosConfig = {
     <a href="<?= kronos_url('/dashboard/ai') ?>" class="nav-item <?= $nav_active('/dashboard/ai') ?>">
       <span class="nav-icon">AI</span> AI Assistant
     </a>
+    <?php do_action('kronos/dashboard/nav/tools', $currentUri); ?>
 
     <?php if (kronos_user_can('app_manager')): ?>
     <div class="nav-section-label">Manage</div>

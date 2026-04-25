@@ -72,6 +72,7 @@ class KronosAPIRouter
         // System / update (manager only)
         $this->router->get('/api/kronos/v1/system/update/check',  $system, $managerOnly);
         $this->router->post('/api/kronos/v1/system/update/apply', $system, $managerOnly);
+        $this->router->post('/api/kronos/v1/system/scheduled-publishing/run', $system, $managerOnly);
 
         // Commerce (authenticated)
         $this->router->get('/api/kronos/v1/commerce/products',          $commerce, $authenticated);

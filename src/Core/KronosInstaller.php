@@ -179,8 +179,13 @@ class KronosInstaller
                 `post_id` INT UNSIGNED NOT NULL,
                 `user_id` INT UNSIGNED NULL,
                 `title` VARCHAR(500) NOT NULL DEFAULT '',
+                `slug` VARCHAR(191) NULL,
                 `content` LONGTEXT NOT NULL,
+                `status` VARCHAR(40) NULL,
+                `published_at` DATETIME NULL,
+                `layout_id` INT UNSIGNED NULL,
                 `meta` JSON NULL,
+                `terms_json` LONGTEXT NULL,
                 `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 PRIMARY KEY (`id`),
                 KEY `idx_revision_post` (`post_id`, `created_at`)

@@ -22,14 +22,17 @@ class KronosDashboardModule extends KronosModule
 
         $router->get('/dashboard',                  fn($p) => $this->page('home', $p),       [$auth]);
         $router->get('/dashboard/content',          fn($p) => $this->page('content', $p),    [$auth]);
+        $router->post('/dashboard/content',         fn($p) => $this->page('content', $p),    [$auth]);
         $router->get('/dashboard/content/new',      fn($p) => $this->page('content-edit', $p), [$auth]);
         $router->post('/dashboard/content/new',     fn($p) => $this->page('content-edit', $p), [$auth]);
         $router->get('/dashboard/content/{id:\d+}', fn($p) => $this->page('content-edit', $p), [$auth]);
         $router->post('/dashboard/content/{id:\d+}',fn($p) => $this->page('content-edit', $p), [$auth]);
         $router->get('/dashboard/posts',            fn($p) => $this->page('content', array_merge($p, ['post_type' => 'post'])), [$auth]);
+        $router->post('/dashboard/posts',           fn($p) => $this->page('content', array_merge($p, ['post_type' => 'post'])), [$auth]);
         $router->get('/dashboard/posts/new',        fn($p) => $this->page('content-edit', array_merge($p, ['post_type' => 'post'])), [$auth]);
         $router->post('/dashboard/posts/new',       fn($p) => $this->page('content-edit', array_merge($p, ['post_type' => 'post'])), [$auth]);
         $router->get('/dashboard/pages',            fn($p) => $this->page('content', array_merge($p, ['post_type' => 'page'])), [$auth]);
+        $router->post('/dashboard/pages',           fn($p) => $this->page('content', array_merge($p, ['post_type' => 'page'])), [$auth]);
         $router->get('/dashboard/pages/new',        fn($p) => $this->page('content-edit', array_merge($p, ['post_type' => 'page'])), [$auth]);
         $router->post('/dashboard/pages/new',       fn($p) => $this->page('content-edit', array_merge($p, ['post_type' => 'page'])), [$auth]);
         $router->get('/dashboard/taxonomies',       fn($p) => $this->page('taxonomies', $p), [$auth]);
@@ -50,6 +53,7 @@ class KronosDashboardModule extends KronosModule
         $router->get('/dashboard/marketplace',      fn($p) => $this->page('marketplace', $p),[$auth]);
         $router->get('/dashboard/ai',               fn($p) => $this->page('ai', $p),         [$auth]);
         $router->get('/dashboard/settings',         fn($p) => $this->page('settings', $p),   [$auth]);
+        $router->post('/dashboard/settings',        fn($p) => $this->page('settings', $p),   [$auth]);
         $router->post('/dashboard/mode-switch',     fn($p) => $this->modeSwitchAction(),      [$auth]);
 
         // Login page (public)

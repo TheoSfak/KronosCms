@@ -40,8 +40,52 @@ class MarketplaceEndpoint
     {
         $app    = KronosApp::getInstance();
         $client = new HubClient($app->config());
-        $data   = $client->fetchDirectory();
+        $data   = isset($_GET['refresh'])
+            ? $client->refreshDirectory()
+            : $client->fetchDirectory();
+        $data = array_map(fn(array $package): array => $this->withInstallStatus($package), $data);
         kronos_json(['data' => $data]);
+    }
+
+    /**
+     * @param array<string, mixed> $package
+     * @return array<string, mixed>
+     */
+    private function withInstallStatus(array $package): array
+    {
+        $app = KronosApp::getInstance();
+        $slug = preg_replace('/[^a-z0-9-]/', '', strtolower((string) ($package['slug'] ?? '')));
+        $type = (string) ($package['type'] ?? 'module');
+        $type = $type === 'theme' ? 'theme' : 'module';
+
+        if ($slug === '') {
+            return $package + [
+                'installed' => false,
+                'active' => false,
+                'install_status' => 'invalid',
+            ];
+        }
+
+        if ($type === 'theme') {
+            $dir = $app->rootDir() . '/themes/' . $slug;
+            $installed = is_dir($dir);
+            $active = $installed && $app->themeManager()->getActiveSlug() === $slug;
+        } else {
+            $dir = $app->rootDir() . '/modules/' . $slug;
+            $installed = is_dir($dir);
+            $active = isset($app->moduleLoader()->getLoaded()[$slug]);
+        }
+
+        $entry = $type === 'theme'
+            ? $dir . '/theme.json'
+            : $dir . '/' . $slug . '.php';
+
+        return array_merge($package, [
+            'installed' => $installed,
+            'active' => $active,
+            'install_status' => $active ? 'active' : ($installed ? 'installed' : 'available'),
+            'entry_file_ok' => $installed ? is_file($entry) : null,
+        ]);
     }
 
     private function install(): void

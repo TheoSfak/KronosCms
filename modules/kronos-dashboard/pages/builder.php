@@ -39,6 +39,30 @@ if (!$layout) {
 $ast  = json_decode((string) ($layout['json_data'] ?? '[]'), true);
 if (!is_array($ast)) $ast = [];
 if (isset($ast['blocks']) && is_array($ast['blocks'])) $ast = $ast['blocks'];
+$normalizeBuilderNode = function(array $node) use (&$normalizeBuilderNode): array {
+    if (!isset($node['attrs']) && isset($node['props']) && is_array($node['props'])) {
+        $node['attrs'] = $node['props'];
+    }
+    unset($node['props']);
+    if (!empty($node['children']) && is_array($node['children'])) {
+        $node['children'] = array_map(
+            fn($child) => is_array($child) ? $normalizeBuilderNode($child) : $child,
+            $node['children']
+        );
+    }
+    return $node;
+};
+$ast = array_map(fn($node) => is_array($node) ? $normalizeBuilderNode($node) : $node, $ast);
+
+$linkedContent = $layoutId > 0
+    ? $db->getRow("SELECT id, title, slug, post_type FROM kronos_posts WHERE layout_id = ? AND post_type IN ('post','page') ORDER BY post_type = 'page' DESC, id ASC LIMIT 1", [$layoutId])
+    : null;
+$exitUrl = $linkedContent
+    ? '/dashboard/content/' . (int) $linkedContent['id']
+    : '/dashboard/pages';
+$previewUrl = $linkedContent
+    ? kronos_public_content_path($linkedContent) . '?preview=1'
+    : '';
 
 // Widget categories for the palette
 $widgetCategories = [
@@ -72,14 +96,14 @@ $widgetsFlat = array_merge(...array_values($widgetCategories));
 $pageTitle   = 'Builder — ' . ($layout['layout_name'] ?? 'Untitled');
 $builderPage = true;
 $topbarExtra = '
-  <span class="builder-editor-badge">Editing layout</span>
+  <span class="builder-editor-badge">' . ($linkedContent ? 'Editing ' . htmlspecialchars((string) $linkedContent['title'], ENT_QUOTES) : 'Editing layout') . '</span>
   <input type="text" id="builder-layout-name"
     value="' . htmlspecialchars($layout['layout_name'] ?? '', ENT_QUOTES) . '"
     placeholder="Layout name…">
   <span id="builder-save-status" class="builder-save-status">Auto-saved</span>
-  <button id="builder-preview-btn" class="btn btn-ghost btn-sm topbar-btn" title="Preview (P)">Preview</button>
+  ' . ($previewUrl !== '' ? '<a href="' . kronos_url($previewUrl) . '" target="_blank" class="btn btn-ghost btn-sm topbar-btn">Preview Page</a>' : '<button id="builder-preview-btn" class="btn btn-ghost btn-sm topbar-btn" title="Preview (P)">Preview</button>') . '
   <button id="builder-save-btn" class="btn btn-primary btn-sm">Update</button>
-  <a href="' . kronos_url('/dashboard/content') . '" class="btn btn-ghost btn-sm topbar-btn">← Exit</a>';
+  <a href="' . kronos_url($exitUrl) . '" class="btn btn-ghost btn-sm topbar-btn">← Exit</a>';
 $dashDir     = dirname(__DIR__);
 require $dashDir . '/partials/layout-header.php';
 ?>

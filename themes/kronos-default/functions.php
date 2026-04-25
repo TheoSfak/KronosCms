@@ -40,7 +40,11 @@ $staticPages = ['about', 'services', 'contact'];
 
 foreach ($staticPages as $pageSlug) {
     $tpl = $themeDir . '/' . $pageSlug . '.php';
-    $router->get('/' . $pageSlug, function (array $params) use ($tpl): void {
+    $router->get('/' . $pageSlug, function (array $params) use ($tpl, $pageSlug): void {
+        if (kronos_render_cms_page_by_slug($pageSlug)) {
+            return;
+        }
+
         if (!file_exists($tpl)) {
             kronos_abort(404);
         }

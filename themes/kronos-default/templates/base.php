@@ -7,21 +7,22 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
-<?php
-// Always inline theme CSS directly from source — bypasses public/assets/ copy entirely
-// so there is NEVER a stale-cache or copy problem.
-$_themeCssFile = dirname(__DIR__) . '/assets/theme.css';
-if (file_exists($_themeCssFile)) {
-    echo '<style>' . file_get_contents($_themeCssFile) . '</style>';
-} else {
-    echo '<link rel="stylesheet" href="' . kronos_asset('css/theme.css') . '">';
-}
-?>
+<link rel="stylesheet" href="<?= kronos_asset('css/theme.css') ?>">
 <?php do_action('kronos/theme/head'); ?>
 <style>
   :root {
     --font: <?= json_encode(kronos_option('body_font', 'Inter')) ?>, system-ui, -apple-system, sans-serif;
     --heading-font: <?= json_encode(kronos_option('heading_font', 'Inter')) ?>, system-ui, -apple-system, sans-serif;
+    <?php if (kronos_option('brand_primary_color', '') !== ''): ?>
+    --accent: <?= kronos_e((string) kronos_option('brand_primary_color', '#4f46e5')) ?>;
+    --accent-rgb: <?= kronos_e(kronos_hex_to_rgb_csv((string) kronos_option('brand_primary_color', '#4f46e5'))) ?>;
+    <?php endif; ?>
+    <?php if (kronos_option('brand_accent_color', '') !== ''): ?>
+    --accent-h: <?= kronos_e((string) kronos_option('brand_accent_color', '#4338ca')) ?>;
+    <?php endif; ?>
+    <?php if (kronos_option('site_background_color', '') !== ''): ?>
+    --bg: <?= kronos_e((string) kronos_option('site_background_color', '#ffffff')) ?>;
+    <?php endif; ?>
   }
 </style>
 </head>

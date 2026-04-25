@@ -102,7 +102,17 @@ function kronos_url(string $path = ''): string
 
 function kronos_asset(string $path): string
 {
-    return kronos_url('assets/' . ltrim($path, '/'));
+    $assetPath = ltrim($path, '/');
+    $url = kronos_url('assets/' . $assetPath);
+    try {
+        $file = rtrim(KronosApp::getInstance()->rootDir(), '/\\') . '/public/assets/' . $assetPath;
+        if (is_file($file)) {
+            $url .= '?v=' . filemtime($file);
+        }
+    } catch (Throwable) {
+        // Asset URLs should still resolve during early install/bootstrap.
+    }
+    return $url;
 }
 
 function kronos_public_url_for_post(array $post): string
@@ -110,6 +120,27 @@ function kronos_public_url_for_post(array $post): string
     $slug = (string) ($post['slug'] ?? '');
     $type = (string) ($post['post_type'] ?? 'post');
     return kronos_url(($type === 'page' ? '/page/' : '/post/') . $slug);
+}
+
+/**
+ * Send mail through the active mail transport.
+ *
+ * Plugins can fully handle delivery by returning a boolean from
+ * `kronos/mail/send`; otherwise Kronos falls back to PHP's mail().
+ *
+ * @param array<int, string> $headers
+ */
+function kronos_mail(string $to, string $subject, string $message, array $headers = []): bool
+{
+    $handled = apply_filters('kronos/mail/send', null, $to, $subject, $message, $headers);
+    if (is_bool($handled)) {
+        return $handled;
+    }
+
+    $headerText = implode("\r\n", $headers);
+    return $headerText !== ''
+        ? @mail($to, $subject, $message, $headerText)
+        : @mail($to, $subject, $message);
 }
 
 // ---------------------------------------------------------------------------
@@ -230,15 +261,279 @@ function kronos_ensure_editor_tables(): void
             `post_id` INT UNSIGNED NOT NULL,
             `user_id` INT UNSIGNED NULL,
             `title` VARCHAR(500) NOT NULL DEFAULT '',
+            `slug` VARCHAR(191) NULL,
             `content` LONGTEXT NOT NULL,
+            `status` VARCHAR(40) NULL,
+            `published_at` DATETIME NULL,
+            `layout_id` INT UNSIGNED NULL,
             `meta` JSON NULL,
+            `terms_json` LONGTEXT NULL,
             `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (`id`),
             KEY `idx_revision_post` (`post_id`, `created_at`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+        "ALTER TABLE `kronos_post_revisions` ADD COLUMN `slug` VARCHAR(191) NULL AFTER `title`",
+        "ALTER TABLE `kronos_post_revisions` ADD COLUMN `status` VARCHAR(40) NULL AFTER `content`",
+        "ALTER TABLE `kronos_post_revisions` ADD COLUMN `published_at` DATETIME NULL AFTER `status`",
+        "ALTER TABLE `kronos_post_revisions` ADD COLUMN `layout_id` INT UNSIGNED NULL AFTER `published_at`",
+        "ALTER TABLE `kronos_post_revisions` ADD COLUMN `terms_json` LONGTEXT NULL AFTER `meta`",
     ]);
 
     $done = true;
+}
+
+function kronos_create_post_revision(int $postId, ?int $userId = null): void
+{
+    if ($postId <= 0) {
+        return;
+    }
+
+    kronos_ensure_editor_tables();
+    kronos_ensure_taxonomy_tables();
+
+    $db = KronosApp::getInstance()->db();
+    $post = $db->getRow('SELECT * FROM kronos_posts WHERE id = ? LIMIT 1', [$postId]);
+    if (!$post) {
+        return;
+    }
+
+    $terms = $db->getResults(
+        'SELECT t.id, t.slug, t.taxonomy
+         FROM kronos_terms t
+         INNER JOIN kronos_term_relationships tr ON tr.term_id = t.id
+         WHERE tr.post_id = ?
+         ORDER BY t.taxonomy ASC, t.slug ASC',
+        [$postId]
+    );
+
+    $db->insert('kronos_post_revisions', [
+        'post_id' => $postId,
+        'user_id' => $userId ?: null,
+        'title' => (string) ($post['title'] ?? ''),
+        'slug' => (string) ($post['slug'] ?? ''),
+        'content' => (string) ($post['content'] ?? ''),
+        'status' => (string) ($post['status'] ?? 'draft'),
+        'published_at' => $post['published_at'] ?: null,
+        'layout_id' => !empty($post['layout_id']) ? (int) $post['layout_id'] : null,
+        'meta' => $post['meta'] ?: null,
+        'terms_json' => json_encode($terms, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+        'created_at' => date('Y-m-d H:i:s'),
+    ]);
+}
+
+function kronos_promote_due_scheduled_posts(): int
+{
+    $app = KronosApp::getInstance();
+    $result = (new \Kronos\Content\ScheduledPublisher($app->db(), $app->config()))->run();
+    return (int) $result['published'];
+}
+
+function kronos_hex_to_rgb_csv(string $hex, string $fallback = '79,70,229'): string
+{
+    $hex = ltrim(trim($hex), '#');
+    if (!preg_match('/^[a-f0-9]{6}$/i', $hex)) {
+        return $fallback;
+    }
+
+    return hexdec(substr($hex, 0, 2)) . ',' . hexdec(substr($hex, 2, 2)) . ',' . hexdec(substr($hex, 4, 2));
+}
+
+/**
+ * Create the default site pages as CMS records so they are visible in Pages and editable in Builder.
+ */
+function kronos_ensure_default_site_pages(): void
+{
+    static $done = false;
+    if ($done) {
+        return;
+    }
+
+    $app = KronosApp::getInstance();
+    $db = $app->db();
+    $themeLayoutDir = rtrim($app->rootDir(), '/\\') . '/themes/kronos-default/layouts';
+
+    $loadLayout = function(string $file, array $fallback) use ($themeLayoutDir): array {
+        $path = $themeLayoutDir . '/' . $file;
+        if (is_file($path)) {
+            $decoded = json_decode((string) file_get_contents($path), true);
+            if (is_array($decoded)) {
+                return $decoded['blocks'] ?? $decoded;
+            }
+        }
+        return $fallback;
+    };
+
+    $makeHero = function(string $title, string $subtitle, string $button = '', string $url = '#'): array {
+        return [[
+            'id' => 'hero-' . kronos_sanitize_slug($title),
+            'type' => 'hero-block',
+            'attrs' => [
+                'pretitle' => 'KronosCMS',
+                'title' => $title,
+                'subtitle' => $subtitle,
+                'btnLabel' => $button,
+                'btnUrl' => $url,
+                'imageLayout' => 'split-right',
+                'bg' => 'linear-gradient(135deg,#111827,#1d4ed8)',
+                'pad' => 72,
+                'minHeight' => 420,
+            ],
+            'children' => [],
+        ]];
+    };
+
+    $pages = [
+        'home' => [
+            'title' => 'Home',
+            'layout_name' => 'Homepage',
+            'layout' => $loadLayout('home.json', $makeHero('Welcome to KronosCMS', 'Build beautiful websites with a visual builder, CMS tools, and a clean admin experience.', 'Start editing', '/dashboard/pages')),
+            'content' => '',
+            'meta' => ['hide_title' => true, 'seeded_page' => true],
+        ],
+        'about' => [
+            'title' => 'About',
+            'layout_name' => 'About Page',
+            'layout' => $loadLayout('about.json', $makeHero('About KronosCMS', 'A lightweight CMS and builder made for clean publishing workflows.', 'Contact us', '/contact')),
+            'content' => '',
+            'meta' => ['seeded_page' => true],
+        ],
+        'services' => [
+            'title' => 'Services',
+            'layout_name' => 'Services Page',
+            'layout' => [
+                ...$makeHero('Services', 'Present your core services with flexible builder sections and reusable content blocks.', 'Get in touch', '/contact'),
+                [
+                    'id' => 'services-grid',
+                    'type' => 'container',
+                    'attrs' => ['style' => 'max-width:1100px;margin:48px auto;padding:0 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px'],
+                    'children' => [
+                        ['id' => 'service-a', 'type' => 'text', 'attrs' => ['text' => 'Website design, landing pages, and content structures built around your brand.'], 'children' => []],
+                        ['id' => 'service-b', 'type' => 'text', 'attrs' => ['text' => 'CMS setup, navigation, media organization, and publishing workflows.'], 'children' => []],
+                        ['id' => 'service-c', 'type' => 'text', 'attrs' => ['text' => 'Builder-powered sections that your team can edit without touching code.'], 'children' => []],
+                    ],
+                ],
+            ],
+            'content' => '',
+            'meta' => ['seeded_page' => true],
+        ],
+        'contact' => [
+            'title' => 'Contact',
+            'layout_name' => 'Contact Page',
+            'layout' => $makeHero('Contact', 'Use this page as the editable introduction to your contact form and business details.', 'Send a message', '/contact'),
+            'content' => "Email: hello@example.com\nPhone: +1 555 0100",
+            'meta' => ['seeded_page' => true],
+        ],
+    ];
+
+    foreach ($pages as $slug => $page) {
+        $existing = $db->getRow("SELECT id, layout_id FROM kronos_posts WHERE slug = ? AND post_type = 'page' LIMIT 1", [$slug]);
+        $layoutId = (int) ($existing['layout_id'] ?? 0);
+        if ($layoutId <= 0) {
+            $layoutId = (int) $db->insert('kronos_builder_layouts', [
+                'layout_name' => (string) $page['layout_name'],
+                'layout_type' => 'page',
+                'json_data' => json_encode($page['layout'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            ]);
+        }
+
+        if ($existing) {
+            if (empty($existing['layout_id']) && $layoutId > 0) {
+                $db->update('kronos_posts', [
+                    'layout_id' => $layoutId,
+                    'updated_at' => date('Y-m-d H:i:s'),
+                ], ['id' => (int) $existing['id']]);
+            }
+            continue;
+        }
+
+        $db->insert('kronos_posts', [
+            'title' => (string) $page['title'],
+            'slug' => $slug,
+            'content' => (string) $page['content'],
+            'post_type' => 'page',
+            'status' => 'published',
+            'layout_id' => $layoutId ?: null,
+            'meta' => json_encode($page['meta'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+            'published_at' => date('Y-m-d H:i:s'),
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+    }
+
+    $done = true;
+}
+
+function kronos_get_public_page_by_slug(string $slug, bool $preview = false): ?array
+{
+    $slug = kronos_sanitize_slug($slug);
+    if ($slug === '') {
+        return null;
+    }
+
+    $statusClause = $preview
+        ? "p.status IN ('published','draft','scheduled','private','archived')"
+        : "(p.status = 'published' OR (p.status = 'scheduled' AND p.published_at IS NOT NULL AND p.published_at <= NOW()))";
+
+    return KronosApp::getInstance()->db()->getRow(
+        "SELECT p.*, l.json_data AS layout_json
+         FROM kronos_posts p
+         LEFT JOIN kronos_builder_layouts l ON l.id = p.layout_id
+         WHERE p.slug = ? AND p.post_type = 'page' AND {$statusClause}
+         LIMIT 1",
+        [$slug]
+    );
+}
+
+/**
+ * Return the public URL path for a post/page record.
+ *
+ * @param array<string, mixed> $post
+ */
+function kronos_public_content_path(array $post): string
+{
+    $slug = kronos_sanitize_slug((string) ($post['slug'] ?? ''));
+    if (($post['post_type'] ?? 'post') === 'page') {
+        return $slug === 'home' ? '/' : '/page/' . $slug;
+    }
+    return '/post/' . $slug;
+}
+
+function kronos_render_cms_page_by_slug(string $slug, bool $asHome = false, ?bool $preview = null): bool
+{
+    kronos_ensure_default_site_pages();
+    $post = kronos_get_public_page_by_slug($slug, $preview ?? isset($_GET['preview']));
+    if (!$post) {
+        return false;
+    }
+
+    $engine = new \Kronos\Builder\RenderEngine();
+    $html = $engine->render((string) ($post['layout_json'] ?? '[]'));
+
+    if ($asHome) {
+        $app = KronosApp::getInstance();
+        $theme = $app->themeManager()->getActiveTheme();
+        $themeSlug = $app->themeManager()->getActiveSlug();
+        $baseRel = $theme['templates']['base'] ?? 'templates/base.php';
+        $baseTpl = $app->rootDir() . '/themes/' . $themeSlug . '/' . $baseRel;
+        if (!is_file($baseTpl)) {
+            return false;
+        }
+        $content = $html;
+        $title = kronos_option('app_name', 'KronosCMS');
+        $bodyClass = 'home';
+        require $baseTpl;
+        return true;
+    }
+
+    $theme = apply_filters('kronos/theme/template', null, $post);
+    if ($theme !== null && is_callable($theme)) {
+        call_user_func($theme, $post, $html);
+        return true;
+    }
+
+    return false;
 }
 
 /**
@@ -389,17 +684,23 @@ function kronos_role_label(string $role): string
 
 function kronos_csrf_token(): string
 {
+    static $issuedToken = null;
+    if ($issuedToken !== null) {
+        return $issuedToken;
+    }
+
     if (empty($_COOKIE['kronos_csrf'])) {
-        $token = bin2hex(random_bytes(24));
-        setcookie('kronos_csrf', $token, [
+        $issuedToken = bin2hex(random_bytes(24));
+        setcookie('kronos_csrf', $issuedToken, [
             'httponly' => false, // must be readable by JS for fetch headers
             'samesite' => 'Strict',
             'secure'   => isset($_SERVER['HTTPS']),
             'path'     => '/',
         ]);
-        return $token;
+        return $issuedToken;
     }
-    return $_COOKIE['kronos_csrf'];
+    $issuedToken = (string) $_COOKIE['kronos_csrf'];
+    return $issuedToken;
 }
 
 function kronos_verify_csrf(): void

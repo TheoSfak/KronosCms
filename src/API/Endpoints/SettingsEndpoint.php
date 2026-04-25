@@ -44,6 +44,9 @@ class SettingsEndpoint
         'footer_layout',
         'body_font',
         'heading_font',
+        'brand_primary_color',
+        'brand_accent_color',
+        'site_background_color',
     ];
 
     public function __construct(KronosAPIRouter $api)
@@ -101,6 +104,12 @@ class SettingsEndpoint
                 $value = rtrim((string) $value, '/');
                 if ($value !== '' && !filter_var($value, FILTER_VALIDATE_URL)) {
                     kronos_abort(422, 'app_url must be a valid URL.');
+                }
+            }
+            if (in_array($key, ['brand_primary_color', 'brand_accent_color', 'site_background_color'], true)) {
+                $value = trim((string) $value);
+                if ($value !== '' && !preg_match('/^#[a-f0-9]{6}$/i', $value)) {
+                    kronos_abort(422, $key . ' must be a hex color like #4f46e5.');
                 }
             }
 

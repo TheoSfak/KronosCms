@@ -2,10 +2,61 @@
 declare(strict_types=1);
 $pageTitle = 'Marketplace';
 $dashDir   = dirname(__DIR__);
+$loadedModules = $app->moduleLoader()->getLoaded();
+$packageNames = [];
+foreach ((new \Kronos\Marketplace\HubClient($app->config()))->fetchDirectory() as $package) {
+    $slug = (string) ($package['slug'] ?? '');
+    if ($slug !== '') {
+        $packageNames[$slug] = (string) ($package['name'] ?? $slug);
+    }
+}
+$installedModules = [];
+$modulesDir = rtrim($app->rootDir(), '/\\') . '/modules';
+foreach (glob($modulesDir . '/*', GLOB_ONLYDIR) ?: [] as $moduleDir) {
+    $slug = basename($moduleDir);
+    $entryFile = $moduleDir . '/' . $slug . '.php';
+    $loaded = isset($loadedModules[$slug]);
+    $installedModules[] = [
+        'slug' => $slug,
+        'name' => $packageNames[$slug] ?? ($loaded ? $loadedModules[$slug]->getName() : $slug),
+        'entry_ok' => is_file($entryFile),
+        'loaded' => $loaded,
+    ];
+}
+usort($installedModules, fn(array $a, array $b): int => (int) $b['loaded'] <=> (int) $a['loaded'] ?: $a['slug'] <=> $b['slug']);
 require $dashDir . '/partials/layout-header.php';
 ?>
 
 <div id="marketplace-wrapper">
+  <div class="card mb-4">
+    <div class="card-header">
+      <div>
+        <h3>Installed Plugins</h3>
+        <p class="text-muted">Local modules discovered from the <code>modules</code> folder.</p>
+      </div>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Plugin</th>
+          <th>Folder</th>
+          <th>Entry File</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php foreach ($installedModules as $module): ?>
+        <tr>
+          <td><strong><?= kronos_e($module['name']) ?></strong></td>
+          <td><code><?= kronos_e($module['slug']) ?></code></td>
+          <td><span class="badge <?= $module['entry_ok'] ? 'badge-success' : 'badge-danger' ?>"><?= $module['entry_ok'] ? 'Found' : 'Missing' ?></span></td>
+          <td><span class="badge <?= $module['loaded'] ? 'badge-success' : 'badge-draft' ?>"><?= $module['loaded'] ? 'Loaded' : 'Not loaded' ?></span></td>
+        </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+  </div>
+
   <div class="toolbar">
     <button class="btn btn-secondary" id="refresh-marketplace">🔄 Refresh Directory</button>
     <span class="text-muted">Compatibility checked against KronosCMS v<?= kronos_e(\Kronos\Core\KronosVersion::VERSION) ?>.</span>
@@ -26,7 +77,7 @@ require $dashDir . '/partials/layout-header.php';
       .replace(/'/g, '&#39;');
   }
 
-  async function loadDirectory() {
+  async function loadDirectory(refresh = false) {
     const grid = document.getElementById('marketplace-grid');
     const coreVersion = <?= json_encode(\Kronos\Core\KronosVersion::VERSION) ?>;
     function versionCompare(a, b) {
@@ -51,7 +102,7 @@ require $dashDir . '/partials/layout-header.php';
     }
     grid.innerHTML = '<p class="text-muted">Loading…</p>';
     try {
-      const res = await window.KronosDash.api('/marketplace/directory', 'GET');
+      const res = await window.KronosDash.api('/marketplace/directory' + (refresh ? '?refresh=1' : ''), 'GET');
       if (!res) throw new Error('No response from server — check PHP error logs.');
       const packages = res.data || [];
       if (!packages.length) {
@@ -60,6 +111,10 @@ require $dashDir . '/partials/layout-header.php';
       }
       grid.innerHTML = packages.map(pkg => {
         const compat = compatibility(pkg);
+        const status = pkg.install_status || (pkg.installed ? 'installed' : 'available');
+        const installedLabel = status === 'active' ? 'Active' : (status === 'installed' ? 'Installed' : 'Not installed');
+        const canInstall = !pkg.installed && pkg.download_url;
+        const entryWarning = pkg.installed && pkg.entry_file_ok === false ? '<span class="badge badge-danger">Missing entry</span>' : '';
         return `
         <div class="marketplace-card">
           <div class="mp-icon">${esc(pkg.icon || '📦')}</div>
@@ -69,8 +124,10 @@ require $dashDir . '/partials/layout-header.php';
             <span class="badge ${pkg.requires_license ? 'badge-premium' : 'badge-free'}">${pkg.requires_license ? '👑 Premium' : '✅ Free'}</span>
             <span class="badge">${esc(pkg.type || 'module')}</span>
             <span class="badge ${compat.ok ? 'badge-success' : 'badge-draft'}">${esc(compat.label)}</span>
+            <span class="badge ${status === 'active' ? 'badge-success' : (pkg.installed ? 'badge-draft' : '')}">${esc(installedLabel)}</span>
+            ${entryWarning}
           </div>
-          ${pkg.download_url ? `<button class="btn btn-primary mp-install-btn"
+          ${canInstall ? `<button class="btn btn-primary mp-install-btn"
             data-slug="${esc(pkg.slug)}"
             data-url="${esc(pkg.download_url)}"
             data-type="${esc(pkg.type || 'module')}"
@@ -78,7 +135,7 @@ require $dashDir . '/partials/layout-header.php';
             data-license-tier="${esc(pkg.license_tier || 'free')}"
             data-compatible="${compat.ok ? '1' : '0'}">
             Install
-          </button>` : '<button class="btn btn-secondary" disabled>Unavailable</button>'}
+          </button>` : `<button class="btn btn-secondary" disabled>${esc(pkg.installed ? installedLabel : 'Unavailable')}</button>`}
         </div>
       `;
       }).join('');
@@ -102,6 +159,7 @@ require $dashDir . '/partials/layout-header.php';
             if (res && res.success) {
               this.textContent = 'Installed';
               this.classList.replace('btn-primary', 'btn-success');
+              loadDirectory(true);
             } else {
               throw new Error((res && res.message) || 'Install failed.');
             }
@@ -117,8 +175,8 @@ require $dashDir . '/partials/layout-header.php';
     }
   }
 
-  loadDirectory();
-  document.getElementById('refresh-marketplace').addEventListener('click', loadDirectory);
+  loadDirectory(true);
+  document.getElementById('refresh-marketplace').addEventListener('click', () => loadDirectory(true));
 })();
 </script>
 

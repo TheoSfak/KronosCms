@@ -14,7 +14,9 @@ class TextWidget extends WidgetBase
         // Allow limited inline HTML (nl2br for plain text, else output as-is)
         $text = (string) $this->attr($attrs, 'text', '');
         $html = nl2br($this->e($text));
-        return "<p>{$html}</p>\n";
+        $style = preg_replace('/[<>"\']/', '', (string) $this->attr($attrs, 'style', '')) ?? '';
+        $styleAttr = $style !== '' ? " style=\"{$style}\"" : '';
+        return "<p{$styleAttr}>{$html}</p>\n";
     }
 
     public function getControls(): array

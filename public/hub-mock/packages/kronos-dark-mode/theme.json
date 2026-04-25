@@ -1,0 +1,17 @@
+{
+  "name": "Kronos Dark Mode",
+  "slug": "kronos-dark-mode",
+  "version": "1.0.0",
+  "author": "TheoSfak",
+  "description": "Local development dark theme package for KronosCMS.",
+  "mode": "both",
+  "templates": {
+    "base": "templates/base.php",
+    "page": "templates/page.php",
+    "single": "templates/page.php"
+  },
+  "assets": {
+    "css": "assets/theme.css"
+  },
+  "supports": ["builder"]
+}

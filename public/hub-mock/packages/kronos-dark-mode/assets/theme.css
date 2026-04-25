@@ -1,0 +1,14 @@
+body {
+  margin: 0;
+  background: #0f172a;
+  color: #e5e7eb;
+  font-family: Inter, Arial, sans-serif;
+}
+
+a {
+  color: #93c5fd;
+}
+
+.dark-theme-page {
+  min-height: 100vh;
+}

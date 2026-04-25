@@ -55,6 +55,16 @@ class PackageInstaller
             ? $this->rootDir . '/themes/' . $slug
             : $this->rootDir . '/modules/' . $slug;
 
+        $localSource = $this->resolveLocalPackageSource($downloadUrl);
+        if ($localSource !== null) {
+            try {
+                $this->copyPackage($localSource, $destBase);
+                return ['success' => true, 'message' => "Package '{$slug}' installed successfully."];
+            } catch (\Throwable $e) {
+                return ['success' => false, 'message' => 'Install failed: ' . $e->getMessage()];
+            }
+        }
+
         $tmpDir     = $this->rootDir . '/storage/cache/pkg-tmp/' . $slug . '_' . bin2hex(random_bytes(4));
         $zipPath    = $tmpDir . '/package.zip';
 
@@ -80,6 +90,9 @@ class PackageInstaller
         $hubHost = parse_url((string) ($_ENV['HUB_API_URL'] ?? getenv('HUB_API_URL') ?: ''), PHP_URL_HOST) ?? '';
 
         $allowed = [
+            'localhost',
+            '127.0.0.1',
+            '::1',
             'github.com',
             'codeload.github.com',
             'objects.githubusercontent.com',
@@ -91,6 +104,38 @@ class PackageInstaller
         }
 
         return in_array($host, $allowed, true);
+    }
+
+    private function resolveLocalPackageSource(string $url): ?string
+    {
+        $host = parse_url($url, PHP_URL_HOST) ?? '';
+        if (!in_array($host, ['localhost', '127.0.0.1', '::1'], true)) {
+            return null;
+        }
+
+        $path = parse_url($url, PHP_URL_PATH) ?? '';
+        $marker = '/hub-mock/packages/';
+        $pos = strpos($path, $marker);
+        if ($pos === false) {
+            return null;
+        }
+
+        $relative = trim(substr($path, $pos + strlen($marker)), '/');
+        if ($relative === '' || str_contains($relative, '..')) {
+            return null;
+        }
+
+        $candidate = $this->rootDir . '/public/hub-mock/packages/' . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $relative);
+        $realBase = realpath($this->rootDir . '/public/hub-mock/packages');
+        $realCandidate = realpath($candidate);
+
+        if ($realBase === false || $realCandidate === false || !is_dir($realCandidate)) {
+            return null;
+        }
+
+        return str_starts_with($realCandidate, $realBase . DIRECTORY_SEPARATOR) || $realCandidate === $realBase
+            ? $realCandidate
+            : null;
     }
 
     private function download(string $url, string $dest): void

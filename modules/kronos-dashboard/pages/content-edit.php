@@ -57,7 +57,77 @@ $savePostTerms = function(int $savedPostId, array $termIds) use ($db): void {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     kronos_verify_csrf(); // aborts with 403 JSON on CSRF mismatch
+    $action = (string) ($_POST['action'] ?? 'save_content');
 
+    if ($isEdit && $action === 'restore_revision') {
+        $revisionId = (int) ($_POST['revision_id'] ?? 0);
+        $revision = $revisionId > 0
+            ? $db->getRow('SELECT * FROM kronos_post_revisions WHERE id = ? AND post_id = ? LIMIT 1', [$revisionId, $postId])
+            : null;
+        if ($revision) {
+            $hasFullRevisionState = !empty($revision['slug']) && !empty($revision['status']);
+            $restoreSlug = $hasFullRevisionState
+                ? kronos_sanitize_slug((string) $revision['slug'])
+                : kronos_sanitize_slug((string) ($post['slug'] ?? ''));
+            $restoreStatus = $hasFullRevisionState && in_array(($revision['status'] ?? ''), ['published', 'draft', 'scheduled', 'private', 'archived'], true)
+                ? (string) $revision['status']
+                : (string) ($post['status'] ?? 'draft');
+            if ($restoreSlug !== '') {
+                $duplicate = $db->getRow(
+                    'SELECT id FROM kronos_posts WHERE slug = ? AND post_type = ? AND id <> ? LIMIT 1',
+                    [$restoreSlug, (string) $post['post_type'], $postId]
+                );
+                if ($duplicate) {
+                    $errors[] = 'Cannot restore revision because its slug is already used by another ' . ((string) $post['post_type'] === 'page' ? 'page.' : 'post.');
+                }
+            }
+
+            if (!$errors) {
+                kronos_create_post_revision($postId, (int) ($user['id'] ?? 0) ?: null);
+                $db->update('kronos_posts', [
+                    'title' => (string) $revision['title'],
+                    'slug' => $restoreSlug ?: (string) $post['slug'],
+                    'content' => (string) $revision['content'],
+                    'status' => $restoreStatus,
+                    'published_at' => $hasFullRevisionState ? ($revision['published_at'] ?: null) : ($post['published_at'] ?: null),
+                    'layout_id' => $hasFullRevisionState ? (!empty($revision['layout_id']) ? (int) $revision['layout_id'] : null) : (!empty($post['layout_id']) ? (int) $post['layout_id'] : null),
+                    'meta' => $revision['meta'] ?: null,
+                    'updated_at' => date('Y-m-d H:i:s'),
+                ], ['id' => $postId]);
+
+                if (array_key_exists('terms_json', $revision) && $revision['terms_json'] !== null) {
+                    $terms = json_decode((string) $revision['terms_json'], true);
+                    if (is_array($terms)) {
+                        $db->delete('kronos_term_relationships', ['post_id' => $postId]);
+                        $seenTerms = [];
+                        foreach ($terms as $termRef) {
+                            if (!is_array($termRef)) {
+                                continue;
+                            }
+                            $termId = !empty($termRef['id']) ? (int) $termRef['id'] : 0;
+                            if ($termId <= 0) {
+                                $term = $db->getRow(
+                                    'SELECT id FROM kronos_terms WHERE slug = ? AND taxonomy = ? LIMIT 1',
+                                    [kronos_sanitize_slug((string) ($termRef['slug'] ?? '')), (string) ($termRef['taxonomy'] ?? 'category')]
+                                );
+                                $termId = (int) ($term['id'] ?? 0);
+                            }
+                            if ($termId > 0 && !isset($seenTerms[$termId])) {
+                                $db->insert('kronos_term_relationships', ['post_id' => $postId, 'term_id' => $termId]);
+                                $seenTerms[$termId] = true;
+                            }
+                        }
+                    }
+                }
+                kronos_redirect('/dashboard/content/' . $postId . '?revision_restored=1');
+            }
+        }
+        if (!$revision) {
+            $errors[] = 'Revision not found.';
+        }
+    }
+
+    if ($action !== 'restore_revision') {
     $title    = trim($_POST['title'] ?? '');
     $slug     = kronos_sanitize_slug($_POST['slug'] ?? $title);
     $postType = in_array($_POST['post_type'] ?? '', ['post', 'page'], true) ? $_POST['post_type'] : $defaultType;
@@ -78,6 +148,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if ($slug === '') {
         $errors[] = 'Slug is required.';
+    }
+    if ($slug !== '') {
+        $duplicate = $db->getRow(
+            'SELECT id FROM kronos_posts WHERE slug = ? AND post_type = ? AND id <> ? LIMIT 1',
+            [$slug, $postType, $isEdit ? $postId : 0]
+        );
+        if ($duplicate) {
+            $errors[] = 'Slug is already used by another ' . ($postType === 'page' ? 'page.' : 'post.');
+        }
     }
 
     if (empty($errors)) {
@@ -108,17 +187,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($isEdit) {
             if (
                 (string) ($post['title'] ?? '') !== $data['title']
+                || (string) ($post['slug'] ?? '') !== $data['slug']
                 || (string) ($post['content'] ?? '') !== $data['content']
+                || (string) ($post['status'] ?? '') !== $data['status']
+                || (string) ($post['published_at'] ?? '') !== (string) ($data['published_at'] ?? '')
+                || (string) ($post['layout_id'] ?? '') !== (string) ($data['layout_id'] ?? '')
                 || (string) ($post['meta'] ?? '') !== (string) ($data['meta'] ?? '')
             ) {
-                $db->insert('kronos_post_revisions', [
-                    'post_id' => $postId,
-                    'user_id' => (int) ($user['id'] ?? 0) ?: null,
-                    'title' => (string) ($post['title'] ?? ''),
-                    'content' => (string) ($post['content'] ?? ''),
-                    'meta' => $post['meta'] ?: null,
-                    'created_at' => date('Y-m-d H:i:s'),
-                ]);
+                kronos_create_post_revision($postId, (int) ($user['id'] ?? 0) ?: null);
             }
             $db->update('kronos_posts', $data, ['id' => $postId]);
             $savePostTerms($postId, $postType === 'post' ? ($_POST['term_ids'] ?? []) : []);
@@ -137,6 +213,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $errors[] = 'Failed to create post. Please try again.';
             }
         }
+    }
     }
 }
 
@@ -163,7 +240,7 @@ $typeLabel = $currentType === 'page' ? 'Page' : 'Post';
 $backUrl = $currentType === 'page' ? '/dashboard/pages' : '/dashboard/posts';
 $newActionUrl = $currentType === 'page' ? '/dashboard/pages/new' : '/dashboard/posts/new';
 $publicPath = $isEdit
-    ? (($currentType === 'page' ? '/page/' : '/post/') . (string) ($post['slug'] ?? ''))
+    ? kronos_public_content_path($post)
     : '';
 $publishedAtValue = !empty($post['published_at']) ? date('Y-m-d\TH:i', strtotime((string) $post['published_at'])) : '';
 $pageTitle = $isEdit ? 'Edit: ' . kronos_e($post['title']) : 'New ' . $typeLabel;
@@ -195,9 +272,13 @@ require __DIR__ . '/../partials/layout-header.php';
   <?php if (isset($_GET['created'])): ?>
   <div class="alert alert-success"><?= kronos_e($typeLabel) ?> created! You can now open the Builder to design its layout.</div>
   <?php endif; ?>
+  <?php if (isset($_GET['revision_restored'])): ?>
+  <div class="alert alert-success">Revision restored. The previous current version was kept as a new revision.</div>
+  <?php endif; ?>
 
   <form method="POST" action="<?= $isEdit ? kronos_url("/dashboard/content/{$postId}") : kronos_url($newActionUrl) ?>">
     <input type="hidden" name="_kronos_csrf" value="<?= kronos_csrf_token() ?>">
+    <input type="hidden" name="action" value="save_content">
 
     <div style="display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start;">
 
@@ -363,6 +444,11 @@ require __DIR__ . '/../partials/layout-header.php';
                   <div class="revision-item">
                     <strong><?= kronos_e(date('M j, Y H:i', strtotime((string) $revision['created_at']))) ?></strong>
                     <small><?= kronos_e($revision['display_name'] ?: 'System') ?></small>
+                    <?php $revisionTitle = (string) $revision['title']; ?>
+                    <p class="text-muted text-sm"><?= kronos_e(strlen($revisionTitle) > 64 ? substr($revisionTitle, 0, 61) . '...' : $revisionTitle) ?></p>
+                    <div class="revision-actions">
+                      <button type="button" class="btn btn-secondary btn-sm" data-restore-revision="<?= (int) $revision['id'] ?>">Restore</button>
+                    </div>
                   </div>
                 <?php endforeach; ?>
               </div>
@@ -464,6 +550,28 @@ require __DIR__ . '/../partials/layout-header.php';
       content.value = before + prefix + snippet + '\n' + after;
       content.focus();
       saveLocal();
+    });
+  });
+
+  document.querySelectorAll('[data-restore-revision]').forEach(function(button){
+    button.addEventListener('click', function(){
+      if (!confirm('Restore this revision? The current version will be saved as a new revision first.')) return;
+      var restoreForm = document.createElement('form');
+      restoreForm.method = 'POST';
+      restoreForm.action = <?= json_encode(kronos_url('/dashboard/content/' . (int) $postId)) ?>;
+      [
+        ['_kronos_csrf', <?= json_encode(kronos_csrf_token()) ?>],
+        ['action', 'restore_revision'],
+        ['revision_id', button.dataset.restoreRevision]
+      ].forEach(function(pair){
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = pair[0];
+        input.value = pair[1];
+        restoreForm.appendChild(input);
+      });
+      document.body.appendChild(restoreForm);
+      restoreForm.submit();
     });
   });
 })();

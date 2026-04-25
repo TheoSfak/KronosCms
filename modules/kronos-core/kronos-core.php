@@ -32,6 +32,10 @@ class KronosCoreModule extends KronosModule
 
         // Front-page route — serve active theme home template
         $router->get('/', function (array $params) use ($app): void {
+            if (kronos_render_cms_page_by_slug('home', true)) {
+                return;
+            }
+
             $themeManager = $app->themeManager();
             $theme        = $themeManager->getActiveTheme();
             $slug         = $themeManager->getActiveSlug();

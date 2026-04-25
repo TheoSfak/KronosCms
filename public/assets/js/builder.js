@@ -36,7 +36,8 @@
   reg('heading', {
     label: 'Heading', icon: 'H',
     render: a => {
-      const tag = a.tag || 'h2';
+      const legacyLevel = parseInt(a.level);
+      const tag = a.tag || (legacyLevel >= 1 && legacyLevel <= 6 ? `h${legacyLevel}` : 'h2');
       const st  = buildInlineStyle(a);
       return `<${tag} style="margin:0;${st}">${escHtml(a.text || 'Your Heading')}</${tag}>`;
     },
@@ -68,8 +69,10 @@
       const size   = a.size      || 'md';
       const full   = a.fullWidth === 'true' ? 'display:block;width:100%;text-align:center;' : 'display:inline-block;';
       const sizeMap = { sm: 'padding:6px 14px;font-size:.8rem;', md: 'padding:10px 22px;font-size:.9rem;', lg: 'padding:13px 30px;font-size:1rem;' };
+      const label = a.label || a.text || 'Click Me';
+      const extraStyle = a.style ? sanitizeInlineStyle(a.style) : '';
       return `<div style="text-align:${a._align||'left'}">
-        <a href="${escHtml(a.url||'#')}" style="${full}${sizeMap[size]||sizeMap.md}background:${escHtml(bg)};color:${escHtml(tColor)};border-radius:8px;text-decoration:none;font-weight:600;letter-spacing:.01em">${escHtml(a.label||'Click Me')}</a>
+        <a href="${escHtml(a.url||'#')}" style="${full}${sizeMap[size]||sizeMap.md}background:${escHtml(bg)};color:${escHtml(tColor)};border-radius:8px;text-decoration:none;font-weight:600;letter-spacing:0;${extraStyle}">${escHtml(label)}</a>
       </div>`;
     },
     getControls: () => [
@@ -208,13 +211,16 @@
   // ── Container ────────────────────────────────────────
   reg('container', {
     label: 'Container', icon: '▤',
-    render: a => {
+    render: (a, block, childrenHtml) => {
       const bg   = a._bg     || 'transparent';
       const pad  = parseInt(a._pad) || 24;
       const br   = parseInt(a._radius) || 8;
       const maxw = a.maxw    || '';
-      return `<div style="background:${escHtml(bg)};padding:${pad}px;border-radius:${br}px;${maxw?`max-width:${escHtml(maxw)}px;margin:0 auto`:''};${a.border==='true'?'border:1px solid #e2e8f0':''}">
-        ${a.content || '<p style="color:#94a3b8;font-size:.82rem;text-align:center;margin:0">Container — add HTML content in the inspector</p>'}
+      const legacyStyle = a.style ? sanitizeInlineStyle(a.style) : '';
+      const className = a.className || a.class || '';
+      const content = childrenHtml || a.content || '<p style="color:#94a3b8;font-size:.82rem;text-align:center;margin:0">Container - add blocks inside or HTML content in the inspector</p>';
+      return `<div class="${escHtml(className)}" style="background:${escHtml(bg)};padding:${pad}px;border-radius:${br}px;${maxw?`max-width:${escHtml(maxw)}px;margin:0 auto`:''};${a.border==='true'?'border:1px solid #e2e8f0;':''}${legacyStyle}">
+        ${content}
       </div>`;
     },
     getControls: () => [
@@ -361,6 +367,7 @@
      ══════════════════════════════════════════════════════ */
   function buildInlineStyle(a) {
     let s = '';
+    if (a.style)       s += sanitizeInlineStyle(a.style);
     if (a._color)      s += `color:${a._color};`;
     if (a._bg)         s += `background:${a._bg};`;
     if (a._fontSize)   s += `font-size:${a._fontSize}px;`;
@@ -370,6 +377,10 @@
     if (a._radius)     s += `border-radius:${a._radius}px;`;
     if (a._opacity)    s += `opacity:${a._opacity/100};`;
     return s;
+  }
+
+  function sanitizeInlineStyle(style) {
+    return String(style || '').replace(/[<>"']/g, '');
   }
 
   function toEmbedUrl(url) {
@@ -543,7 +554,9 @@
     // Content
     const content = document.createElement('div');
     content.className = 'block-content';
-    content.innerHTML = widget ? widget.render(block.attrs||{}) : `<span style="color:#9ca3af;font-size:.8rem">[unknown: ${escHtml(block.type)}]</span>`;
+    const childPreview = renderChildPreview(block.children || []);
+    content.innerHTML = widget ? widget.render(block.attrs||{}, block, childPreview) : `<span style="color:#9ca3af;font-size:.8rem">[unknown: ${escHtml(block.type)}]</span>`;
+    attachNestedBlockHandlers(content, ast);
     if (block.attrs?._class) el.classList.add(...block.attrs._class.split(' ').filter(Boolean));
     if (block.attrs?._customCss) {
       const s = document.createElement('style');
@@ -579,6 +592,49 @@
     });
 
     canvas.appendChild(el);
+  }
+
+  function renderChildPreview(children) {
+    if (!Array.isArray(children) || !children.length) return '';
+    return `<div class="builder-child-preview">${children.map(renderPreviewNode).join('')}</div>`;
+  }
+
+  function renderPreviewNode(block) {
+    if (!block || typeof block !== 'object') return '';
+    const widget = Widgets[block.type] || null;
+    const childPreview = renderChildPreview(block.children || []);
+    const attrs = block.attrs || {};
+    const label = escHtml(widget?.label || block.type || 'Block');
+    const html = widget
+      ? widget.render(attrs, block, childPreview)
+      : `<span style="color:#9ca3af;font-size:.8rem">[unknown: ${escHtml(block.type)}]</span>`;
+    return `<div class="builder-nested-block" data-nested-block-id="${escHtml(block.id || '')}">
+      <div class="builder-nested-label">${label}</div>
+      <div class="builder-nested-content">${html}</div>
+    </div>`;
+  }
+
+  function attachNestedBlockHandlers(scope, ast) {
+    scope.querySelectorAll('[data-nested-block-id]').forEach(el => {
+      el.addEventListener('click', e => {
+        e.stopPropagation();
+        const block = findBlockById(ast, el.dataset.nestedBlockId);
+        if (!block) return;
+        document.querySelectorAll('.canvas-block, .builder-nested-block').forEach(b => b.classList.remove('selected'));
+        el.classList.add('selected');
+        renderInspector(block, ast);
+      });
+    });
+  }
+
+  function findBlockById(blocks, id) {
+    if (!Array.isArray(blocks) || !id) return null;
+    for (const block of blocks) {
+      if (block?.id === id) return block;
+      const found = findBlockById(block?.children || [], id);
+      if (found) return found;
+    }
+    return null;
   }
 
   function moveBlock(id, dir, ast) {
@@ -744,8 +800,15 @@
   function updateAttr(block, key, value, ast) {
     block.attrs[key] = value;
     const el     = document.querySelector(`[data-block-id="${block.id}"] .block-content`);
+    const nestedEl = document.querySelector(`[data-nested-block-id="${block.id}"] .builder-nested-content`);
     const widget = Widgets[block.type];
-    if (el && widget) el.innerHTML = widget.render(block.attrs);
+    if (el && widget) {
+      el.innerHTML = widget.render(block.attrs, block, renderChildPreview(block.children || []));
+      attachNestedBlockHandlers(el, ast);
+    } else if (nestedEl && widget) {
+      nestedEl.innerHTML = widget.render(block.attrs, block, renderChildPreview(block.children || []));
+      attachNestedBlockHandlers(nestedEl, ast);
+    }
     saveAst(ast);
   }
 

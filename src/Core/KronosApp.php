@@ -122,6 +122,11 @@ class KronosApp
         return $this->themeManager;
     }
 
+    public function moduleLoader(): KronosModuleLoader
+    {
+        return $this->moduleLoader;
+    }
+
     public function rootDir(): string
     {
         return $this->rootDir;

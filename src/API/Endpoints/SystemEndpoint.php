@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Kronos\API\Endpoints;
 
 use Kronos\API\KronosAPIRouter;
+use Kronos\Content\ScheduledPublisher;
 use Kronos\Core\KronosApp;
 use Kronos\Core\UpdateChecker;
 use Kronos\Core\SelfUpdater;
@@ -12,6 +13,7 @@ use Kronos\Core\SelfUpdater;
  * SystemEndpoint — App update check & apply.
  * Routes: GET  /api/kronos/v1/system/update/check
  *         POST /api/kronos/v1/system/update/apply
+ *         POST /api/kronos/v1/system/scheduled-publishing/run
  */
 class SystemEndpoint
 {
@@ -31,6 +33,8 @@ class SystemEndpoint
             $this->check();
         } elseif (str_ends_with($uri, '/apply') && $method === 'POST') {
             $this->apply();
+        } elseif (str_ends_with($uri, '/scheduled-publishing/run') && $method === 'POST') {
+            $this->runScheduledPublishing();
         } else {
             kronos_abort(404, 'Unknown system action.');
         }
@@ -65,5 +69,13 @@ class SystemEndpoint
             error_log('[KronosCMS SelfUpdater] ' . $e->getMessage());
             kronos_abort(500, 'Update failed: ' . $e->getMessage());
         }
+    }
+
+    private function runScheduledPublishing(): void
+    {
+        $app = KronosApp::getInstance();
+        $limit = isset($_POST['limit']) ? (int) $_POST['limit'] : 50;
+        $result = (new ScheduledPublisher($app->db(), $app->config()))->run($limit);
+        kronos_json(['success' => true] + $result);
     }
 }

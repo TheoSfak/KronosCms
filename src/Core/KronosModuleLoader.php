@@ -38,9 +38,17 @@ class KronosModuleLoader
             return;
         }
 
-        // Ensure kronos-core loads first
-        usort($dirs, function (string $a): int {
-            return str_contains($a, 'kronos-core') ? -1 : 1;
+        // Ensure kronos-core loads first, then keep the rest deterministic.
+        usort($dirs, function (string $a, string $b): int {
+            $aSlug = basename($a);
+            $bSlug = basename($b);
+            if ($aSlug === 'kronos-core') {
+                return -1;
+            }
+            if ($bSlug === 'kronos-core') {
+                return 1;
+            }
+            return $aSlug <=> $bSlug;
         });
 
         foreach ($dirs as $moduleDir) {

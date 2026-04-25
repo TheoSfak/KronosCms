@@ -3,6 +3,7 @@ declare(strict_types=1);
 $pageTitle = 'Settings';
 $dashDir   = dirname(__DIR__);
 $cfg        = $app->config();
+$db         = $app->db();
 $activeMode = kronos_mode();
 $appName    = $cfg->get('app_name', 'KronosCMS');
 $appUrl     = $cfg->get('app_url', '');
@@ -18,11 +19,21 @@ $allowedSettingsKeys = [
     'homepage_cta_title', 'homepage_cta_sub',
     'permalink_page_base', 'permalink_post_base',
     'site_logo_url', 'site_logo_alt', 'header_layout', 'footer_layout', 'body_font', 'heading_font',
+    'brand_primary_color', 'brand_accent_color', 'site_background_color',
 ];
 $allowedTabs = ['general', 'homepage', 'customizer', 'permalinks', 'design', 'mode', 'ai', 'payments', 'tools', 'update'];
 if (!in_array($tab, $allowedTabs, true)) {
     $tab = 'general';
 }
+
+kronos_ensure_editor_tables();
+kronos_ensure_default_site_pages();
+kronos_ensure_taxonomy_tables();
+kronos_ensure_media_table();
+kronos_ensure_menu_tables();
+
+$siteBundleService = new \Kronos\ImportExport\SiteBundleService($app, $allowedSettingsKeys);
+$pluginInventoryService = new \Kronos\Marketplace\PluginInventoryService($app);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'import_settings') {
     kronos_verify_csrf();
@@ -42,6 +53,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'impor
         $settingsNotice = $saved . ' setting(s) imported.';
     } catch (\Throwable $e) {
         $settingsError = 'Import failed: ' . $e->getMessage();
+    }
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'import_site_bundle') {
+    kronos_verify_csrf();
+    $rawJson = trim((string) ($_POST['site_bundle_json'] ?? ''));
+    try {
+        $decoded = json_decode($rawJson, true, 64, JSON_THROW_ON_ERROR);
+        if (!is_array($decoded)) {
+            throw new \RuntimeException('Expected a JSON object.');
+        }
+        $counts = $siteBundleService->import($decoded);
+        $settingsNotice = 'Imported bundle: '
+            . $counts['settings'] . ' settings, '
+            . $counts['taxonomies'] . ' taxonomies, '
+            . $counts['media'] . ' media records, '
+            . $counts['content'] . ' content records, '
+            . $counts['menus'] . ' menus.';
+    } catch (\Throwable $e) {
+        $settingsError = 'Bundle import failed: ' . $e->getMessage();
     }
 }
 
@@ -156,16 +185,18 @@ require $dashDir . '/partials/layout-header.php';
 
 <?php elseif ($tab === 'customizer'): ?>
   <h2 class="card-title">Theme Customizer</h2>
-  <form id="settings-customizer-form" class="settings-form">
-    <div class="form-group">
-      <label>Logo URL</label>
-      <input type="text" name="site_logo_url" value="<?= kronos_e(kronos_option('site_logo_url', '')) ?>" placeholder="<?= kronos_url('/uploads/logo.png') ?>">
-    </div>
-    <div class="form-group">
-      <label>Logo alt text</label>
-      <input type="text" name="site_logo_alt" value="<?= kronos_e(kronos_option('site_logo_alt', $appName)) ?>">
-    </div>
-    <div class="form-row">
+  <p class="text-muted">Live preview updates as you adjust logo, colors, typography, and header/footer layout.</p>
+  <div class="customizer-workbench">
+  <form id="settings-customizer-form" class="settings-form customizer-controls">
+      <div class="form-group">
+        <label>Logo URL</label>
+        <input type="text" name="site_logo_url" value="<?= kronos_e(kronos_option('site_logo_url', '')) ?>" placeholder="<?= kronos_url('/uploads/logo.png') ?>">
+      </div>
+      <div class="form-group">
+        <label>Logo alt text</label>
+        <input type="text" name="site_logo_alt" value="<?= kronos_e(kronos_option('site_logo_alt', $appName)) ?>">
+      </div>
+      <div class="form-row">
       <div class="form-group">
         <label>Header layout</label>
         <select name="header_layout">
@@ -201,8 +232,41 @@ require $dashDir . '/partials/layout-header.php';
         </select>
       </div>
     </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Primary color</label>
+        <input type="color" name="brand_primary_color" value="<?= kronos_e(kronos_option('brand_primary_color', '#4f46e5') ?: '#4f46e5') ?>">
+      </div>
+      <div class="form-group">
+        <label>Accent hover</label>
+        <input type="color" name="brand_accent_color" value="<?= kronos_e(kronos_option('brand_accent_color', '#4338ca') ?: '#4338ca') ?>">
+      </div>
+      <div class="form-group">
+        <label>Background</label>
+        <input type="color" name="site_background_color" value="<?= kronos_e(kronos_option('site_background_color', '#ffffff') ?: '#ffffff') ?>">
+      </div>
+    </div>
     <button type="submit" class="btn btn-primary">Save Customizer Settings</button>
   </form>
+  <section class="customizer-preview" id="customizer-preview"
+    data-app-name="<?= kronos_e($appName) ?>"
+    data-tagline="<?= kronos_e(kronos_option('tagline', 'Build beautiful websites without limits.')) ?>">
+    <div class="customizer-preview-header">
+      <strong class="customizer-preview-logo"><?= kronos_e($appName) ?></strong>
+      <nav><span>Home</span><span>About</span><span>Services</span></nav>
+      <button type="button">Admin</button>
+    </div>
+    <div class="customizer-preview-hero">
+      <p>Live preview</p>
+      <h3><?= kronos_e($appName) ?></h3>
+      <span><?= kronos_e(kronos_option('tagline', 'Build beautiful websites without limits.')) ?></span>
+    </div>
+    <div class="customizer-preview-footer">
+      <strong><?= kronos_e($appName) ?></strong>
+      <span><?= kronos_e(kronos_option('footer_layout', 'columns')) ?> footer</span>
+    </div>
+  </section>
+  </div>
 
 <?php elseif ($tab === 'permalinks'): ?>
   <h2 class="card-title">Permalink Settings</h2>
@@ -306,26 +370,32 @@ require $dashDir . '/partials/layout-header.php';
 
 <?php elseif ($tab === 'tools'): ?>
   <?php
-    $exportData = [];
-    foreach ($allowedSettingsKeys as $key) {
-        $exportData[$key] = kronos_option($key, '');
-    }
+    $exportData = $siteBundleService->export();
   ?>
   <h2 class="card-title">Import / Export</h2>
   <div class="tool-grid">
     <div>
-      <h3>Export Settings</h3>
-      <textarea rows="14" readonly><?= kronos_e(json_encode($exportData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) ?></textarea>
+      <h3>Export Site Bundle</h3>
+      <p class="text-muted">Includes settings, posts, pages, builder layout links, menus, media metadata, categories, and tags.</p>
+      <p class="text-muted">Bundle schema: <code>kronos-site-bundle-v1</code></p>
+      <textarea rows="18" readonly><?= kronos_e(json_encode($exportData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) ?></textarea>
     </div>
     <div>
-      <h3>Import Settings</h3>
+      <h3>Import Site Bundle</h3>
+      <form method="post" action="<?= kronos_url('/dashboard/settings?tab=tools') ?>">
+        <input type="hidden" name="_kronos_csrf" value="<?= kronos_csrf_token() ?>">
+        <input type="hidden" name="action" value="import_site_bundle">
+        <textarea name="site_bundle_json" rows="12" placeholder='{"schema":"kronos-site-bundle-v1",...}'></textarea>
+        <button type="submit" class="btn btn-primary">Import Posts, Pages, Menus, Media, Taxonomies</button>
+      </form>
+      <hr class="settings-divider">
+      <h3>Import Settings Only</h3>
       <form method="post" action="<?= kronos_url('/dashboard/settings?tab=tools') ?>">
         <input type="hidden" name="_kronos_csrf" value="<?= kronos_csrf_token() ?>">
         <input type="hidden" name="action" value="import_settings">
         <textarea name="settings_json" rows="10" placeholder='{"tagline":"My site"}'></textarea>
         <button type="submit" class="btn btn-secondary">Import Allowed Settings</button>
       </form>
-      <p class="text-muted mt-16">Posts, pages, menus, and media export will build on this foundation next.</p>
     </div>
   </div>
 
@@ -335,6 +405,25 @@ require $dashDir . '/partials/layout-header.php';
   <div id="update-status">
     <button class="btn btn-secondary" id="check-update-btn">🔍 Check for Updates</button>
   </div>
+  <?php
+    $installedInventory = $pluginInventoryService->all();
+  ?>
+  <h3 class="mt-24">Installed Plugin & Theme Inventory</h3>
+  <p class="text-muted">Rollback Note explains what folder to preserve before replacing a package.</p>
+  <table class="data-table">
+    <thead><tr><th>Name</th><th>Type</th><th>Status</th><th>Available Version</th><th>Rollback Note</th></tr></thead>
+    <tbody>
+      <?php foreach ($installedInventory as $item): ?>
+      <tr>
+        <td><strong><?= kronos_e($item['name']) ?></strong><br><code><?= kronos_e($item['slug']) ?></code></td>
+        <td><span class="badge"><?= kronos_e($item['type']) ?></span></td>
+        <td><span class="badge <?= $item['status'] === 'Active' ? 'badge-success' : 'badge-draft' ?>"><?= kronos_e($item['status']) ?></span></td>
+        <td><?= kronos_e($item['version']) ?></td>
+        <td><?= kronos_e($item['rollback']) ?></td>
+      </tr>
+      <?php endforeach; ?>
+    </tbody>
+  </table>
 <?php endif; ?>
 
 </div>
@@ -377,6 +466,29 @@ require $dashDir . '/partials/layout-header.php';
 
   const customizerForm = document.getElementById('settings-customizer-form');
   if (customizerForm) {
+    const preview = document.getElementById('customizer-preview');
+    const previewLogo = preview ? preview.querySelector('.customizer-preview-logo') : null;
+    const previewFooter = preview ? preview.querySelector('.customizer-preview-footer span') : null;
+    const applyCustomizerPreview = () => {
+      if (!preview) return;
+      const data = Object.fromEntries(new FormData(customizerForm));
+      preview.style.setProperty('--preview-primary', data.brand_primary_color || '#4f46e5');
+      preview.style.setProperty('--preview-accent', data.brand_accent_color || '#4338ca');
+      preview.style.setProperty('--preview-bg', data.site_background_color || '#ffffff');
+      preview.style.fontFamily = (data.body_font || 'Inter') + ', system-ui, sans-serif';
+      preview.className = 'customizer-preview header-' + (data.header_layout || 'default') + ' footer-' + (data.footer_layout || 'columns');
+      if (previewLogo) {
+        previewLogo.textContent = data.site_logo_alt || preview.dataset.appName || 'KronosCMS';
+      }
+      if (previewFooter) {
+        previewFooter.textContent = (data.footer_layout || 'columns') + ' footer';
+      }
+    };
+    customizerForm.querySelectorAll('input, select').forEach(input => {
+      input.addEventListener('input', applyCustomizerPreview);
+      input.addEventListener('change', applyCustomizerPreview);
+    });
+    applyCustomizerPreview();
     customizerForm.addEventListener('submit', async function(e) {
       e.preventDefault();
       const data = Object.fromEntries(new FormData(this));

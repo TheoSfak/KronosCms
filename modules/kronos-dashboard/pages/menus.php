@@ -6,6 +6,7 @@ $dashDir   = dirname(__DIR__);
 $db        = $app->db();
 
 kronos_ensure_menu_tables();
+kronos_ensure_default_site_pages();
 
 $notice = '';
 $errors = [];

@@ -11,12 +11,15 @@ class HeadingWidget extends WidgetBase
 
     public function render(array $attrs, string $innerHtml = ''): string
     {
-        $tag  = in_array($attrs['tag'] ?? 'h2', ['h1','h2','h3','h4','h5','h6'], true)
+        $legacyLevel = (int) ($attrs['level'] ?? 0);
+        $tag  = in_array($attrs['tag'] ?? '', ['h1','h2','h3','h4','h5','h6'], true)
                 ? $attrs['tag']
-                : 'h2';
+                : ($legacyLevel >= 1 && $legacyLevel <= 6 ? 'h' . $legacyLevel : 'h2');
         $text = $this->e($this->attr($attrs, 'text', 'Heading'));
+        $style = $this->sanitizeStyle((string) $this->attr($attrs, 'style', ''));
+        $styleAttr = $style !== '' ? " style=\"{$style}\"" : '';
 
-        return "<{$tag}>{$text}</{$tag}>\n";
+        return "<{$tag}{$styleAttr}>{$text}</{$tag}>\n";
     }
 
     public function getControls(): array
@@ -27,5 +30,10 @@ class HeadingWidget extends WidgetBase
              'options' => [['value'=>'h1','label'=>'H1'],['value'=>'h2','label'=>'H2'],
                            ['value'=>'h3','label'=>'H3'],['value'=>'h4','label'=>'H4']]],
         ];
+    }
+
+    private function sanitizeStyle(string $style): string
+    {
+        return preg_replace('/[<>"\']/', '', $style) ?? '';
     }
 }
